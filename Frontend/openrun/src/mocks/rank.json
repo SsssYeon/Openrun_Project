@@ -1,0 +1,21 @@
+
+  [
+    {
+      "id": 1,
+      "title": "레미제라블",
+      "rank": 1,
+      "posterUrl": "/mock/les.jpg"
+    },
+    {
+      "id": 2,
+      "title": "지킬앤하이드",
+      "rank": 2,
+      "posterUrl": "/mock/jekyll.jpg"
+    },
+    {
+        "id": 3,
+        "title": "랭보",
+        "rank": 3,
+        "posterUrl": "/mock/langbo.jpg"
+    }
+  ]
