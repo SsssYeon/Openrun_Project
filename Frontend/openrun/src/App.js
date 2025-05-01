@@ -18,11 +18,11 @@ import Main2 from "./pages/main2";
 function App() {
   return (
     <div className="App">
-      {/* <nav><Link to="/main2">Main2</Link> </nav> 
-      <nav><Link to="/main">Main</Link> </nav> */}
+      <nav><Link to="/main2">Main2</Link> </nav> 
+      <nav><Link to="/main">Main</Link> </nav>
       
       <Routes>
-        <Route path="/" element={<Main />} />
+        <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />}/>
         <Route path="/nav" element={<Nav />} />
         <Route path="/userjoin" element={<Userjoin />} />
