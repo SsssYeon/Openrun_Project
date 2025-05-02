@@ -10,6 +10,9 @@ import Findpwresult from "./pages/findpwresult";
 import Findidresult from "./pages/findidresult";
 import Main from "./pages/main";
 import Main2 from "./pages/main2";
+import Home from "./pages/home";
+
+
 // import Counter from"./pages/counter";
 // import Input from"./pages/input";
 // import Input2 from"./pages/input2";
@@ -18,11 +21,13 @@ import Main2 from "./pages/main2";
 function App() {
   return (
     <div className="App">
-      <nav><Link to="/main2">Main2</Link> </nav> 
-      <nav><Link to="/main">Main</Link> </nav>
+      {/* <nav><Link to="/main2">Main2</Link> </nav> 
+      <nav><Link to="/main">Main</Link> </nav> */}
       
+      
+
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />}/>
         <Route path="/nav" element={<Nav />} />
         <Route path="/userjoin" element={<Userjoin />} />

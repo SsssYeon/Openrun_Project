@@ -1,19 +1,21 @@
 /* src/components/Nav.css */
 
 .navbar {
+  position: fixed;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 14px 40px;
   background-color: #ffffff;
-  border-bottom: 1px solid #eaeaea;
-  position: sticky;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
+  height: 80px; 
 }
 
 .nav-logo {
-  height: 50px;
+  height: 30px;
   cursor: pointer;
 }
 

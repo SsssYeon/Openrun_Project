@@ -2,7 +2,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import "./nav.css"; 
-import logo from "../components/logo.png";
+import logo from "../components/logo3.png";
 
 const Nav = () => {
   return (
@@ -22,7 +22,7 @@ const Nav = () => {
           </div>
         </div>
         <NavLink to="/community" className="nav-item">커뮤니티</NavLink>
-        <NavLink to="/mypage" className="nav-item">마이페이지</NavLink> {/* 로그인 시 마이페이지로, 로그인하지 않은 상태일 시 로그인 페이지로 */}
+        <NavLink to="/login" className="nav-item">마이페이지</NavLink> {/* 로그인 시 마이페이지로, 로그인하지 않은 상태일 시 로그인 페이지로 */}
       </div>
     </nav>
   );
