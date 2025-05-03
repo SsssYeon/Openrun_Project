@@ -1,34 +1,97 @@
 .flex {
-    display: flex;
-    height: calc(100vh - 60px); /* 전체 화면 높이에서 Nav 높이 뺌 */
-    margin-top: 60px; /* Nav 아래로 내려오게 함 */
-    gap: 20px;
-    padding: 20px;
-    box-sizing: border-box;
-  }
+  display: flex;
+  height: calc(100vh - 60px); /* 전체 화면 높이에서 Nav 높이 뺌 */
+  margin-top: 60px; /* Nav 아래로 내려오게 함 */
+  gap: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+ 
+}
+
+/* 좌측 달력 */
+.calendar {
+  width: 400px;
+  height: 100%;
+  margin-left: 200px;
+  flex-shrink: 0;
+}
+
+/* 우측 티켓 카드 */
+.tickets {
+  width: 500px;
+  height: 100%;
+  overflow-y: visible;
+  margin-right: 200px;
+}
+
+.fc-prev-button,
+.fc-next-button {
+    background-color:#ffd049 !important;
+     border:none !important;
+}
+
+.fc-prev-button .fc-icon,
+.fc-next-button .fc-icon {
+  color: white !important;
+}
+
+.fc-daygrid-day-frame {
+  display: flex;
+  position: relative; /* 이벤트 absolute 위치 잡기 위함 */
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: center; /* 가로 중앙 정렬 */
+  align-items: center;
+  max-height:80px; 
+  box-sizing: border-box;
+  padding:0 !important;
+  margin:0 !important;
+ 
+}
+
+.fc-event {
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  background: none !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+
+/* 이벤트가 날짜 셀 전체를 채우도록 */
+.fc-daygrid-event-harness {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
   
-  /* 좌측 달력 */
-  .calendar {
-    width: 400px;
+}
+
+.fc-event img {
+    width: 100%;
     height: 100%;
-    margin-left: 200px;
-
-  }
-  
-  /* 우측 티켓 카드 */
-  .tickets {
-    width: 500px;
-    height: 100%;
-    overflow-y: auto;
-    margin-right: 200px;
+    object-fit: cover; /* 셀 크기 유지하며 꽉 채움 */
+    display: block;
+    
   }
 
-  .fc-daygrid-day-frame {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    min-height: 140px; /* 더 길쭉한 느낌 주기 */
-    box-sizing: border-box;
+  .fc-theme-standard .fc-scrollgrid {
+    border: 1px solid #ccc;  /* 원하는 색으로 변경 가능 */
+    border-radius: 8px;      /* 선택 사항: 모서리 둥글게 */
+    overflow: hidden;        /* 내부 콘텐츠 넘침 제거 */
   }
 
+/* 날짜 셀의 선 제거 */
+.fc-theme-standard td, 
+.fc-theme-standard th {
+  border: none !important;
+}
+
+.fc-day-today {
+    background-color: white !important;
+  }
   

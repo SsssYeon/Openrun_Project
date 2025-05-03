@@ -23,6 +23,24 @@ const Calendarrecords = () => {
     navigate(`/detail/${info.event.id}`);
   };
 
+  const renderEventContent = (eventInfo) => {
+    const { poster } = eventInfo.event.extendedProps;
+    return (
+      <img
+      src={poster}
+      alt="poster"
+    />
+    );
+  };
+
+  const handleEventDidMount = (info) => {
+    const dayCell = info.el.closest(".fc-daygrid-day");
+    const dateNumberEl = dayCell?.querySelector(".fc-daygrid-day-number");
+    if (dateNumberEl) {
+      dateNumberEl.style.display = "none";
+    }
+  };
+
   return (
     <div>
       <div>
@@ -35,15 +53,17 @@ const Calendarrecords = () => {
             plugins={[dayGridPlugin]}
             initialView="dayGridMonth"
             events={eventsData}
+            eventContent={renderEventContent} 
             dateClick={handleDateClick}
             eventClick={handleEventClick}
             height={700}
             contentHeight="auto"
             contentWidth="auto"
             dayMaxEventRows={false}
-            fixedWeekCount={false} // 주 수 고정 해제
+            fixedWeekCount={true} // 주 수 고정 해제
             showNonCurrentDates={false}
-            handleWindowResize={true}
+            handleWindowResize={false}
+            eventDidMount={handleEventDidMount}
             headerToolbar={{
               left: 'prev',
               center: 'title',
