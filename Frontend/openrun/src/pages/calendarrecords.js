@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import eventsData from "../mocks/events.js"; // 예시 JSON 데이터
 
 const Calendarrecords = () => {
-  const [selectedDateEvents, setSelectedDateEvents] = useState([]);
+  const [selectedDateEvents, setSelectedDateEvents] = useState(eventsData);
   const navigate = useNavigate();
 
   // 날짜 클릭 시 해당 날짜의 이벤트만 추출
@@ -25,12 +25,7 @@ const Calendarrecords = () => {
 
   const renderEventContent = (eventInfo) => {
     const { poster } = eventInfo.event.extendedProps;
-    return (
-      <img
-      src={poster}
-      alt="poster"
-    />
-    );
+    return <img src={poster} alt="poster" />;
   };
 
   const handleEventDidMount = (info) => {
@@ -53,7 +48,7 @@ const Calendarrecords = () => {
             plugins={[dayGridPlugin]}
             initialView="dayGridMonth"
             events={eventsData}
-            eventContent={renderEventContent} 
+            eventContent={renderEventContent}
             dateClick={handleDateClick}
             eventClick={handleEventClick}
             height={700}
@@ -65,36 +60,49 @@ const Calendarrecords = () => {
             handleWindowResize={false}
             eventDidMount={handleEventDidMount}
             headerToolbar={{
-              left: 'prev',
-              center: 'title',
-              right: 'next' // 'today' 제거됨
+              left: "prev",
+              center: "title",
+              right: "next", // 'today' 제거됨
             }}
           />
         </div>
 
         {/* 우측 상세 정보 요약 카드 */}
         <div className="tickets">
-          {selectedDateEvents.map((event) => (
-            <div
-              key={event.id}
-              className="border rounded-lg p-4 cursor-pointer hover:shadow-md"
-              onClick={() => navigate(`/detail/${event.id}`)}
-            >
-              <div className="flex">
-                <img
-                  src={event.poster}
-                  alt={event.title}
-                  className="w-24 h-32 object-cover mr-4"
-                />
-                <div>
-                  <h3 className="font-bold text-lg">{event.title}</h3>
-                  <p>날짜: {event.date}</p>
-                  <p>시간: {event.time}</p>
-                  <p>장소: {event.location}</p>
+          <div className="searchmytickets">
+            <input
+              type="text"
+              placeholder="배우, 공연명, 공연장을 검색하세요"
+            />
+          </div>
+
+          <div className="mytickets-scroll">
+            <div className="mytickets">
+              {selectedDateEvents.map((event) => (
+                <div
+                  key={event.id}
+                  className="ticket"
+                  onClick={() => navigate(`/detail/${event.id}`)}
+                >
+                  <div className="ticketscontent">
+                    <img
+                      src={event.poster}
+                      alt={event.title}
+                      className="ticketspicture"
+                    />
+                    <div>
+                      <h3 className="ticketsinfomations">{event.title}</h3>
+                      <p>날짜: {event.start}</p>
+                      <p>시간: {event.time}</p>
+                      <p>장소: {event.location}</p>
+                      <p>좌석: {event.seat}</p>
+                      <p>출연진: {event.cast}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>
