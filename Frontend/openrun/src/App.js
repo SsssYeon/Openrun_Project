@@ -1,5 +1,5 @@
 import React from "react";
-import {Routes, Route, Link} from "react-router-dom";
+import {Routes, Route} from "react-router-dom";
 
 import Login from"./pages/login";
 import Nav from"./components/nav";
@@ -11,6 +11,7 @@ import Findidresult from "./pages/findidresult";
 import Main from "./pages/main";
 import Main2 from "./pages/main2";
 import Home from "./pages/home";
+import Calendarrecords from "./pages/calendarrecords";
 
 
 // import Counter from"./pages/counter";
@@ -37,6 +38,7 @@ function App() {
         <Route path="/findidresult" element={<Findidresult />} />
         <Route path="/main" element={<Main />} />
         <Route path="/main2" element={<Main2 />} />
+        <Route path="/calendarrecords" element={<Calendarrecords />} />
       </Routes>
     </div>
    );

@@ -14,11 +14,11 @@ const Nav = () => {
       </div>
       <div className="nav-right">
         <div className="nav-item-dropdown">
-          <NavLink to="/calendar/records" className="nav-item">내 달력</NavLink>{/* 로그인 시 내 달력으로, 로그인하지 않은 상태일 시 로그인 페이지로 */}
+          <NavLink to="/calendarrecords" className="nav-item">내 달력</NavLink>{/* 로그인 시 내 달력으로, 로그인하지 않은 상태일 시 로그인 페이지로 */}
           <div className="dropdown-content">
-            <NavLink to="/calendar/records" className="dropdown-item">내 관극 기록</NavLink>
-            <NavLink to="/calendar/favorites" className="dropdown-item">관심 공연</NavLink>
-            <NavLink to="/calendar/statistics" className="dropdown-item">나의 통계</NavLink>
+            <NavLink to="/calendarrecords" className="dropdown-item">내 관극 기록</NavLink>
+            <NavLink to="/calendarfavorites" className="dropdown-item">관심 공연</NavLink>
+            <NavLink to="/calendarstatistics" className="dropdown-item">나의 통계</NavLink>
           </div>
         </div>
         <NavLink to="/community" className="nav-item">커뮤니티</NavLink>

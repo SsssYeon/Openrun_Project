@@ -14,7 +14,7 @@ const Home = () => (
       render={() => (
         <div>
           {/* 첫 번째 섹션 (Main 컴포넌트) */}
-          <div className="section">
+          <div className="section" >
             <Main />
           </div>
           

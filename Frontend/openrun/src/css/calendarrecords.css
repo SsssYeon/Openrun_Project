@@ -1,0 +1,34 @@
+.flex {
+    display: flex;
+    height: calc(100vh - 60px); /* 전체 화면 높이에서 Nav 높이 뺌 */
+    margin-top: 60px; /* Nav 아래로 내려오게 함 */
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  /* 좌측 달력 */
+  .calendar {
+    width: 400px;
+    height: 100%;
+    margin-left: 200px;
+
+  }
+  
+  /* 우측 티켓 카드 */
+  .tickets {
+    width: 500px;
+    height: 100%;
+    overflow-y: auto;
+    margin-right: 200px;
+  }
+
+  .fc-daygrid-day-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 140px; /* 더 길쭉한 느낌 주기 */
+    box-sizing: border-box;
+  }
+
+  
