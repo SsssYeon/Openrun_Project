@@ -1,31 +1,35 @@
 /* 전체 레이아웃 */
-.flex {
+.mypage-container {
     display: flex;
-    margin: 100px 200px;
+    margin: 100px 250px;
+    gap: 20px;
   }
   
   /* 왼쪽 메뉴 */
-  .left {
-    width: 300px;
-    
+  .mypage-left {
+    flex: 0 0 200px;
+    display: flex;
     border: 1px solid lightgrey;
     border-radius: 16px;
-    padding: 20px;
+    padding: 25px;
+    flex-direction: column;
+    justify-content: center; 
   }
   
   .menu-name {
     font-weight: bold;
-    margin-bottom: 10px;
+    
+    font-size: 18px;
   }
   
   .menu-item {
     list-style: none;
     padding-left: 0;
-    margin-bottom: 20px;
+
   }
   
   .menu-item li {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
   
   .menu-item li a {
@@ -34,30 +38,48 @@
   }
   
   .menu-item li a:hover {
-    color: #ff7e00; /* 강조 색상 */
+    text-decoration: underline;
+  text-decoration-color: #ffd049;
   }
   
+  .mypage-right {
+    min-width: 700px;
+    
+  }
   /* 오른쪽 상단 인사말 */
-  .right-top {
-    width: 700px;
+  .mypage-right-top {
     border: 1px solid lightgrey;
     border-radius: 16px;
     padding: 30px;
+    
   }
   
+  .hello,
+.right-middle,
+.user-title {
+  text-align: center;
+  width: 100%; /* 가운데 정렬 유지 */
+}
+
   .hello {
+
     font-size: 20px;
     font-weight: 600;
     margin-bottom: 30px;
   }
   
-  .hello .text-orange-500 {
-    color: #ff7e00;
+  .hello .hello-name {
+    color: #ffd049;
+    text-decoration: underline;
+  text-decoration-color: #ffd049;
   }
   
   /* 관심 공연 */
-  .right-middle {
+  .mypage-right-middle {
     margin-bottom: 40px;
+    border: 1px solid lightgrey;
+    border-radius: 16px;
+    
   }
   
   .user-title {
@@ -69,6 +91,7 @@
   .user-favorite {
     display: flex;
     gap: 20px;
+    justify-content: center;
   }
   
   .user-favorite-content {
@@ -88,6 +111,12 @@
   }
   
   /* 나의 글 */
+  .mypage-right-bottom{
+    border: 1px solid lightgrey;
+    border-radius: 16px;
+    padding: 0 30px;
+  }
+
   .user-community {
     display: flex;
     flex-direction: column;

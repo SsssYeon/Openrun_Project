@@ -44,8 +44,7 @@ body {
   background-color: white;
   padding: 16px;
   flex-direction: column;
-  border: 1px solid lightgrey;
-  border-radius : 8px;
+  
 }
 
 .banner {
