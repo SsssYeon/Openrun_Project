@@ -13,6 +13,7 @@ import Main2 from "./pages/main2";
 import Home from "./pages/home";
 import Calendarrecords from "./pages/calendarrecords";
 import Eventdetail from "./pages/eventdetail";
+import Mypage from "./pages/mypage";
 
 // import Counter from"./pages/counter";
 // import Input from"./pages/input";
@@ -39,6 +40,7 @@ function App() {
           <Route path="/main2" element={<Main2 />} />
           <Route path="/calendarrecords" element={<Calendarrecords />} />
           <Route path="/detail/:id" element={<Eventdetail />} />
+          <Route path="/mypage" element={<Mypage />} />
         </Routes>
       
     </div>

@@ -7,13 +7,14 @@ body {
 
 .layout {
   display: grid;
-  grid-template-columns: 300px 600px;
-  grid-template-rows: 250px 200px 100px;
+  grid-template-columns: 400px 600px;
+  grid-template-rows: 300px 200px 100px;
   height: 90%;
-  padding: 0px 250px; /* 바깥쪽 여백 */
+  padding: 0px 200px; /* 바깥쪽 여백 */
   gap: 10px;
   box-sizing: border-box;
   flex-direction: column;
+  
 }
 
 #title {
@@ -26,7 +27,7 @@ body {
 .left {
   grid-row: 1 / 3; /* 위아래 두 행 모두 차지 */
   background-color: white;
- 
+  min-width: 400px;
   display: flex;
   flex-direction: column;
   
@@ -36,21 +37,22 @@ body {
   background-color: white;
   padding: 16px;
   flex-direction: column;
+  max-width: 600px;
 }
 
 .right-bottom {
   background-color: white;
   padding: 16px;
   flex-direction: column;
-  
-  
+  border: 1px solid lightgrey;
+  border-radius : 8px;
 }
 
 .banner {
   grid-column: 1 / 3; /* 왼쪽+오른쪽 전체 너비 차지 */
   background-color: #f0f0f0;
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 10px;
   text-align: center;
 }
 
@@ -98,12 +100,13 @@ body {
 .ranking-item {
   display: flex;
   align-items: center;
+  margin-left: 5px;
   border: 2px solid #ddd;
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 28px;
   height: 85px;
-  width: 300px;
+  width: 350px;
 }
 
 .rank-num {

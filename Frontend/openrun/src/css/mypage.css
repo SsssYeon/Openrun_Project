@@ -1,0 +1,120 @@
+/* 전체 레이아웃 */
+.flex {
+    display: flex;
+    margin: 100px 200px;
+  }
+  
+  /* 왼쪽 메뉴 */
+  .left {
+    width: 300px;
+    
+    border: 1px solid lightgrey;
+    border-radius: 16px;
+    padding: 20px;
+  }
+  
+  .menu-name {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .menu-item {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 20px;
+  }
+  
+  .menu-item li {
+    margin-bottom: 8px;
+  }
+  
+  .menu-item li a {
+    text-decoration: none;
+    color: #333;
+  }
+  
+  .menu-item li a:hover {
+    color: #ff7e00; /* 강조 색상 */
+  }
+  
+  /* 오른쪽 상단 인사말 */
+  .right-top {
+    width: 700px;
+    border: 1px solid lightgrey;
+    border-radius: 16px;
+    padding: 30px;
+  }
+  
+  .hello {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 30px;
+  }
+  
+  .hello .text-orange-500 {
+    color: #ff7e00;
+  }
+  
+  /* 관심 공연 */
+  .right-middle {
+    margin-bottom: 40px;
+  }
+  
+  .user-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  
+  .user-favorite {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .user-favorite-content {
+    text-align: center;
+  }
+  
+  .user-favorite-poster {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+  
+  .user-favorite-title {
+    font-size: 14px;
+    margin-top: 8px;
+  }
+  
+  /* 나의 글 */
+  .user-community {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .user-community-content {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 10px 16px;
+    background-color: #fafafa;
+  }
+  
+  .user-community-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 70%;
+  }
+  
+  .user-community-date {
+    font-size: 12px;
+    color: #888;
+    align-self: center;
+  }
