@@ -36,6 +36,17 @@ const Calendarrecords = () => {
     }
   };
 
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredEvents = selectedDateEvents.filter((event) => {
+    const search = searchTerm.toLowerCase();
+    return (
+      event.title.toLowerCase().includes(search) ||
+      event.location.toLowerCase().includes(search) ||
+      event.cast.toLowerCase().includes(search)
+    );
+  });
+
   return (
     <div>
       <div>
@@ -73,34 +84,38 @@ const Calendarrecords = () => {
             <input
               type="text"
               placeholder="배우, 공연명, 공연장을 검색하세요"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
           <div className="mytickets-scroll">
             <div className="mytickets">
-              {selectedDateEvents.map((event) => (
-                <div
-                  key={event.id}
-                  className="ticket"
-                  onClick={() => navigate(`/detail/${event.id}`)}
-                >
-                  <div className="ticketscontent">
-                    <img
-                      src={event.poster}
-                      alt={event.title}
-                      className="ticketspicture"
-                    />
-                    <div>
-                      <h3 className="ticketsinfomations">{event.title}</h3>
-                      <p>날짜: {event.start}</p>
-                      <p>시간: {event.time}</p>
-                      <p>장소: {event.location}</p>
-                      <p>좌석: {event.seat}</p>
-                      <p>출연진: {event.cast}</p>
+              {(searchTerm ? filteredEvents : selectedDateEvents).map(
+                (event) => (
+                  <div
+                    key={event.id}
+                    className="ticket"
+                    onClick={() => navigate(`/detail/${event.id}`)}
+                  >
+                    <div className="ticketscontent">
+                      <img
+                        src={event.poster}
+                        alt={event.title}
+                        className="ticketspicture"
+                      />
+                      <div>
+                        <h3 className="ticketsinfomations">{event.title}</h3>
+                        <p>날짜: {event.start}</p>
+                        <p>시간: {event.time}</p>
+                        <p>장소: {event.location}</p>
+                        <p>좌석: {event.seat}</p>
+                        <p>출연진: {event.cast}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           </div>
         </div>

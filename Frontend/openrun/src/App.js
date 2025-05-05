@@ -1,8 +1,8 @@
 import React from "react";
-import {Routes, Route} from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
-import Login from"./pages/login";
-import Nav from"./components/nav";
+import Login from "./pages/login";
+import Nav from "./components/nav";
 import Userjoin from "./pages/userjoin";
 import Findid from "./pages/findid";
 import Findpw from "./pages/findpw";
@@ -12,7 +12,7 @@ import Main from "./pages/main";
 import Main2 from "./pages/main2";
 import Home from "./pages/home";
 import Calendarrecords from "./pages/calendarrecords";
-
+import Eventdetail from "./pages/eventdetail";
 
 // import Counter from"./pages/counter";
 // import Input from"./pages/input";
@@ -24,24 +24,25 @@ function App() {
     <div className="App">
       {/* <nav><Link to="/main2">Main2</Link> </nav> 
       <nav><Link to="/main">Main</Link> </nav> */}
-      
-      
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />}/>
-        <Route path="/nav" element={<Nav />} />
-        <Route path="/userjoin" element={<Userjoin />} />
-        <Route path="/findid" element={<Findid />} />
-        <Route path="/findpw" element={<Findpw />} />
-        <Route path="/findpwresult" element={<Findpwresult />} />
-        <Route path="/findidresult" element={<Findidresult />} />
-        <Route path="/main" element={<Main />} />
-        <Route path="/main2" element={<Main2 />} />
-        <Route path="/calendarrecords" element={<Calendarrecords />} />
-      </Routes>
+      
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/nav" element={<Nav />} />
+          <Route path="/userjoin" element={<Userjoin />} />
+          <Route path="/findid" element={<Findid />} />
+          <Route path="/findpw" element={<Findpw />} />
+          <Route path="/findpwresult" element={<Findpwresult />} />
+          <Route path="/findidresult" element={<Findidresult />} />
+          <Route path="/main" element={<Main />} />
+          <Route path="/main2" element={<Main2 />} />
+          <Route path="/calendarrecords" element={<Calendarrecords />} />
+          <Route path="/detail/:id" element={<Eventdetail />} />
+        </Routes>
+      
     </div>
-   );
+  );
 }
 //     <div className="App">
 //       <nav>
@@ -60,6 +61,5 @@ function App() {
 //         <Route path="/list" element={<List />} />
 //       </Routes>
 //     </div>
-
 
 export default App;
