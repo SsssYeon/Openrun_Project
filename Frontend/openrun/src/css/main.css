@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-
+  padding-top: 200px;
 }
 
 .logo {
@@ -35,7 +35,7 @@
   color: lightgray;
 }
 
-.dropdown {
+.main-dropdown {
   position: absolute;
   top: 110%;
   left: 0;
@@ -51,26 +51,32 @@
   margin-top: 5px;
 }
 
-.dropdown-item {
+.main-dropdown-item {
   padding: 10px;
   cursor: pointer;
   list-style: none;
 }
 
-.dropdown-item:hover {
+.main-dropdown-item:hover {
   background-color: #f0f0f0;
 }
 
 .no-result {
   color: #aaa;
   cursor: default;
+  padding: 10px;
 }
 
 .section {
   height: 100vh !important;
-  overflow: hidden;
+  overflow: visible !important;
   margin: 0;
   padding: 0;
   background: none !important;
+}
+
+.main-section {
+  overflow: visible !important;
+  
 }
 

@@ -47,12 +47,12 @@ const Main = () => {
           <button className="search-icon"> ▼</button>
 
           {showDropdown && query && (
-            <ul className="dropdown">
+            <ul className="main-dropdown">
               {filtered.length > 0 ? (
                 filtered.map((item, idx) => (
                   <li
                     key={idx}
-                    className="dropdown-item"
+                    className="main-dropdown-item"
                     onClick={() => {
                       setQuery(item);
                       setShowDropdown(false);
@@ -62,7 +62,7 @@ const Main = () => {
                   </li>
                 ))
               ) : (
-                <li className="dropdown-item no-result">검색 결과 없음</li>
+                <li className="no-result">검색 결과 없음</li>
               )}
             </ul>
           )}
