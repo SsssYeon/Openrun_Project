@@ -1,0 +1,44 @@
+.event-detail {
+    max-width: 900px;
+    margin: 100px auto;
+    padding: 20px;
+    flex-direction: row;
+    align-items:center;
+    gap: 50px;
+    display: flex;
+  }
+  
+  .poster {
+    width: 220px;
+    height: auto;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+
+  .event-info-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* content 위, review 아래 배치 */
+    flex: 1;
+    height: 100%;
+    gap: 10px;
+  }
+  
+  .title-center {
+    text-align: center;
+  }
+
+  .event-content{
+    border: 2px solid lightgrey;
+    padding: 10px 30px;
+    border-radius: 16px;     
+  }
+
+  .event-review{
+    border: 2px solid lightgrey;
+    padding: 10px 30px;
+    max-height: 250px;
+    border-radius: 16px;  
+    overflow-y: auto;
+  }
+  

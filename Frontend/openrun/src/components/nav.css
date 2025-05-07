@@ -1,0 +1,73 @@
+/* src/components/Nav.css */
+
+.navbar {
+  position: fixed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 40px;
+  background-color: #ffffff;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 80px; 
+}
+
+.nav-logo {
+  height: 30px;
+  cursor: pointer;
+}
+
+.nav-right {
+  display: flex;
+  gap: 24px;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.nav-item:hover {
+  text-decoration: underline;
+  text-decoration-color: #ffd049; /* 호버 색상 강조 */
+}
+
+.nav-item-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 130px;
+  background-color: white;
+  border: 1px solid #ccc;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  padding: 8px 0;
+}
+
+.dropdown-content .dropdown-item {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: #333;
+}
+
+.dropdown-content .dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* 마우스 오버 시 드롭다운 표시 */
+.nav-item-dropdown:hover .dropdown-content {
+  display: block;
+}
