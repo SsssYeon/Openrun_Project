@@ -120,6 +120,12 @@ const Calendarrecords = () => {
           </div>
         </div>
       </div>
+      <button
+  className="floating-add-button"
+  onClick={() => navigate("/addticket")} // 원하는 경로로 수정
+>
+<span className="plus-symbol">+</span>
+</button>
     </div>
   );
 };

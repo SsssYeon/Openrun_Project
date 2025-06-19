@@ -167,3 +167,34 @@
   margin: 2px 0;
   color: #333;
 }
+
+.floating-add-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background-color: #ffd049;
+  color: white;
+  font-size: 36px;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+  display: flex;              /* 중앙 정렬을 위해 flex 사용 */
+  align-items: center;        /* 수직 중앙 */
+  justify-content: center;    /* 수평 중앙 */
+}
+
+.plus-symbol {
+  font-size: 36px;
+  line-height: 1;
+  vertical-align: middle;
+  padding-bottom: 7px; /* 또는 3px 정도 */
+}
+
+.floating-add-button:hover {
+  box-shadow: 3px 4px 12px rgba(0, 0, 0, 0.2);
+}

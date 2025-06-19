@@ -1,8 +1,38 @@
 import React from "react";
 import Nav from "../components/nav";
 import { Link } from "react-router-dom";
+import { NavLink, navigate } from "react-router-dom";
 import userData from "../mocks/users";
 import "../css/mypage.css";
+
+// const handleLogout = () => {
+//     const confirmed = window.confirm("로그아웃 하시겠습니까?");
+//     if (confirmed) {
+//       // 실제 로그아웃 처리 로직 예: 토큰 삭제 등
+//       localStorage.removeItem("token"); // 예시
+//       navigate("/mypage"); // 로그아웃 처리 후 이동할 페이지
+//     }
+//   };
+
+//   const handleWithdraw = () => {
+//     const confirmed = window.confirm("회원 탈퇴 하시겠습니까?");
+//     if (confirmed) {
+//       // 실제 회원 탈퇴 API 호출 등의 로직
+//       fetch("/api/withdraw", {
+//         method: "DELETE",
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem("token")}`,
+//         },
+//       }).then((res) => {
+//         if (res.ok) {
+//           localStorage.clear(); // 사용자 정보 초기화
+//           navigate("/mypage"); // 탈퇴 완료 페이지 등으로 이동
+//         } else {
+//           alert("탈퇴 처리에 실패했습니다.");
+//         }
+//       });
+//     }
+//   };
 
 const MyPage = () => {
   const user = userData;
@@ -16,22 +46,28 @@ const MyPage = () => {
             <h2 className="menu-name">내 정보 설정</h2>
             <ul className="menu-item">
               <li>
-                <Link to="/mypage/account">계정 설정</Link>
+                <NavLink to="/account">계정 설정</NavLink>
               </li>
               <li>
-                <Link to="/mypage/posts">나의 글</Link>
+                <Link to="/myposts">나의 글</Link>
               </li>
               <li>
-                <Link to="/mypage/interest">관심 공연</Link>
+                <Link to="/favorites">관심 공연</Link>
               </li>
               <li>
-                <Link to="/mypage/password">비밀번호 변경</Link>
+                <Link to="/passwordchange">비밀번호 변경</Link>
               </li>
               <li>
-                <Link to="/logout">로그아웃</Link>
+                <Link to="/mypage">로그아웃</Link>
+                {/* <button onClick={handleLogout} className="text-button">
+                  로그아웃
+                </button> */}
               </li>
               <li>
-                <Link to="/withdraw">회원 탈퇴</Link>
+                <Link to="/mypage">회원탈퇴</Link>
+                {/* <button onClick={handleWithdraw} className="text-button">
+                  회원 탈퇴
+                </button> */}
               </li>
             </ul>
           </div>
@@ -48,11 +84,11 @@ const MyPage = () => {
           </div>
         </div>
         <div className="mypage-right">
+          <div className="mypage-scroll">
           {/* 오른쪽 본문 영역 */}
           <div className="mypage-right-top">
             <p className="hello">
-              안녕하세요{" "}
-              <span className="hello-name">{user.nickname}</span>님!
+              안녕하세요 <span className="hello-name">{user.nickname}</span>님!
             </p>
 
             {/* 관심 공연 */}
@@ -83,6 +119,7 @@ const MyPage = () => {
                   </div>
                 ))}
               </div>
+            </div>
             </div>
           </div>
         </div>

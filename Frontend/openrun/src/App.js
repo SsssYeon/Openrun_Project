@@ -14,6 +14,10 @@ import Home from "./pages/home";
 import Calendarrecords from "./pages/calendarrecords";
 import Eventdetail from "./pages/eventdetail";
 import Mypage from "./pages/mypage";
+import Account from "./pages/account";
+import Passwordchange from "./pages/passwordchange";
+import Myposts from "./pages/myposts";
+import Favorites from "./pages/favorites";
 
 // import Counter from"./pages/counter";
 // import Input from"./pages/input";
@@ -41,6 +45,10 @@ function App() {
           <Route path="/calendarrecords" element={<Calendarrecords />} />
           <Route path="/detail/:id" element={<Eventdetail />} />
           <Route path="/mypage" element={<Mypage />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/passwordchange" element={<Passwordchange />} />
+          <Route path="/myposts" element={<Myposts />} />
+          <Route path="/favorites" element={<Favorites />} />
         </Routes>
       
     </div>
