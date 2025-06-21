@@ -14,6 +14,7 @@ const Userjoin = () => {
   });
 
   const [idChecked, setIdChecked] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,11 +53,83 @@ const Userjoin = () => {
     }
   };
 
+   // ✅ 인증번호 전송
+  const handleSendPhoneCode = async () => {
+    if (!formData.user_phonenum) {
+      alert("휴대폰 번호를 입력해주세요.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/auth/verify/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_phonenum: formData.user_phonenum,
+          purpose: "signup",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("인증번호가 전송되었습니다.");
+      } else {
+        alert(`전송 실패: ${data.message}`);
+      }
+    } catch (err) {
+      console.error("전송 오류:", err);
+      alert("인증번호 전송 중 오류가 발생했습니다.");
+    }
+  };
+
+  // ✅ 인증번호 확인
+  const handleVerifyPhoneCode = async () => {
+    if (!formData.user_phonecode) {
+      alert("인증번호를 입력해주세요.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/auth/verify/check", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_phonenum: formData.user_phonenum,
+          code: formData.user_phonecode,
+          purpose: "signup",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        alert("인증 성공!");
+        setPhoneVerified(true);
+      } else {
+        alert(`인증 실패: ${data.message || "잘못된 인증번호입니다."}`);
+        setPhoneVerified(false);
+      }
+    } catch (err) {
+      console.error("인증 확인 오류:", err);
+      alert("인증 확인 중 오류가 발생했습니다.");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!idChecked) {
       alert("아이디 중복확인을 해주세요.");
+      return;
+    }
+
+    if (!phoneVerified) {
+      alert("휴대폰 인증을 완료해주세요.");
       return;
     }
 
@@ -180,7 +253,7 @@ const Userjoin = () => {
               onChange={handleChange}
               maxLength="11"
             />
-            <button type="button" id="sendPhoneCode">인증번호 전송</button> {/* 추가 api 필요!! 추후 구현 */}
+            <button type="button" id="sendPhoneCode" onClick={handleSendPhoneCode}>인증번호 전송</button> {/* 추가 api 필요!! 추후 구현 */}
           </div>
 
           {/* 인증번호, 인증번호 전송 api 연결 후 구현 */}
@@ -194,7 +267,7 @@ const Userjoin = () => {
               onChange={handleChange}
               maxLength="6"
             />
-            <button type="button" id="verifyPhoneCode">인증 확인</button>
+            <button type="button" id="verifyPhoneCode" onClick={handleVerifyPhoneCode}>인증 확인</button>
           </div>
         </div>
         <div>

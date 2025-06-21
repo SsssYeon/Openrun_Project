@@ -24,13 +24,13 @@ const Calendarrecords = () => {
           id: item.pfmcalender_doc_no,
           title: item.pfmcalender_nm,
           start: item.pfmcalender_date, // yyyy-mm-dd
-          location: item.pfmcalender_bookingsite,
+          location: item.pfmcalender_location, // db에 추가해야 할 데이터
           cast: item.pfmcalender_today_cast,
           seat: item.pfmcalender_seat,
           cost: item.pfmcalender_cost,
           memo: item.pfmcalender_memo,
-          poster: "/default-poster.png", // 포스터 없음 → 기본 이미지 사용
-          time: "", // 별도 시간 없음
+          poster: item.pfmcalender_poster, // db에 추가해야 할 데이터
+          time: item.pfmcalender_time, // db에 추가해야 할 데이터
           extendedProps: {
             ...item,
           },
