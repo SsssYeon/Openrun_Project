@@ -8,6 +8,8 @@ build/
 !.idea/codeStyles/
 !.idea/runConfigurations/
 
+**/firebase-service-key.json
+
 ### STS ###
 .apt_generated
 .classpath
