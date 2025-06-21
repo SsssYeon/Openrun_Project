@@ -1,21 +1,55 @@
 import Nav from "../components/nav.js";
 import "../css/calendarrecords.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import { useNavigate } from "react-router-dom";
-import eventsData from "../mocks/events.js"; // 예시 JSON 데이터
+// import eventsData from "../mocks/events.js"; // 예시 JSON 데이터
 
 const Calendarrecords = () => {
-  const [selectedDateEvents, setSelectedDateEvents] = useState(eventsData);
+  const [events, setEvents] = useState([]); // 전체 관극 기록
+  const [selectedDateEvents, setSelectedDateEvents] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+
+  // 관극 기록 API 호출
+  useEffect(() => {
+    const fetchCalendarData = async () => {
+      try {
+        const res = await fetch("/api/calendar/me");
+        const data = await res.json();
+
+        // FullCalendar 및 카드 렌더링용 가공
+        const formatted = data.map((item) => ({
+          id: item.pfmcalender_doc_no,
+          title: item.pfmcalender_nm,
+          start: item.pfmcalender_date, // yyyy-mm-dd
+          location: item.pfmcalender_bookingsite,
+          cast: item.pfmcalender_today_cast,
+          seat: item.pfmcalender_seat,
+          cost: item.pfmcalender_cost,
+          memo: item.pfmcalender_memo,
+          poster: "/default-poster.png", // 포스터 없음 → 기본 이미지 사용
+          time: "", // 별도 시간 없음
+          extendedProps: {
+            ...item,
+          },
+        }));
+
+        setEvents(formatted);
+        setSelectedDateEvents(formatted);
+      } catch (error) {
+        console.error("관극 기록 데이터를 불러오는 중 오류 발생:", error);
+      }
+    };
+
+    fetchCalendarData();
+  }, []);
 
   // 날짜 클릭 시 해당 날짜의 이벤트만 추출
   const handleDateClick = (arg) => {
-    const filteredEvents = eventsData.filter(
-      (event) => event.date === arg.dateStr
-    );
-    setSelectedDateEvents(filteredEvents);
+    const filtered = events.filter((event) => event.start === arg.dateStr);
+    setSelectedDateEvents(filtered);
   };
 
   // 이벤트(포스터) 클릭 시 상세 페이지로 이동
@@ -35,8 +69,6 @@ const Calendarrecords = () => {
       dateNumberEl.style.display = "none";
     }
   };
-
-  const [searchTerm, setSearchTerm] = useState("");
 
   const filteredEvents = selectedDateEvents.filter((event) => {
     const search = searchTerm.toLowerCase();
@@ -58,7 +90,7 @@ const Calendarrecords = () => {
           <FullCalendar
             plugins={[dayGridPlugin]}
             initialView="dayGridMonth"
-            events={eventsData}
+            events={events}
             eventContent={renderEventContent}
             dateClick={handleDateClick}
             eventClick={handleEventClick}
@@ -121,11 +153,11 @@ const Calendarrecords = () => {
         </div>
       </div>
       <button
-  className="floating-add-button"
-  onClick={() => navigate("/addticket")} // 원하는 경로로 수정
->
-<span className="plus-symbol">+</span>
-</button>
+        className="floating-add-button"
+        onClick={() => navigate("/addticket")} // 원하는 경로로 수정
+      >
+        <span className="plus-symbol">+</span>
+      </button>
     </div>
   );
 };

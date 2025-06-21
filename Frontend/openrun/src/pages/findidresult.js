@@ -1,9 +1,13 @@
 import React from "react";
 import "../css/findidresult.css";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import logo from "../components/logo.png";
 
 const Findidresult = () => {
+
+  const location = useLocation();
+  const { userId } = location.state || {}; // 전달받은 값
+
   return (
     <div>
       <form className="findidresultform">
@@ -11,11 +15,14 @@ const Findidresult = () => {
           <img src={logo} alt="로고" className="findidresult_logo" />
         </NavLink>
         <div className="findid_result">
-          <p>
-            귀하의 아이디는{" "}
-            <span style={{ color: "#9F0000" }}>exampleUserId123</span>입니다.
-            {/* 유저 아이디 DB에서 전달받아 출력 */}
-          </p>
+          {userId ? (
+            <p>
+              귀하의 아이디는{" "}
+              <span style={{ color: "#9F0000" }}>{userId}</span>입니다.
+            </p>
+          ) : (
+            <p style={{ color: "gray" }}>잘못된 접근입니다.</p>
+          )}
         </div>
         <NavLink to="/login" id="sbtn">
           {" "}
