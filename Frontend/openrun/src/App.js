@@ -18,6 +18,9 @@ import Account from "./pages/account";
 import Passwordchange from "./pages/passwordchange";
 import Myposts from "./pages/myposts";
 import Favorites from "./pages/favorites";
+import Performancedetail from "./pages/performancedetail";
+import Addrecord from "./pages/addrecord";
+import Modifyrecord from "./pages/modifyrecord";
 
 // import Counter from"./pages/counter";
 // import Input from"./pages/input";
@@ -49,6 +52,9 @@ function App() {
           <Route path="/passwordchange" element={<Passwordchange />} />
           <Route path="/myposts" element={<Myposts />} />
           <Route path="/favorites" element={<Favorites />} />
+          <Route path="/performance/:id" element={<Performancedetail />} />
+          <Route path="/addrecord" element={<Addrecord />} />
+          <Route path="/modifyrecord/:id" element={<Modifyrecord />} />
         </Routes>
       
     </div>
