@@ -53,4 +53,14 @@ public class PfmCalendarService {
             return null;
         }
     }
+
+    // 관극 기록 저장
+    public String addEvent(PfmCalendarDTO dto) throws ExecutionException, InterruptedException {
+        CollectionReference colRef = firestore.collection("Calendar_me");
+
+        // Firestore 문서 자동 생성 (ID 자동 부여)
+        ApiFuture<DocumentReference> future = colRef.add(dto);
+
+        return future.get().getId(); // 생성된 문서 ID 반환
+    }
 }

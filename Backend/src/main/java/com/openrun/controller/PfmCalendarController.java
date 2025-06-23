@@ -30,4 +30,12 @@ public class PfmCalendarController {
     public PfmCalendarDTO getEventDetail(@PathVariable String id) throws ExecutionException, InterruptedException {
         return calendarService.getEventById(id);
     }
+
+    // 관극 기록 추가
+    @PostMapping("/me")
+    public String addCalendarEvent(@RequestBody PfmCalendarDTO dto) throws ExecutionException, InterruptedException {
+        return calendarService.addEvent(dto);
+    }
 }
+
+
