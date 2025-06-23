@@ -35,7 +35,7 @@ function Eventdetail() {
       </div>
       <div className="event-detail">
         <img
-          src={"/default-poster.png"} // 포스터 정보가 없다면 기본 이미지 사용
+          src={event.pfmcalender_poster || "/default-poster.png"}
           alt={`${event.pfmcalender_nm} 포스터`}
           className="poster"
         />
@@ -46,10 +46,10 @@ function Eventdetail() {
               <strong>날짜:</strong> {event.pfmcalender_date}
             </p>
             <p>
-              <strong>시간:</strong> {event.pfmclender_time}
+              <strong>시간:</strong> {event.pfmcalender_time}
             </p>
             <p>
-              <strong>장소:</strong> {event.pfmclender_location}
+              <strong>장소:</strong> {event.pfmcalender_location}
             </p>
             <p>
               <strong>좌석:</strong> {event.pfmcalender_seat}

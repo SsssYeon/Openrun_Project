@@ -1,49 +1,33 @@
 import Nav from "../components/nav.js";
-import "../css/calendarrecords.css";
+import "../css/mylikescalendar.css";
 import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import { useNavigate } from "react-router-dom";
-// import eventsData from "../mocks/events.js"; // 예시 JSON 데이터
+import favorites from "../mocks/favorites.js"; // 예시 JSON 데이터
 
-const Calendarrecords = () => {
+const Mylikescalendar = () => {
   const [events, setEvents] = useState([]); // 전체 관극 기록
   const [selectedDateEvents, setSelectedDateEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
+  const addOneDay = (dateStr) => {
+    const date = new Date(dateStr);
+    date.setDate(date.getDate() + 1);
+    return date.toISOString().split("T")[0];
+  };
+
   // 관극 기록 API 호출
   useEffect(() => {
-    const fetchCalendarData = async () => {
-      try {
-        const res = await fetch("/api/calendar/me");
-        const data = await res.json();
-
-        // FullCalendar 및 카드 렌더링용 가공
-        const formatted = data.map((item) => ({
-          id: item.pfmcalender_doc_no,
-          title: item.pfmcalender_nm,
-          start: item.pfmcalender_date, // yyyy-mm-dd
-          location: item.pfmcalender_location, // db에 추가해야 할 데이터
-          cast: item.pfmcalender_today_cast,
-          seat: item.pfmcalender_seat,
-          cost: item.pfmcalender_cost,
-          memo: item.pfmcalender_memo,
-          poster: item.pfmcalender_poster, // db에 추가해야 할 데이터
-          time: item.pfmcalender_time, // db에 추가해야 할 데이터
-          extendedProps: {
-            ...item,
-          },
-        }));
-
-        setEvents(formatted);
-        setSelectedDateEvents(formatted);
-      } catch (error) {
-        console.error("관극 기록 데이터를 불러오는 중 오류 발생:", error);
-      }
-    };
-
-    fetchCalendarData();
+    const formatted = favorites.map((item) => ({
+      title: item.title,
+      start: item.start,
+      end: addOneDay(item.end), // ✅ 꼭 하루 추가!
+       poster: item.poster,     
+    }));
+    setEvents(formatted);
+    setSelectedDateEvents(formatted);
   }, []);
 
   // 날짜 클릭 시 해당 날짜의 이벤트만 추출
@@ -58,25 +42,28 @@ const Calendarrecords = () => {
   };
 
   const renderEventContent = (eventInfo) => {
-    const { poster } = eventInfo.event.extendedProps;
-    return <img src={poster} alt="poster" />;
-  };
-
-  const handleEventDidMount = (info) => {
-    const dayCell = info.el.closest(".fc-daygrid-day");
-    const dateNumberEl = dayCell?.querySelector(".fc-daygrid-day-number");
-    if (dateNumberEl) {
-      dateNumberEl.style.display = "none";
-    }
+    return (
+      <div
+        style={{
+          backgroundColor: "#ffcc66", // 원하는 색
+          borderRadius: "5px",
+          padding: "2px 4px",
+          fontWeight: "bold",
+          color: "#333",
+          fontSize: "0.8rem",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {eventInfo.event.title}
+      </div>
+    );
   };
 
   const filteredEvents = selectedDateEvents.filter((event) => {
     const search = searchTerm.toLowerCase();
-    return (
-      event.title.toLowerCase().includes(search) ||
-      event.location.toLowerCase().includes(search) ||
-      event.cast.toLowerCase().includes(search)
-    );
+    return event.title.toLowerCase().includes(search);
   });
 
   return (
@@ -86,22 +73,20 @@ const Calendarrecords = () => {
       </div>
       <div className="flex">
         {/* 좌측 달력 */}
-        <div className="calendar">
+        <div className="mylikescalendar">
           <FullCalendar
             plugins={[dayGridPlugin]}
             initialView="dayGridMonth"
             events={events}
-            eventContent={renderEventContent}
             dateClick={handleDateClick}
             eventClick={handleEventClick}
             height={700}
-            contentHeight="auto"
-            contentWidth="auto"
             dayMaxEventRows={false}
             fixedWeekCount={true} // 주 수 고정 해제
             showNonCurrentDates={false}
+            contentHeight="auto"
             handleWindowResize={false}
-            eventDidMount={handleEventDidMount}
+            eventDisplay="auto"
             headerToolbar={{
               left: "prev",
               center: "title",
@@ -152,14 +137,8 @@ const Calendarrecords = () => {
           </div>
         </div>
       </div>
-      <button
-        className="floating-add-button"
-        onClick={() => navigate("/addrecord")} // 원하는 경로로 수정
-      >
-        <span className="plus-symbol">+</span>
-      </button>
     </div>
   );
 };
 
-export default Calendarrecords;
+export default Mylikescalendar;

@@ -21,6 +21,8 @@ import Favorites from "./pages/favorites";
 import Performancedetail from "./pages/performancedetail";
 import Addrecord from "./pages/addrecord";
 import Modifyrecord from "./pages/modifyrecord";
+import Mylikescalendar from "./pages/mylikescalendar";
+import Myreport from "./pages/myreport";
 
 // import Counter from"./pages/counter";
 // import Input from"./pages/input";
@@ -55,6 +57,8 @@ function App() {
           <Route path="/performance/:id" element={<Performancedetail />} />
           <Route path="/addrecord" element={<Addrecord />} />
           <Route path="/modifyrecord/:id" element={<Modifyrecord />} />
+          <Route path="/mylikescalendar" element={<Mylikescalendar />} />
+          <Route path="/myreport" element={<Myreport />} />
         </Routes>
       
     </div>

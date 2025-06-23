@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import Nav from "../components/nav";
 import "../css/eventdetail.css";
-import logo2 from "../components/logo2.png";
 import performances from "../mocks/performances"; // 공연 정보 데이터
 
 const Addrecord = () => {
   const [name, setName] = useState("");
-  const [poster, setPoster] = useState(logo2);
+  const [poster, setPoster] = useState("/default-poster.png");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
@@ -23,7 +22,7 @@ const Addrecord = () => {
     if (found) {
       setPoster(found.api_poster); // 해당 공연 포스터로 변경
     } else {
-      setPoster(logo2); // 찾을 수 없으면 기본 이미지
+      setPoster("/default-poster.png"); // 찾을 수 없으면 기본 이미지
     }
   };
 
@@ -73,7 +72,7 @@ const Addrecord = () => {
           className="poster"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = logo2; // 이미지 오류 시 기본 포스터
+            e.target.src = "/default-poster.png"; // 이미지 오류 시 기본 포스터
           }}
         />
         <div className="event-info-container">
