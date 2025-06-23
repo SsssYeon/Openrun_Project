@@ -2,11 +2,15 @@ package com.openrun.service;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.firebase.cloud.StorageClient;
 import com.openrun.dto.PfmCalendarDTO;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -55,12 +59,74 @@ public class PfmCalendarService {
     }
 
     // 관극 기록 저장
-    public String addEvent(PfmCalendarDTO dto) throws ExecutionException, InterruptedException {
-        CollectionReference colRef = firestore.collection("Calendar_me");
+    public String addEvent(String name, String date, String time, String location, String seat,
+                           String cast, String cost, String memo, MultipartFile posterFile) throws Exception {
 
-        // Firestore 문서 자동 생성 (ID 자동 부여)
-        ApiFuture<DocumentReference> future = colRef.add(dto);
+        Map<String, Object> data = new HashMap<>();
+        data.put("pfmcalender_nm", name);
+        data.put("pfmcalender_date", date);
+        if (time != null) data.put("pfmcalender_time", time);
+        if (location != null) data.put("pfmcalender_location", location);
+        if (seat != null) data.put("pfmcalender_seat", seat);
+        if (cast != null) data.put("pfmcalender_today_cast", cast);
+        if (cost != null) data.put("pfmcalender_cost", cost);
+        if (memo != null) data.put("pfmcalender_memo", memo);
 
-        return future.get().getId(); // 생성된 문서 ID 반환
+        if (posterFile != null && !posterFile.isEmpty()) {
+            String fileName = UUID.randomUUID() + "_" + posterFile.getOriginalFilename();
+            String imageUrl = uploadPosterImage(posterFile, fileName);
+            data.put("pfmcalender_poster", imageUrl);
+        }
+
+        DocumentReference docRef = firestore.collection("Calendar_me").document();
+        docRef.set(data);
+
+        return docRef.getId();
+    }
+
+
+    public String updateEvent(String id,
+                              String name,
+                              String date,
+                              String time,
+                              String location,
+                              String seat,
+                              String cast,
+                              String cost,
+                              String memo,
+                              MultipartFile posterFile) throws Exception {
+
+        DocumentReference docRef = firestore.collection("Calendar_me").document(id);
+
+        Map<String, Object> updateData = new HashMap<>();
+        updateData.put("pfmcalender_nm", name);
+        updateData.put("pfmcalender_date", date);
+        if (time != null) updateData.put("pfmcalender_time", time);
+        if (location != null) updateData.put("pfmcalender_location", location);
+        if (seat != null) updateData.put("pfmcalender_seat", seat);
+        if (cast != null) updateData.put("pfmcalender_today_cast", cast);
+        if (cost != null) updateData.put("pfmcalender_cost", cost);
+        if (memo != null) updateData.put("pfmcalender_memo", memo);
+
+        if (posterFile != null && !posterFile.isEmpty()) {
+            String fileName = UUID.randomUUID() + "_" + posterFile.getOriginalFilename();
+            String imageUrl = uploadPosterImage(posterFile, fileName);
+            updateData.put("pfmcalender_poster", imageUrl); // Firestore에 URL 저장
+        }
+
+        docRef.update(updateData);
+
+        return "updated";
+    }
+
+    public String uploadPosterImage(MultipartFile file, String fileName) throws IOException {
+        Bucket bucket = StorageClient.getInstance().bucket();
+
+        String blobName = "posters/" + fileName;
+        Blob blob = bucket.create(blobName, file.getBytes(), file.getContentType());
+
+        // 올바른 Firebase Storage URL 생성
+        return String.format("https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media",
+                bucket.getName(), java.net.URLEncoder.encode(blob.getName(), "UTF-8"));
     }
 }

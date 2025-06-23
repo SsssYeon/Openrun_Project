@@ -5,6 +5,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.cloud.firestore.Firestore;
+import com.google.firebase.cloud.StorageClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -16,17 +17,28 @@ import java.io.InputStream;
 public class FirebaseConfig {
 
     @Bean
-    public Firestore firestore() throws IOException {
+    public FirebaseApp firebaseApp() throws IOException {
         if (FirebaseApp.getApps().isEmpty()) {
-            InputStream serviceAccount =
-                    new ClassPathResource("firebase-service-key.json").getInputStream();
+            InputStream serviceAccount = new ClassPathResource("firebase-service-key.json").getInputStream();
 
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setStorageBucket("openrun-8e238.firebasestorage.app")
                     .build();
 
-            FirebaseApp.initializeApp(options);
+            return FirebaseApp.initializeApp(options);
+        } else {
+            return FirebaseApp.getInstance();
         }
-        return FirestoreClient.getFirestore();
+    }
+
+    @Bean
+    public Firestore firestore(FirebaseApp firebaseApp) {
+        return FirestoreClient.getFirestore(firebaseApp);
+    }
+
+    @Bean
+    public StorageClient storageClient(FirebaseApp firebaseApp) {
+        return StorageClient.getInstance(firebaseApp);
     }
 }

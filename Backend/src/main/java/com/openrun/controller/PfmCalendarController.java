@@ -4,6 +4,7 @@ import com.openrun.dto.PfmCalendarDTO;
 import com.openrun.service.PfmCalendarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -32,10 +33,35 @@ public class PfmCalendarController {
     }
 
     // 관극 기록 추가
-    @PostMapping("/me")
-    public String addCalendarEvent(@RequestBody PfmCalendarDTO dto) throws ExecutionException, InterruptedException {
-        return calendarService.addEvent(dto);
+    @PostMapping(value = "/me", consumes = "multipart/form-data")
+    public String addCalendarEvent(
+            @RequestPart(value = "pfmcalender_poster", required = false) MultipartFile posterFile,
+            @RequestPart("pfmcalender_nm") String name,
+            @RequestPart("pfmcalender_date") String date,
+            @RequestPart(value = "pfmcalender_time", required = false) String time,
+            @RequestPart(value = "pfmcalender_location", required = false) String location,
+            @RequestPart(value = "pfmcalender_seat", required = false) String seat,
+            @RequestPart(value = "pfmcalender_today_cast", required = false) String cast,
+            @RequestPart(value = "pfmcalender_cost", required = false) String cost,
+            @RequestPart(value = "pfmcalender_memo", required = false) String memo
+    ) throws Exception {
+        return calendarService.addEvent(name, date, time, location, seat, cast, cost, memo, posterFile);
+    }
+
+    // 관극 기록 수정
+    @PatchMapping(value = "/me/{id}", consumes = "multipart/form-data")
+    public String updateCalendarEvent(
+            @PathVariable String id,
+            @RequestPart(value = "pfmcalender_poster", required = false) MultipartFile posterFile,
+            @RequestPart("pfmcalender_nm") String name,
+            @RequestPart("pfmcalender_date") String date,
+            @RequestPart(value = "pfmcalender_time", required = false) String time,
+            @RequestPart(value = "pfmcalender_location", required = false) String location,
+            @RequestPart(value = "pfmcalender_seat", required = false) String seat,
+            @RequestPart(value = "pfmcalender_today_cast", required = false) String cast,
+            @RequestPart(value = "pfmcalender_cost", required = false) String cost,
+            @RequestPart(value = "pfmcalender_memo", required = false) String memo
+    ) throws Exception {
+        return calendarService.updateEvent(id, name, date, time, location, seat, cast, cost, memo, posterFile);
     }
 }
-
-
