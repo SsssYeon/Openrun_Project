@@ -18,13 +18,16 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody SignupRequest request) {
+    @PostMapping(value = "/signup", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<Map<String, String>> signup(@RequestBody SignupRequest request) {
+        Map<String, String> result = new HashMap<>();
         try {
             authService.signup(request);
-            return ResponseEntity.ok("회원가입 성공!");
+            result.put("message", "회원가입 성공!");
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("회원가입 실패: " + e.getMessage());
+            result.put("message", "회원가입 실패: " + e.getMessage());
+            return ResponseEntity.badRequest().body(result);
         }
     }
 
