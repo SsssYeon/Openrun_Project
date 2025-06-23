@@ -1,12 +1,10 @@
-// api 연결 X 버전 / api 연결 버전 구현 완료
-
 import Nav from "../components/nav.js";
 import "../css/calendarrecords.css";
 import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import { useNavigate } from "react-router-dom";
-import eventsData from "../mocks/events.js"; // 예시 JSON 데이터
+// import eventsData from "../mocks/events.js"; // 예시 JSON 데이터
 
 const Calendarrecords = () => {
   const [events, setEvents] = useState([]); // 전체 관극 기록
@@ -14,24 +12,18 @@ const Calendarrecords = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  const addOneDay = (dateStr) => {
-  const d = new Date(dateStr);
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().slice(0, 10);
-};
   // 관극 기록 API 호출
   useEffect(() => {
-    // const fetchCalendarData = async () => {
-    //   try {
-    //     const res = await fetch("/api/calendar/me");
-    //     const data = await res.json();
+    const fetchCalendarData = async () => {
+      try {
+        const res = await fetch("/api/calendar/me");
+        const data = await res.json();
 
-    //     // FullCalendar 및 카드 렌더링용 가공
-        const formatted = eventsData.map((item) => ({ //eventsdata 대신 data로 바꾸기
+        // FullCalendar 및 카드 렌더링용 가공
+        const formatted = data.map((item) => ({
           id: item.pfmcalender_doc_no,
           title: item.pfmcalender_nm,
           start: item.pfmcalender_date, // yyyy-mm-dd
-          end: item.pfmcalender_end_date,
           location: item.pfmcalender_location, // db에 추가해야 할 데이터
           cast: item.pfmcalender_today_cast,
           seat: item.pfmcalender_seat,
@@ -44,16 +36,14 @@ const Calendarrecords = () => {
           },
         }));
 
-    //     setEvents(formatted);
-    //     setSelectedDateEvents(formatted);
-    //   } catch (error) {
-    //     console.error("관극 기록 데이터를 불러오는 중 오류 발생:", error);
-    //   }
-    // };
+        setEvents(formatted);
+        setSelectedDateEvents(formatted);
+      } catch (error) {
+        console.error("관극 기록 데이터를 불러오는 중 오류 발생:", error);
+      }
+    };
 
-    // fetchCalendarData();
-    setEvents(formatted);
-    setSelectedDateEvents(formatted);
+    fetchCalendarData();
   }, []);
 
   // 날짜 클릭 시 해당 날짜의 이벤트만 추출
@@ -108,15 +98,14 @@ const Calendarrecords = () => {
             contentHeight="auto"
             contentWidth="auto"
             dayMaxEventRows={false}
-            fixedWeekCount={true} 
+            fixedWeekCount={true} // 주 수 고정 해제
             showNonCurrentDates={false}
             handleWindowResize={false}
             eventDidMount={handleEventDidMount}
-            eventDisplay="block"
             headerToolbar={{
               left: "prev",
               center: "title",
-              right: "next", 
+              right: "next", // 'today' 제거됨
             }}
           />
         </div>

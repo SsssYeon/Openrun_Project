@@ -9,6 +9,7 @@ const favorites = [
     start: "2025-05-03",
     end: "2025-07-09", // 종료일 다음날로 설정
     poster: poster1,
+    className: 'favorite-1',
   },
   {
     id: "2",
@@ -16,6 +17,7 @@ const favorites = [
     start: "2025-06-04",
     end: "2025-08-06", // 종료일 다음날로 설정
     poster: poster2,
+    className: 'favorite-2',
   },
   {
     id: "3",
@@ -23,6 +25,7 @@ const favorites = [
     start: "2025-06-04",
     end: "2025-06-19", // 종료일 다음날로 설정
     poster: poster3,
+    className: 'favorite-3',
   },
 ];
 

@@ -1,10 +1,11 @@
-// api 연결 X ver => api 연결 버전 구현했는데 저장을 안해놓은 듯 주석 지우고 수정 필요
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Nav from "../components/nav";
-import events from "../mocks/events"; // 경로는 실제 파일 위치에 맞게 조정
+// import events from "../mocks/events"; // 경로는 실제 파일 위치에 맞게 조정
 import "../css/eventdetail.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+
+
 
 const Modifyrecord = () => {
   const { id } = useParams();
@@ -18,59 +19,93 @@ const Modifyrecord = () => {
   const [cast, setCast] = useState("");
   const [cost, setCost] = useState("");
   const [memo, setMemo] = useState("");
+  const [posterFile, setPosterFile] = useState(null);
+  const [posterPreview, setPosterPreview] = useState("/default-poster.png");
+  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
+
+  const setFormFields = (data) => {
+    setEvent(data);
+    setName(data.pfmcalender_nm || "");
+    setDate(data.pfmcalender_date || "");
+    setTime(data.pfmcalender_time || "");
+    setLocation(data.pfmcalender_location || "");
+    setSeat(data.pfmcalender_seat || "");
+    setCast(data.pfmcalender_today_cast || "");
+    setCost(data.pfmcalender_cost || "");
+    setMemo(data.pfmcalender_memo || "");
+  };
 
   useEffect(() => {
-    //   const fetchEventDetail = async () => {
-    //     try {
-    //       const res = await fetch(`/api/calendar/me/${id}`);
-    //       const data = await res.json();
-    //       setEvent(data);
-    //     } catch (error) {
-    //       console.error("관극 기록을 불러오는 데 실패했습니다:", error);
-    //     } finally {
-    //       setLoading(false);
-    //     }
-    //   };
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`/api/calendar/me/${id}`);
+        if (!res.ok) throw new Error("데이터를 불러올 수 없습니다.");
+        const data = await res.json();
 
-    //   fetchEventDetail();
-    // }, [id]);
+        setEvent(data);
+        setName(data.pfmcalender_nm || "");
+        setDate(data.pfmcalender_date || "");
+        setTime(data.pfmcalender_time || "");
+        setLocation(data.pfmcalender_location || "");
+        setSeat(data.pfmcalender_seat || "");
+        setCast(data.pfmcalender_today_cast || "");
+        setCost(data.pfmcalender_cost || "");
+        setMemo(data.pfmcalender_memo || "");
 
-    const found = events.find((item) => String(item.pfmcalender_doc_no) === id);
-    if (found) {
-      setEvent(found);
-      setName(found.pfmcalender_nm || "");
-      setDate(found.pfmcalender_date || "");
-      setTime(found.pfmcalender_time || "");
-      setLocation(found.pfmcalender_location || "");
-      setSeat(found.pfmcalender_seat || "");
-      setCast(found.pfmcalender_today_cast || "");
-      setCost(found.pfmcalender_cost || "");
-      setMemo(found.pfmcalender_memo || "");
-    }
-    setLoading(false);
+        setPosterPreview(data.pfmcalender_poster || "/default-poster.png");
+      } catch (error) {
+        console.error(error);
+        setEvent(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [id]);
 
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+
+  // 이미지 파일 선택 시
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPosterFile(file);
+      setPosterPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSave = async () => {
-    const updatedRecord = {
-      pfmcalender_nm: name,
-      pfmcalender_date: date,
-      pfmcalender_time: time,
-      pfmcalender_location: location,
-      pfmcalender_seat: seat,
-      pfmcalender_today_cast: cast,
-      pfmcalender_cost: Number(cost),
-      pfmcalender_memo: memo,
-    };
+    if (!name || !date) {
+      alert("공연명, 날짜는 필수 입력입니다.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("pfmcalender_nm", name);
+    formData.append("pfmcalender_date", date);
+    formData.append("pfmcalender_time", time);
+    formData.append("pfmcalender_location", location);
+    formData.append("pfmcalender_seat", seat);
+    formData.append("pfmcalender_today_cast", cast);
+    formData.append("pfmcalender_cost", cost);
+    formData.append("pfmcalender_memo", memo);
+
+    if (posterFile) {
+      formData.append("pfmcalender_poster", posterFile);
+    }
 
     try {
       const res = await fetch(`/api/calendar/me/${id}`, {
-        method: "PUT", // 또는 PATCH
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedRecord),
+        method: "PATCH", // PUT 대신 PATCH로 변경
+        body: formData,
       });
 
       if (res.ok) {
         alert("수정이 완료되었습니다.");
+        navigate("/calendarrecords");
         // navigate("/"); 등으로 이동 가능
       } else {
         alert("수정에 실패했습니다.");
@@ -89,15 +124,23 @@ const Modifyrecord = () => {
         <Nav />
       </div>
       <div className="event-detail">
-        {/* <img
-          src={"/default-poster.png"} // 포스터 정보가 없다면 기본 이미지 사용
-          alt={`${event.pfmcalender_nm} 포스터`}
-          className="poster"
-        /> */}
         <img
-          src={event.pfmcalender_poster || "/default-poster.png"}
-          alt={`${event.pfmcalender_nm} 포스터`}
+          src={posterPreview}
+          alt="포스터 미리보기"
           className="poster"
+          onClick={handleImageClick}
+          style={{ cursor: "pointer" }}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "/default-poster.png";
+          }}
+        />
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          onChange={handleFileChange}
         />
         <div className="event-info-container">
           <div className="event-content">
@@ -151,7 +194,9 @@ const Modifyrecord = () => {
               rows={6}
             />
           </div>
-          <button onClick={handleSave} className="modifyrecord-button">저장</button>
+          <button onClick={handleSave} className="modifyrecord-button">
+            저장
+          </button>
         </div>
       </div>
     </div>

@@ -1,11 +1,9 @@
-// api 연결 X 버전 / api 연결 버전 구현 완료
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/main.css"; // CSS 파일 연결
 import logo from "../components/logo.png";
 import Nav from "../components/nav.js";
-import performancesData from "../mocks/performances"; 
+// import performancesData from "../mocks/performances"; 
 
 // const dummyData = [
 //   "레미제라블",
@@ -19,12 +17,34 @@ import performancesData from "../mocks/performances";
 
 const Main = () => {
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
-  const filtered = performancesData.filter((item) =>
-    item.api_prfnm.toLowerCase().includes(query.toLowerCase())
-  );
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (query.trim() === "") {
+        setResults([]);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/performances/search?query=${encodeURIComponent(query)}`);
+        if (!response.ok) {
+          throw new Error("검색 실패");
+        }
+        const data = await response.json();
+        setResults(data); // 백엔드에서 공연 배열을 반환해야 함
+      } catch (error) {
+        console.error("검색 중 오류 발생:", error);
+        setResults([]);
+      }
+    };
+
+    const debounceTimer = setTimeout(fetchResults, 300); // 디바운싱
+
+    return () => clearTimeout(debounceTimer);
+  }, [query]);
 
   const handleLogoClick = () => {
     navigate("/");
@@ -52,13 +72,13 @@ const Main = () => {
 
           {showDropdown && query && (
             <ul className="main-dropdown">
-              {filtered.length > 0 ? (
-                filtered.map((item) => (
+              {results.length > 0 ? (
+                results.map((item) => (
                   <li
-                    key={item.api_mt20id}
+                    key={item.pfm_doc_id} // 백엔드 필드명 기준
                     className="main-dropdown-item"
                     onClick={() => {
-                      navigate(`/performance/${item.api_mt20id}`);
+                      navigate(`/performance/${item.pfm_doc_id}`);
                       setQuery("");
                       setShowDropdown(false);
                     }}
