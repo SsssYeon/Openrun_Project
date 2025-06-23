@@ -1,3 +1,5 @@
+//api 연결 O
+
 import React, { useState } from "react";
 import "../css/userjoin.css";
 import Nav from "../components/nav";

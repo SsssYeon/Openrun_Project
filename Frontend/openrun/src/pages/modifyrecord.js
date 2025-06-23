@@ -1,3 +1,5 @@
+// api 연결 X ver => api 연결 버전 구현했는데 저장을 안해놓은 듯 주석 지우고 수정 필요
+
 import { useParams } from "react-router-dom";
 import Nav from "../components/nav";
 import events from "../mocks/events"; // 경로는 실제 파일 위치에 맞게 조정

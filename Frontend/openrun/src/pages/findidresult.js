@@ -1,3 +1,5 @@
+//api 연결 O
+
 import React from "react";
 import "../css/findidresult.css";
 import { NavLink, useLocation } from "react-router-dom";

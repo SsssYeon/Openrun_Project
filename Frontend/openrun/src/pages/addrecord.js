@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+//api 연결 O, 백엔드 없이 화면 보는데 문제 없음
+
+import React, { useRef, useState } from "react";
 import Nav from "../components/nav";
 import "../css/eventdetail.css";
 import performances from "../mocks/performances"; // 공연 정보 데이터
@@ -13,6 +15,8 @@ const Addrecord = () => {
   const [cast, setCast] = useState("");
   const [cost, setCost] = useState("");
   const [memo, setMemo] = useState("");
+  const [posterFile, setPosterFile] = useState(null);
+  const [posterPreview, setPosterPreview] = useState("/default-poster.png");
 
   const handleTitleChange = (e) => {
     const title = e.target.value;
@@ -26,34 +30,48 @@ const Addrecord = () => {
     }
   };
 
+  const fileInputRef = useRef(null); // input 참조
+
+  const handleImageClick = () => {
+    fileInputRef.current.click(); // 이미지 클릭 시 input 열기
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPosterFile(file);
+      setPosterPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSave = async () => {
     if (!name || !date || !location || !cast) {
       alert("공연명, 날짜, 장소, 출연진은 필수 입력입니다.");
       return;
     }
 
-    const newRecord = {
-      pfmcalender_nm: name,
-      pfmcalender_poster: poster,
-      pfmcalender_date: date,
-      pfmcalender_time: time,
-      pfmcalender_location: location,
-      pfmcalender_seat: seat,
-      pfmcalender_today_cast: cast,
-      pfmcalender_cost: Number(cost),
-      pfmcalender_memo: memo,
-    };
+    const formData = new FormData();
+    formData.append("pfmcalender_nm", name);
+    formData.append("pfmcalender_date", date);
+    formData.append("pfmcalender_time", time);
+    formData.append("pfmcalender_location", location);
+    formData.append("pfmcalender_seat", seat);
+    formData.append("pfmcalender_today_cast", cast);
+    formData.append("pfmcalender_cost", cost);
+    formData.append("pfmcalender_memo", memo);
+
+    if (posterFile) {
+      formData.append("pfmcalender_poster", posterFile); // 실제 이미지 파일 추가
+    }
 
     try {
       const res = await fetch("/api/calendar/me", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newRecord),
+        body: formData,
       });
 
       if (res.ok) {
         alert("기록이 저장되었습니다.");
-        // navigate("/") 등 이동 처리 가능
       } else {
         alert("기록 저장에 실패했습니다.");
       }
@@ -67,14 +85,24 @@ const Addrecord = () => {
       <Nav />
       <div className="event-detail">
         <img
-          src={poster}
-          alt={`${name} 포스터`}
+          src={posterPreview}
+          alt="포스터 미리보기"
           className="poster"
+          onClick={handleImageClick}
+          style={{ cursor: "pointer" }}
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = "/default-poster.png"; // 이미지 오류 시 기본 포스터
+            e.target.src = "/default-poster.png";
           }}
         />
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          onChange={handleFileChange}
+        />
+
         <div className="event-info-container">
           <div className="event-content">
             <h3 className="title-center">관람기록 추가</h3>

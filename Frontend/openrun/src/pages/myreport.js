@@ -1,3 +1,5 @@
+// 나의 통계 => api 연결 필요
+
 import React, { useState } from "react";
 import Nav from "../components/nav";
 

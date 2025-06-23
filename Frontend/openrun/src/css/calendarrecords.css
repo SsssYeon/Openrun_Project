@@ -34,7 +34,8 @@
   flex-direction: column;
   justify-content: center; /* 가로 중앙 정렬 */
   align-items: center;
-  max-height: 80px;
+   max-height: 80px; /* 제한 없애기 */
+  
   box-sizing: border-box;
   padding: 0 !important;
   margin: 0 !important;
@@ -50,7 +51,7 @@
 }
 
 /* 이벤트가 날짜 셀 전체를 채우도록 이거 calendar 안에서만으로 바꾸니깐 사진이 작아지네요...ㅠ */
-.fc-daygrid-event-harness {
+.calendar.fc-daygrid-event-harness {
   width: 100%;
   height: 100%;
   position: absolute;

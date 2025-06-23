@@ -1,3 +1,5 @@
+// 홈 2번째 화면, api 연결 필요
+
 import React from "react";
 import "../css/main2.css"; // CSS 파일 연결
 import poster1 from "../components/poster1.jpg";

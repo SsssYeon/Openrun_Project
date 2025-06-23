@@ -1,3 +1,5 @@
+//api 연결 O, 백엔드 없이 화면 보는데 문제 없음
+
 import React, { useState, useEffect } from "react";
 import "../css/userjoin.css";
 import Nav from "../components/nav";

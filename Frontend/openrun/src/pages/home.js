@@ -1,3 +1,5 @@
+//api 연결 필요 X
+
 import React from "react";
 import ReactFullpage from "@fullpage/react-fullpage";
 import Main from "./main.js";

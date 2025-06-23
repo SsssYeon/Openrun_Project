@@ -1,3 +1,5 @@
+// api 연결 X 버전 => api 연결 버전 다시 만들어야 함
+
 import Nav from "../components/nav.js";
 import "../css/mylikescalendar.css";
 import React, { useState, useEffect } from "react";
@@ -5,6 +7,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import { useNavigate } from "react-router-dom";
 import favorites from "../mocks/favorites.js"; // 예시 JSON 데이터
+import performances from "../mocks/performances.js";
 
 const Mylikescalendar = () => {
   const [events, setEvents] = useState([]); // 전체 관극 기록
@@ -21,10 +24,12 @@ const Mylikescalendar = () => {
   // 관극 기록 API 호출
   useEffect(() => {
     const formatted = favorites.map((item) => ({
+      id: item.id, // ❗️eventClick 등에서 id가 필요함
       title: item.title,
       start: item.start,
-      end: addOneDay(item.end), // ✅ 꼭 하루 추가!
-       poster: item.poster,     
+      end: addOneDay(item.end),
+      poster: item.poster,
+      className: item.className, // ✅ className 포함
     }));
     setEvents(formatted);
     setSelectedDateEvents(formatted);
@@ -61,17 +66,23 @@ const Mylikescalendar = () => {
     );
   };
 
-  const filteredEvents = selectedDateEvents.filter((event) => {
-    const search = searchTerm.toLowerCase();
-    return event.title.toLowerCase().includes(search);
-  });
+  const filteredPerformances = performances.filter(
+    ({ api_prfcast, api_prfnm, api_fcltynm }) => {
+      const term = searchTerm.toLowerCase();
+      return (
+        api_prfnm.toLowerCase().includes(term) ||
+        api_prfcast.toLowerCase().includes(term) ||
+        api_fcltynm.toLowerCase().includes(term)
+      );
+    }
+  );
 
   return (
     <div>
       <div>
         <Nav />
       </div>
-      <div className="flex">
+      <div className="mylikescalendarbox">
         {/* 좌측 달력 */}
         <div className="mylikescalendar">
           <FullCalendar
@@ -96,8 +107,8 @@ const Mylikescalendar = () => {
         </div>
 
         {/* 우측 상세 정보 요약 카드 */}
-        <div className="tickets">
-          <div className="searchmytickets">
+        <div className="mylikes-right">
+          <div className="searchperformances">
             <input
               type="text"
               placeholder="배우, 공연명, 공연장을 검색하세요"
@@ -105,34 +116,36 @@ const Mylikescalendar = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          <div className="search-results">
+            {searchTerm && filteredPerformances.length === 0 && (
+              <p>검색 결과가 없습니다.</p>
+            )}
 
-          <div className="mytickets-scroll">
-            <div className="mytickets">
-              {(searchTerm ? filteredEvents : selectedDateEvents).map(
-                (event) => (
-                  <div
-                    key={event.id}
-                    className="ticket"
-                    onClick={() => navigate(`/detail/${event.id}`)}
-                  >
-                    <div className="ticketscontent">
-                      <img
-                        src={event.poster}
-                        alt={event.title}
-                        className="ticketspicture"
-                      />
-                      <div>
-                        <h3 className="ticketsinfomations">{event.title}</h3>
-                        <p>날짜: {event.start}</p>
-                        <p>시간: {event.time}</p>
-                        <p>장소: {event.location}</p>
-                        <p>좌석: {event.seat}</p>
-                        <p>출연진: {event.cast}</p>
-                      </div>
-                    </div>
-                  </div>
-                )
-              )}
+            {filteredPerformances.map((performance) => (
+              <div key={performance.api_mt20id} className="result-item">
+                {performance.api_prfnm}
+              </div>
+            ))}
+          </div>
+
+          <div className="favorites-list">
+            <div className="favorites-header">
+              <h2>나의 관심 공연</h2>
+              <button
+                className="favorites-button"
+                onClick={() => navigate("/favorites")}
+                type="button"
+              >
+                모두 보기
+              </button>
+            </div>
+            <div className="favorite-items-container">
+              {favorites.slice(0, 3).map((fav) => (
+                <div key={fav.id} className="favorite-item">
+                  <img src={fav.poster} alt={fav.title} />
+                  <p>{fav.title}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>

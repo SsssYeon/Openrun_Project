@@ -1,3 +1,15 @@
+
+.mylikescalendarbox {
+  display: flex;
+  height: calc(100vh - 60px); /* 전체 화면 높이에서 Nav 높이 뺌 */
+  gap: 10px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  grid-template-columns: 400px 500px;
+  margin: 100px 200px;
+}
+
 .mylikescalendar {
   width: 400px; /* 기존과 동일 */
   height: 100%;
@@ -22,12 +34,13 @@
   padding: 2px 4px !important;  /* 막대 형태에 맞게 약간 패딩 주기 */
   margin-top: auto; /*날짜 숫자와의 간격 조절*/
   border-radius: 4px !important; /* 막대 모서리 둥글게 */
-  background-color: #ffd049 !important; /* 기간 표시 막대 색상 */
+  background-color: #ffd049; /* 기간 표시 막대 색상 */
   border: none !important;
   width: auto !important;
   height: 6px !important; /* 막대 높이 */
   box-sizing: border-box;
   position: relative;
+  padding: 0 !important;
 }
 
 .mylikescalendar .fc-event:hover {
@@ -49,17 +62,163 @@
   background-color: white !important;
 }
 
-.mylikescalendar .fc-daygrid-event-harness {
-position: static !important; /* or relative */
-  width: 100% !important;
-  height: auto !important;
-  top: auto !important;
-  left: auto !important;
 
-}
 
 .mylikescalendar .fc-daygrid-day-number {
   z-index: 10;
   position: relative; /* 숫자가 이벤트보다 위에 표시되도록 */
   margin-bottom: 6px; /* 숫자와 이벤트 사이 간격 */
+}
+
+.mylikescalendar .fc-event-title {
+  display: none !important;
+}
+
+.mylikescalendar .fc-daygrid-event {
+  margin-bottom: 6px !important; /* 이벤트끼리 간격 추가 */
+}
+
+.mylikescalendar .fc-event.favorite-1 {
+  background-color: #ffd049 !important; /* 노란색 */
+}
+
+.mylikescalendar .fc-event.favorite-2 {
+  background-color: #4dabf7 !important; /* 파란색 */
+}
+
+.mylikescalendar .fc-event.favorite-3 {
+  background-color: #ff6b6b !important; /* 빨간색 */
+}
+
+.mylikes-right {
+  min-width: 500px;
+  height: 100vh;
+  margin: -100px 0 0 50px;
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+}
+
+.searchperformances {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.searchperformances input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #ffd049;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+
+.search-results {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  height: 250px;      /* 고정 높이 */
+  overflow-y: auto;   /* 내부 세로 스크롤 가능 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 8px 12px;
+  margin-top: 100px;
+}
+
+.result-item {
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.result-item:last-child {
+  border-bottom: none;
+}
+
+.result-item:hover {
+  background-color: #ffd04933; /* 연한 노란 배경 */
+}
+
+.favorites-list {
+    margin-top: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* 아이템 사이 띄우기 */
+  gap: 6px;
+  padding: 20px 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  height: 300px
+}
+
+.favorites-header {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 필요에 따라 left, right로 조절 가능 */
+  position: relative;
+  display: flex;
+  justify-content: center; /* 제목과 버튼 전체를 중앙으로 */
+  align-items: center;
+margin-top:10px;
+}
+
+.favorites-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.favorites-button {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  background-color: #ffd049;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #333;
+  transition: background-color 0.2s ease;
+position: absolute;
+  right: 0; /* 오른쪽 끝에 버튼 고정 */
+}
+
+.favorites-button:hover {
+  background-color: #ffbf33;
+}
+
+.favorite-items-container {
+  display: flex;
+  flex-direction: row; /* 기본값이라 생략 가능 */
+  justify-content: space-between;
+  gap: 10px;
+}
+
+
+.favorite-item {
+  width: calc((100% - 20px) / 3); /* 3개 나란히 */
+  text-align: center;
+  cursor: pointer;
+}
+
+.favorite-item img {
+  width: 100px;
+  height: 100px;
+  border-radius: 6px;
+  object-fit: cover;
+  margin-bottom: 6px;
+}
+
+.favorite-item p {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

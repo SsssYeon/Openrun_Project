@@ -1,3 +1,5 @@
+// 마이페이지 - 관심공연 => api 연결 X
+
 import React from "react";
 import Nav from "../components/nav";
 import { Link } from "react-router-dom";

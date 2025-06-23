@@ -1,3 +1,5 @@
+// 마이페이지 - 나의 글 => api 연결 필요
+
 import React from "react";
 import Nav from "../components/nav";
 import { Link } from "react-router-dom";

@@ -1,3 +1,5 @@
+// api 연결 x
+
 import React from "react";
 import Nav from "../components/nav";
 import { Link } from "react-router-dom";
