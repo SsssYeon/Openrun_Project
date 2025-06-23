@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class PfmCalendarService {
 
-    private static final String COLLECTION_NAME = "calendarEvents";
+    private static final String COLLECTION_NAME = "Calendar_me";
 
     public List<PfmCalendarEvent> getAllEvents() throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
