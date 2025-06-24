@@ -20,22 +20,22 @@ const Performancedetail = () => {
 
         // 백엔드 필드를 프론트에 맞게 변환 (선택)
         const mappedData = {
-          api_mt20id: data.pfm_doc_id,
-          api_prfnm: data.pfm_nm,
-          api_prfpdfrom: data.pfm_start,
-          api_prfpdto: data.pfm_end,
-          api_fcltynm: data.pfm_fclty_nm,
-          api_prfcast: data.pfm_cast,
-          api_prfruntime: data.pfm_runtime,
-          api_prfage: data.pfm_age,
-          api_entrpsnmP: data.pfm_mnfctr,
-          api_pcseguidance: data.pfm_cost,
-          api_poster: data.pfm_poster,
-          api_sty: data.pfm_sty,
-          api_genrenm: data.pfm_genre,
-          api_dtguidance: data.pfm_dt,
-          api_relatenm: data.pfm_bookingsite_nm,
-          api_relateurl: data.pfm_bookingsite_url,
+          api_mt20id: data.mt20id,
+          api_prfnm: data.prfnm,
+          api_prfpdfrom: data.prfpdfrom,
+          api_prfpdto: data.prfpdto,
+          api_fcltynm: data.fcltynm,
+          api_prfcast: data.prfcast,
+          api_prfruntime: data.prfruntime,
+          api_prfage: data.prfage,
+          api_entrpsnmP: data.entrpsnmP,
+          api_pcseguidance: data.pcseguidance,
+          api_poster: data.poster,
+          api_sty: data.sty,
+          api_genrenm: data.genrenm,
+          api_dtguidance: data.dtguidance,
+          api_relatenm: data.relatenm,
+          api_relateurl: data.relateurl,
         };
 
         setPerformance(mappedData);
@@ -49,7 +49,7 @@ const Performancedetail = () => {
       if (!userId) return;
       try {
         const response = await fetch(
-          `/api/performances/${id}/interest?user_id=${userId}`
+          `/api/performances/${id}/interest?user_id=현재_로그인_사용자_ID`
         );
         const data = await response.json();
         setIsFavorite(data.isLiked); // 또는 true/false 반환 구조에 따라 수정
@@ -85,7 +85,7 @@ const Performancedetail = () => {
         },
         body: newFavoriteStatus
           ? JSON.stringify({
-              user_id: userId, // 실제 사용자 ID로 교체
+              user_id: "현재_로그인_사용자_ID", // 실제 사용자 ID로 교체
               likecalender_nm: performance.api_prfnm,
               likecalender_timestamp: new Date().toISOString(),
             })
