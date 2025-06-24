@@ -83,7 +83,7 @@ const Main = () => {
                       setShowDropdown(false);
                     }}
                   >
-                    {item.api_prfnm}
+                    {item.prfnm}
                   </li>
                 ))
               ) : (
