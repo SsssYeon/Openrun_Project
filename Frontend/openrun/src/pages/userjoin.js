@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import "../css/userjoin.css";
 import Nav from "../components/nav";
+import { useNavigate } from "react-router-dom";
 
 const Userjoin = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ const Userjoin = () => {
 
   const [idChecked, setIdChecked] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -160,7 +162,7 @@ const Userjoin = () => {
 
       if (response.ok) {
         alert("회원가입 성공!");
-        // navigate("/login");
+        navigate("/login");
       } else {
         alert(`회원가입 실패: ${data.message}`);
       }
