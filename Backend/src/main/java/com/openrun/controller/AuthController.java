@@ -1,6 +1,7 @@
 package com.openrun.controller;
 
 import com.openrun.dto.SignupRequest;
+import com.openrun.dto.LoginRequest;
 import com.openrun.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,9 +41,23 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             e.printStackTrace();
-            // 서버 에러가 나도 중복이 아니라고 알려주거나, 적절한 오류 메시지를 프론트에 내려줘야 해
             response.put("exists", false);
             return ResponseEntity.status(500).body(response);
+        }
+    }
+
+
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        System.out.println("로그인 요청 userId: " + request.getUserId());
+        System.out.println("로그인 요청 userPw: " + request.getUserPw());
+
+        try {
+            Map<String, String> result = authService.login(request);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 }

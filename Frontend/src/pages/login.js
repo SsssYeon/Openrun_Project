@@ -13,7 +13,7 @@ const Login = () => {
     e.preventDefault(); // 폼 제출 기본 동작 막기
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
