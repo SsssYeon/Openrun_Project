@@ -1,19 +1,11 @@
+// api를 통해 못 찾을 시 mocks 데이터에서 찾도록 설정
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/main.css"; // CSS 파일 연결
 import logo from "../components/logo.png";
 import Nav from "../components/nav.js";
-// import performancesData from "../mocks/performances"; 
-
-// const dummyData = [
-//   "레미제라블",
-//   "오페라의 유령",
-//   "노트르담 드 파리",
-//   "위키드",
-//   "캣츠",
-//   "드라큘라",
-//   "지킬 앤 하이드",
-// ];
+import performancesData from "../mocks/performances"; 
 
 const Main = () => {
   const [query, setQuery] = useState("");
@@ -36,15 +28,21 @@ const Main = () => {
         const data = await response.json();
         setResults(data); // 백엔드에서 공연 배열을 반환해야 함
       } catch (error) {
-        console.error("검색 중 오류 발생:", error);
-        setResults([]);
-      }
+      console.warn("🔁 API 실패 → mocks 데이터로 대체 중:", error);
+
+      const filtered = performancesData.filter(
+        (item) =>
+          item.pfm_nm &&
+          item.pfm_nm.toLowerCase().includes(query.toLowerCase())
+      );
+
+      setResults(filtered); // ✅ 예시 데이터 필터링
+    }
     };
 
-    const debounceTimer = setTimeout(fetchResults, 300); // 디바운싱
-
-    return () => clearTimeout(debounceTimer);
-  }, [query]);
+    const timer = setTimeout(fetchResults, 300);
+  return () => clearTimeout(timer);
+}, [query]);
 
   const handleLogoClick = () => {
     navigate("/");
@@ -83,7 +81,7 @@ const Main = () => {
                       setShowDropdown(false);
                     }}
                   >
-                    {item.api_prfnm}
+                    {item.pfm_nm}
                   </li>
                 ))
               ) : (

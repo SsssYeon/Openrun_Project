@@ -1,4 +1,3 @@
-
 .mylikescalendarbox {
   display: flex;
   height: calc(100vh - 60px); /* 전체 화면 높이에서 Nav 높이 뺌 */
@@ -31,7 +30,7 @@
 }
 
 .mylikescalendar .fc-event {
-  padding: 2px 4px !important;  /* 막대 형태에 맞게 약간 패딩 주기 */
+  padding: 2px 4px !important; /* 막대 형태에 맞게 약간 패딩 주기 */
   margin-top: auto; /*날짜 숫자와의 간격 조절*/
   border-radius: 4px !important; /* 막대 모서리 둥글게 */
   background-color: #ffd049; /* 기간 표시 막대 색상 */
@@ -62,8 +61,6 @@
   background-color: white !important;
 }
 
-
-
 .mylikescalendar .fc-daygrid-day-number {
   z-index: 10;
   position: relative; /* 숫자가 이벤트보다 위에 표시되도록 */
@@ -79,15 +76,15 @@
 }
 
 .mylikescalendar .fc-event.favorite-1 {
-  background-color: #ffd049 !important; /* 노란색 */
+  background-color: #ece6f0 !important;
 }
 
 .mylikescalendar .fc-event.favorite-2 {
-  background-color: #4dabf7 !important; /* 파란색 */
+  background-color: #ffeebc !important;
 }
 
 .mylikescalendar .fc-event.favorite-3 {
-  background-color: #ff6b6b !important; /* 빨간색 */
+  background-color: #dcf9c5 !important;
 }
 
 .mylikes-right {
@@ -122,11 +119,17 @@
   background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 6px;
-  height: 250px;      /* 고정 높이 */
-  overflow-y: auto;   /* 내부 세로 스크롤 가능 */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  height: 250px; /* 고정 높이 */
+  overflow-y: auto; /* 내부 세로 스크롤 가능 */
   padding: 8px 12px;
   margin-top: 100px;
+  font-size: 14px;
+}
+
+.search-results p {
+  padding: 8px 10px;
+  margin: 0;
+  color: #666;
 }
 
 .result-item {
@@ -147,7 +150,7 @@
 }
 
 .favorites-list {
-    margin-top: 0px;
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between; /* 아이템 사이 띄우기 */
@@ -155,7 +158,7 @@
   padding: 20px 15px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  height: 300px
+  height: 270px;
 }
 
 .favorites-header {
@@ -166,7 +169,7 @@
   display: flex;
   justify-content: center; /* 제목과 버튼 전체를 중앙으로 */
   align-items: center;
-margin-top:10px;
+  margin-top: 10px;
 }
 
 .favorites-header h2 {
@@ -184,7 +187,7 @@ margin-top:10px;
   cursor: pointer;
   color: #333;
   transition: background-color 0.2s ease;
-position: absolute;
+  position: absolute;
   right: 0; /* 오른쪽 끝에 버튼 고정 */
 }
 
@@ -199,11 +202,11 @@ position: absolute;
   gap: 10px;
 }
 
-
 .favorite-item {
   width: calc((100% - 20px) / 3); /* 3개 나란히 */
   text-align: center;
   cursor: pointer;
+  display: flex; flex-direction: column; align-items: center;
 }
 
 .favorite-item img {
@@ -221,4 +224,16 @@ position: absolute;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.favorite-item.favorite-1 p {
+  border-bottom: 4px solid #ece6f0;
+}
+
+.favorite-item.favorite-2 p {
+  border-bottom: 4px solid #ffeebc;
+}
+
+.favorite-item.favorite-3 p {
+  border-bottom: 4px solid #dcf9c5;
 }

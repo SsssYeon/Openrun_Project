@@ -124,6 +124,10 @@
   gap: 12px;
 }
 
+.community-list{
+  margin-top:20px;
+}
+
 .user-community-content {
   display: flex;
   justify-content: space-between;
@@ -162,6 +166,7 @@
 }
 
 #account_title {
+  margin-bottom:0px;
   text-align: center;
   color: black;
 }
@@ -172,6 +177,7 @@
   box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-size:13px;
 
 }
 
@@ -184,6 +190,7 @@
   border-radius: 4px;
   background-color: #f9f9f9; /* 입력창처럼 배경 설정 (선택) */
   color: #333;
+  font-size:13px;
 }
 
 #accountbutton {
@@ -198,10 +205,13 @@
   margin: 20px 0 50px 0;
 }
 
-.passwodchange-content{
+.passwordchange-content{
   padding : 20px;
 }
 
+#accountbutton{
+  margin-top : 50px;
+}
 
 .show-grid {
   display: grid;
@@ -216,11 +226,40 @@
   font-size: 14px;
   color: #333;
 }
-
+/* 
 .show-card img {
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+} */
+
+/* 하트 위치를 위해 감싸는 wrapper 추가 */
+.favorite-poster-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.favorite-poster-wrapper img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 하트 아이콘 오른쪽 위에 고정 */
+.heart-icon {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.heart-icon:hover {
+  transform: scale(1.2);
 }

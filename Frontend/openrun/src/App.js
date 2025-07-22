@@ -23,6 +23,7 @@ import Addrecord from "./pages/addrecord";
 import Modifyrecord from "./pages/modifyrecord";
 import Mylikescalendar from "./pages/mylikescalendar";
 import Myreport from "./pages/myreport";
+import PrivateRoute from "./components/privateroute";
 
 // import Counter from"./pages/counter";
 // import Input from"./pages/input";
@@ -47,9 +48,23 @@ function App() {
           <Route path="/findidresult" element={<Findidresult />} />
           <Route path="/main" element={<Main />} />
           <Route path="/main2" element={<Main2 />} />
-          <Route path="/calendarrecords" element={<Calendarrecords />} />
+          <Route
+          path="/calendarrecords"
+          element={
+            <PrivateRoute>
+              <Calendarrecords />
+            </PrivateRoute>
+          }
+        />
           <Route path="/detail/:id" element={<Eventdetail />} />
-          <Route path="/mypage" element={<Mypage />} />
+         <Route
+          path="/mypage"
+          element={
+            <PrivateRoute>
+              <Mypage />
+            </PrivateRoute>
+          }
+        />
           <Route path="/account" element={<Account />} />
           <Route path="/passwordchange" element={<Passwordchange />} />
           <Route path="/myposts" element={<Myposts />} />
@@ -57,29 +72,26 @@ function App() {
           <Route path="/performance/:id" element={<Performancedetail />} />
           <Route path="/addrecord" element={<Addrecord />} />
           <Route path="/modifyrecord/:id" element={<Modifyrecord />} />
-          <Route path="/mylikescalendar" element={<Mylikescalendar />} />
-          <Route path="/myreport" element={<Myreport />} />
+          <Route
+          path="/mylikescalendar"
+          element={
+            <PrivateRoute>
+              <Mylikescalendar />
+            </PrivateRoute>
+          }
+        />
+          <Route
+          path="/myreport"
+          element={
+            <PrivateRoute>
+              <Myreport />
+            </PrivateRoute>
+          }
+        />
         </Routes>
       
     </div>
   );
 }
-//     <div className="App">
-//       <nav>
-//         <Link to="/">Home</Link> | <Link to="/about">About</Link> | {" "}
-//         <Link to="/counter">Counter</Link> | {" "}
-//         <Link to="/input">Input</Link> | {" "}
-//         <Link to="/input2">Input2</Link> | {" "}
-//         <Link to="/list">List</Link>
-//       </nav>
-//       <Routes>
-//         <Route path="/" element={<Home />} />
-//         <Route path="/about" element={<About />} />
-//         <Route path="/counter" element={<Counter />} />
-//         <Route path="/input" element={<Input />} />
-//         <Route path="/input2" element={<Input2 />} />
-//         <Route path="/list" element={<List />} />
-//       </Routes>
-//     </div>
 
 export default App;

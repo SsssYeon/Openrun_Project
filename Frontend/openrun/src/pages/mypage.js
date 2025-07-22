@@ -1,9 +1,8 @@
-// api 연결 x
+// 닉네임 불러오는 것만 api 연결 완료, api 연결 안됐을 때 mocks 데이터 사용 (오픈런 고인물)
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Nav from "../components/nav";
-import { Link } from "react-router-dom";
-import { NavLink, navigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import userData from "../mocks/users";
 import "../css/mypage.css";
 
@@ -37,7 +36,36 @@ import "../css/mypage.css";
 //   };
 
 const MyPage = () => {
-  const user = userData;
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch("/api/users/me", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("인증 실패 또는 서버 오류");
+        }
+
+        const data = await response.json();
+        setUser(data);
+      } catch (error) {
+        console.error("유저 정보 불러오기 실패, 예시 데이터로 대체:", error);
+        setUser(userData); // ← 예시 데이터로 대체
+      }
+    };
+
+    fetchUser();
+  }, [navigate]);
+
+  if (!user) return <div>로딩 중...</div>;
+
   return (
     <div>
       <Nav />
@@ -87,41 +115,42 @@ const MyPage = () => {
         </div>
         <div className="mypage-right">
           <div className="mypage-scroll">
-          {/* 오른쪽 본문 영역 */}
-          <div className="mypage-right-top">
-            <p className="hello">
-              안녕하세요 <span className="hello-name">{user.nickname}</span>님!
-            </p>
+            {/* 오른쪽 본문 영역 */}
+            <div className="mypage-right-top">
+              <p className="hello">
+                안녕하세요{" "}
+                <span className="hello-name">{user.user_nicknm}</span>님!
+              </p>
 
-            {/* 관심 공연 */}
-            <div className="mypage-right-middle">
-              <h3 className="user-title">나의 관심 공연</h3>
-              <div className="user-favorite">
-                {user.favorites.map((show) => (
-                  <div key={show.id} className="user-favorite-content">
-                    <img
-                      src={show.thumbnail}
-                      alt={show.title}
-                      className="user-favorite-poster"
-                    />
-                    <p className="user-favorite-title">{show.title}</p>
-                  </div>
-                ))}
+              {/* 관심 공연 */}
+              <div className="mypage-right-middle">
+                <h3 className="user-title">나의 관심 공연</h3>
+                <div className="user-favorite">
+                  {user.favorites.map((show) => (
+                    <div key={show.id} className="user-favorite-content">
+                      <img
+                        src={show.thumbnail}
+                        alt={show.title}
+                        className="user-favorite-poster"
+                      />
+                      <p className="user-favorite-title">{show.title}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* 나의 글 */}
-            <div className="mypage-right-bottom">
-              <h3 className="user-title">나의 글</h3>
-              <div className="user-community">
-                {user.posts.map((post) => (
-                  <div key={post.id} className="user-community-content">
-                    <div className="user-community-title">{post.title}</div>
-                    <div className="user-community-date">{post.date}</div>
-                  </div>
-                ))}
+              {/* 나의 글 */}
+              <div className="mypage-right-bottom">
+                <h3 className="user-title">나의 글</h3>
+                <div className="user-community">
+                  {user.posts.map((post) => (
+                    <div key={post.id} className="user-community-content">
+                      <div className="user-community-title">{post.title}</div>
+                      <div className="user-community-date">{post.date}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
             </div>
           </div>
         </div>

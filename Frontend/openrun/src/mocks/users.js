@@ -3,8 +3,10 @@ import poster2 from "../components/poster2.jpg";
 // import poster3 from "../components/poster3.jpg";
 
 const userData = {
-    nickname: '오픈런고인물',
-    ID: 'openrun',
+    user_nicknm: '오픈런고인물',
+    user_nm: '홍길동',
+    user_id : 'openrun',
+    user_phonenum : '010-1234-5678',
     favorites: [
       {
         id: 1,

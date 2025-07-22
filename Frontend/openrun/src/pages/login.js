@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+//api 연결 O
+
+import React, { useEffect, useState } from "react";
 import "../css/login.css";
 import { NavLink, useNavigate } from "react-router-dom";
 import Nav from "../components/nav.js";
 
 const Login = () => {
-
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate(); // 로그인 성공 후 페이지 이동용
@@ -30,15 +31,29 @@ const Login = () => {
 
       const data = await response.json();
       // 예시: 토큰 저장
-      localStorage.setItem("user_token", data.user_local_token);
+
+      localStorage.setItem("token", data.user_local_token);
+      localStorage.setItem("userId", data.user_id);
+      localStorage.setItem("nickname", data.user_nicknm);
+
       alert(`${data.user_nicknm}님 환영합니다!`);
       navigate("/"); // 홈 또는 마이페이지 등으로 이동
-
     } catch (err) {
       console.error(err);
       alert("아이디 또는 비밀번호를 확인하세요.");
     }
   };
+
+  useEffect(() => {
+    if (
+      process.env.NODE_ENV === "development" &&
+      !localStorage.getItem("token")
+    ) {
+      localStorage.setItem("token", "dummy-token");
+      localStorage.setItem("userId", "testuser");
+      localStorage.setItem("nickname", "테스트계정");
+    }
+  }, []); // 임시 코드 로그인된 상태로 만들기 위해 토큰 자동 삽입, 추후 주석처리 예정
 
   return (
     <div>
@@ -53,7 +68,7 @@ const Login = () => {
         </div>
         <div>
           <div className="input">
-          <h5> 아이디 </h5>
+            <h5> 아이디 </h5>
             <input
               type="text"
               className="userId"
@@ -72,7 +87,9 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             ></input>
-            <button id="loginBut" type="submit">로그인</button>
+            <button id="loginBut" type="submit">
+              로그인
+            </button>
             <div className="link">
               <NavLink to="/findid">아이디 찾기</NavLink>
               <span>&nbsp;|&nbsp;</span>

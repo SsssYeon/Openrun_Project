@@ -7,7 +7,6 @@ import performances from "../mocks/performances"; // 공연 정보 데이터
 
 const Addrecord = () => {
   const [name, setName] = useState("");
-  const [poster, setPoster] = useState("/default-poster.png");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
@@ -19,15 +18,7 @@ const Addrecord = () => {
   const [posterPreview, setPosterPreview] = useState("/default-poster.png");
 
   const handleTitleChange = (e) => {
-    const title = e.target.value;
-    setName(title); // 또는 setSelectedTitle(title)
-
-    const found = performances.find((p) => p.api_prfnm === title);
-    if (found) {
-      setPoster(found.api_poster); // 해당 공연 포스터로 변경
-    } else {
-      setPoster("/default-poster.png"); // 찾을 수 없으면 기본 이미지
-    }
+    setName(e.target.value);
   };
 
   const fileInputRef = useRef(null); // input 참조
@@ -109,16 +100,7 @@ const Addrecord = () => {
 
             <div className="modifyrecord-row">
               <strong>공연명: </strong>
-              <input
-                value={name}
-                onChange={handleTitleChange}
-                list="performance-list"
-              />
-              <datalist id="performance-list">
-                {performances.map((p) => (
-                  <option key={p.api_mt20id} value={p.api_prfnm} />
-                ))}
-              </datalist>
+              <input value={name} onChange={handleTitleChange} />
             </div>
 
             <div className="modifyrecord-row">

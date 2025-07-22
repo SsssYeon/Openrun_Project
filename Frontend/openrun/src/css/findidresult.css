@@ -12,7 +12,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, 20%);
+    transform: translate(-50%, -25%);
     border-radius: 20px;
     padding: 20px;
     background-color: #ffffff;

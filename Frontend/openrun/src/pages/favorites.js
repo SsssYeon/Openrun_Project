@@ -1,20 +1,30 @@
 // 마이페이지 - 관심공연 => api 연결 X
 
-import React from "react";
+import React, { useState } from "react";
 import Nav from "../components/nav";
-import { Link } from "react-router-dom";
-// import userData from "../mocks/users";
+import { Link, useNavigate } from "react-router-dom";
 import "../css/mypage.css";
-import poster1 from "../components/poster1.jpg";
-import poster2 from "../components/poster2.jpg";
-
-const favoriteShows = [
-  { title: "지킬 앤 하이드", image: poster1 },
-  { title: "랭보", image: poster2 },
-];
+import favorites from "../mocks/favorites";
 
 const Favorites = () => {
-  // const user = userData;
+
+  const navigate = useNavigate();
+
+  const [likedStates, setLikedStates] = useState(() => {
+    const initialState = {};
+    favorites.forEach((fav) => {
+      initialState[fav.id] = false; // 백엔드에서 정보 받아와 기존에 저장되어 있는 정보대로 달력에 표시되고 있던 공연들만 채운 하트 표시 예정
+    });
+    return initialState;
+  });
+
+  const toggleHeart = (id) => {
+    setLikedStates((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   return (
     <div>
       <Nav />
@@ -62,9 +72,22 @@ const Favorites = () => {
             <h3 id="account_title">관심 공연</h3>
           </div>
           <div className="show-grid">
-            {favoriteShows.map((show, index) => (
-              <div key={index} className="show-card">
-                <img src={show.image} alt={show.title} />
+            {favorites.map((show) => (
+              <div key={show.id} className="show-card">
+                <div className="favorite-poster-wrapper">
+                  <img
+                    src={show.poster}
+                    alt={show.title}
+                    onClick={() => navigate(`/performance/${show.pfm_doc_id}`)}
+                    style={{ cursor: "pointer" }}
+                  />
+                  <span
+                    className="heart-icon"
+                    onClick={() => toggleHeart(show.id)}
+                  >
+                    {likedStates[show.id] ? "❤️" : "🤍"}
+                  </span>
+                </div>
                 <p>{show.title}</p>
               </div>
             ))}

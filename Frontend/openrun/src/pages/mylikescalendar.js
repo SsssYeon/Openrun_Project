@@ -1,4 +1,4 @@
-// api 연결 X 버전 => api 연결 버전 다시 만들어야 함
+// 검색 기능만 연결 완료 api 연결 X 버전 => api 연결 버전 다시 만들어야 함
 
 import Nav from "../components/nav.js";
 import "../css/mylikescalendar.css";
@@ -13,6 +13,7 @@ const Mylikescalendar = () => {
   const [events, setEvents] = useState([]); // 전체 관극 기록
   const [selectedDateEvents, setSelectedDateEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filteredPerformances, setFilteredPerformances] = useState([]);
   const navigate = useNavigate();
 
   const addOneDay = (dateStr) => {
@@ -25,6 +26,7 @@ const Mylikescalendar = () => {
   useEffect(() => {
     const formatted = favorites.map((item) => ({
       id: item.id, // ❗️eventClick 등에서 id가 필요함
+      pfm_doc_id: item.pfm_doc_id,
       title: item.title,
       start: item.start,
       end: addOneDay(item.end),
@@ -43,39 +45,44 @@ const Mylikescalendar = () => {
 
   // 이벤트(포스터) 클릭 시 상세 페이지로 이동
   const handleEventClick = (info) => {
-    navigate(`/detail/${info.event.id}`);
+    navigate(`/performance/${info.event.extendedProps.pfm_doc_id}`);
   };
 
-  const renderEventContent = (eventInfo) => {
-    return (
-      <div
-        style={{
-          backgroundColor: "#ffcc66", // 원하는 색
-          borderRadius: "5px",
-          padding: "2px 4px",
-          fontWeight: "bold",
-          color: "#333",
-          fontSize: "0.8rem",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {eventInfo.event.title}
-      </div>
-    );
-  };
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      if (!searchTerm.trim()) {
+        setFilteredPerformances([]);
+        return;
+      }
 
-  const filteredPerformances = performances.filter(
-    ({ api_prfcast, api_prfnm, api_fcltynm }) => {
-      const term = searchTerm.toLowerCase();
-      return (
-        api_prfnm.toLowerCase().includes(term) ||
-        api_prfcast.toLowerCase().includes(term) ||
-        api_fcltynm.toLowerCase().includes(term)
-      );
-    }
-  );
+      try {
+        const res = await fetch(
+          `/api/performances/search?query=${encodeURIComponent(searchTerm)}`
+        );
+        if (!res.ok) throw new Error("API 요청 실패");
+
+        const data = await res.json();
+        setFilteredPerformances(data);
+      } catch (error) {
+        console.error("API 실패, mocks로 대체:", error);
+
+        // mocks로 대체
+        const fallback = performances.filter(
+          ({ pfm_cast, pfm_nm, pfm_fclty_nm }) => {
+            const term = searchTerm.toLowerCase();
+            return (
+              pfm_nm?.toLowerCase().includes(term) ||
+              pfm_cast?.toLowerCase().includes(term) ||
+              pfm_fclty_nm?.toLowerCase().includes(term)
+            );
+          }
+        );
+        setFilteredPerformances(fallback);
+      }
+    };
+
+    fetchSearchResults();
+  }, [searchTerm]);
 
   return (
     <div>
@@ -106,7 +113,7 @@ const Mylikescalendar = () => {
           />
         </div>
 
-        {/* 우측 상세 정보 요약 카드 */}
+        {/* 우측 검색창 및 관심 공연 */}
         <div className="mylikes-right">
           <div className="searchperformances">
             <input
@@ -117,15 +124,23 @@ const Mylikescalendar = () => {
             />
           </div>
           <div className="search-results">
-            {searchTerm && filteredPerformances.length === 0 && (
+            {searchTerm === "" ? (
+              <p>궁금한 공연의 제목을 입력해주세요</p>
+            ) : filteredPerformances.length === 0 ? (
               <p>검색 결과가 없습니다.</p>
+            ) : (
+              filteredPerformances.map((performance) => (
+                <div
+                  key={performance.pfm_doc_id}
+                  className="result-item"
+                  onClick={() =>
+                    navigate(`/performance/${performance.pfm_doc_id}`)
+                  }
+                >
+                  {performance.pfm_nm}
+                </div>
+              ))
             )}
-
-            {filteredPerformances.map((performance) => (
-              <div key={performance.api_mt20id} className="result-item">
-                {performance.api_prfnm}
-              </div>
-            ))}
           </div>
 
           <div className="favorites-list">
@@ -140,8 +155,13 @@ const Mylikescalendar = () => {
               </button>
             </div>
             <div className="favorite-items-container">
-              {favorites.slice(0, 3).map((fav) => (
-                <div key={fav.id} className="favorite-item">
+              {favorites.slice(0, 3).map((fav, index) => (
+                <div
+                  key={fav.id}
+                  className={`favorite-item favorite-${index + 1}`}
+                  onClick={() => navigate(`/performance/${fav.pfm_doc_id}`)} // ✅ 이동 추가
+                  style={{ cursor: "pointer" }}
+                >
                   <img src={fav.poster} alt={fav.title} />
                   <p>{fav.title}</p>
                 </div>

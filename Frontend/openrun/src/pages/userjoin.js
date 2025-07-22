@@ -28,14 +28,16 @@ const Userjoin = () => {
     if (name === "user_id") setIdChecked(false);
   };
 
-    const handleCheckDuplicateId = async () => {
+  const handleCheckDuplicateId = async () => {
     if (!formData.user_id) {
       alert("아이디를 입력해주세요.");
       return;
     }
 
     try {
-      const response = await fetch(`/api/auth/check-id?user_id=${formData.user_id}`);
+      const response = await fetch(
+        `/api/auth/check-id?user_id=${formData.user_id}`
+      );
       const data = await response.json();
 
       if (response.ok) {
@@ -55,7 +57,7 @@ const Userjoin = () => {
     }
   };
 
-   // ✅ 인증번호 전송
+  // ✅ 인증번호 전송
   const handleSendPhoneCode = async () => {
     if (!formData.user_phonenum) {
       alert("휴대폰 번호를 입력해주세요.");
@@ -122,6 +124,12 @@ const Userjoin = () => {
     }
   };
 
+  const isValidPassword = (pw, userId) => {
+    const regex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+    return regex.test(pw) && !pw.includes(userId);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -132,6 +140,13 @@ const Userjoin = () => {
 
     if (!phoneVerified) {
       alert("휴대폰 인증을 완료해주세요.");
+      return;
+    }
+
+    if (!isValidPassword(formData.user_pw, formData.user_id)) {
+      alert(
+        "비밀번호는 영문, 숫자, 특수기호 포함 8자 이상이며, 아이디와 동일할 수 없습니다."
+      );
       return;
     }
 
@@ -189,7 +204,13 @@ const Userjoin = () => {
               maxLength="20"
               autoFocus
             />
-            <button type="button" id="dupIdCheck" onClick={handleCheckDuplicateId}>중복확인</button>
+            <button
+              type="button"
+              id="dupIdCheck"
+              onClick={handleCheckDuplicateId}
+            >
+              중복확인
+            </button>
           </div>
 
           {/* 비밀번호 */}
@@ -203,6 +224,12 @@ const Userjoin = () => {
               onChange={handleChange}
               maxLength="15"
             />
+            <p
+              className="pw-requirements"
+              style={{ fontSize: "0.85rem", color: "#888", marginTop: "4px" }}
+            >
+              - 영문, 숫자, 특수기호 포함 8자 이상 / 아이디 불가
+            </p>
           </div>
 
           {/* 비밀번호 확인 */}
@@ -253,12 +280,17 @@ const Userjoin = () => {
               name="user_phonenum"
               value={formData.user_phonenum}
               onChange={handleChange}
-              maxLength="11"
+              maxLength="13"
             />
-            <button type="button" id="sendPhoneCode" onClick={handleSendPhoneCode}>인증번호 전송</button> {/* 추가 api 필요!! 추후 구현 */}
+            <button
+              type="button"
+              id="sendPhoneCode"
+              onClick={handleSendPhoneCode}
+            >
+              인증번호 전송
+            </button>{" "}
           </div>
 
-          {/* 인증번호, 인증번호 전송 api 연결 후 구현 */}
           <div>
             <h5>인증번호</h5>
             <input
@@ -269,11 +301,19 @@ const Userjoin = () => {
               onChange={handleChange}
               maxLength="6"
             />
-            <button type="button" id="verifyPhoneCode" onClick={handleVerifyPhoneCode}>인증 확인</button>
+            <button
+              type="button"
+              id="verifyPhoneCode"
+              onClick={handleVerifyPhoneCode}
+            >
+              인증 확인
+            </button>
           </div>
         </div>
         <div>
-        <button type="submit" id="sbtn">가입완료</button>
+          <button type="submit" id="sbtn">
+            가입완료
+          </button>
         </div>
       </form>
     </div>
@@ -281,4 +321,3 @@ const Userjoin = () => {
 };
 
 export default Userjoin;
-

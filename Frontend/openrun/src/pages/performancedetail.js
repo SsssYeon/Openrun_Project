@@ -1,6 +1,8 @@
+// api를 통해 찾지 못했을 시 mocks 데이터에서 찾도록
+
 import { useParams } from "react-router-dom";
 import Nav from "../components/nav";
-// import performances from "../mocks/performances"; // 경로는 실제 파일 위치에 맞게 조정
+import performances from "../mocks/performances"; // 경로는 실제 파일 위치에 맞게 조정
 import "../css/performancedetail.css";
 import React, { useState, useEffect } from "react";
 
@@ -20,22 +22,22 @@ const Performancedetail = () => {
 
         // 백엔드 필드를 프론트에 맞게 변환 (선택)
         const mappedData = {
-          api_mt20id: data.pfm_doc_id,
-          api_prfnm: data.pfm_nm,
-          api_prfpdfrom: data.pfm_start,
-          api_prfpdto: data.pfm_end,
-          api_fcltynm: data.pfm_fclty_nm,
-          api_prfcast: data.pfm_cast,
-          api_prfruntime: data.pfm_runtime,
-          api_prfage: data.pfm_age,
-          api_entrpsnmP: data.pfm_mnfctr,
-          api_pcseguidance: data.pfm_cost,
-          api_poster: data.pfm_poster,
-          api_sty: data.pfm_sty,
-          api_genrenm: data.pfm_genre,
-          api_dtguidance: data.pfm_dt,
-          api_relatenm: data.pfm_bookingsite_nm,
-          api_relateurl: data.pfm_bookingsite_url,
+          api_mt20id: data.mt20id,
+          api_prfnm: data.prfnm,
+          api_prfpdfrom: data.prfpdfrom,
+          api_prfpdto: data.prfpdto,
+          api_fcltynm: data.fcltynm,
+          api_prfcast: data.prfcast,
+          api_prfruntime: data.prfruntime,
+          api_prfage: data.prfage,
+          api_entrpsnmP: data.entrpsnmP,
+          api_pcseguidance: data.pcseguidance,
+          api_poster: data.poster,
+          api_sty: data.sty,
+          api_genrenm: data.genrenm,
+          api_dtguidance: data.dtguidance,
+          api_relatenm: data.relatenm,
+          api_relateurl: data.relateurl,
         };
 
         setPerformance(mappedData);
@@ -44,12 +46,35 @@ const Performancedetail = () => {
       }
     };
 
+         // API 실패 시 mock 데이터에서 찾아서 세팅
+      const found = performances.find((p) => p.pfm_doc_id === id);
+      if (found) {
+        setPerformance({
+          api_mt20id: found.pfm_doc_id,
+          api_prfnm: found.pfm_nm,
+          api_prfpdfrom: found.pfm_start,
+          api_prfpdto: found.pfm_end,
+          api_fcltynm: found.pfm_fclty_nm,
+          api_prfcast: found.pfm_cast,
+          api_prfruntime: found.pfm_runtime,
+          api_prfage: found.pfm_age,
+          api_entrpsnmP: found.pfm_mnfctr,
+          api_pcseguidance: found.pfm_cost,
+          api_poster: found.pfm_poster,
+          api_sty: found.pfm_sty,
+          api_genrenm: found.pfm_genre,
+          api_dtguidance: found.pfm_dt,
+        });
+      } else {
+        setPerformance(null);
+      }
+
     const fetchFavoriteStatus = async () => {
       const userId = localStorage.getItem("user_id");
       if (!userId) return;
       try {
         const response = await fetch(
-          `/api/performances/${id}/interest?user_id=${userId}`
+          `/api/performances/${id}/interest?user_id=현재_로그인_사용자_ID`
         );
         const data = await response.json();
         setIsFavorite(data.isLiked); // 또는 true/false 반환 구조에 따라 수정
@@ -85,7 +110,7 @@ const Performancedetail = () => {
         },
         body: newFavoriteStatus
           ? JSON.stringify({
-              user_id: userId, // 실제 사용자 ID로 교체
+              user_id: "현재_로그인_사용자_ID", // 실제 사용자 ID로 교체
               likecalender_nm: performance.api_prfnm,
               likecalender_timestamp: new Date().toISOString(),
             })
@@ -149,16 +174,6 @@ const Performancedetail = () => {
           </p>
           <p>
             <strong>티켓 가격: </strong> {performance.api_pcseguidance}
-          </p>
-          <p>
-            <strong>예매처: </strong>
-            <a
-              href={performance.api_relateurl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {performance.api_relatenm}
-            </a>
           </p>
           <p>
             <strong>줄거리: </strong> {performance.api_sty}

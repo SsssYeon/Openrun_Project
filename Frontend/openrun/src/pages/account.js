@@ -1,13 +1,71 @@
-// 마이페이지 - 계정 설정 => api 연결 X
+// 마이페이지 - 계정 설정 => api 연결 완료
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Nav from "../components/nav";
 import { Link } from "react-router-dom";
-import userData from "../mocks/users";
+import mockUserData from "../mocks/users";
 import "../css/mypage.css";
 
 const Account = () => {
-  const user = userData;
+  const [userData, setUserData] = useState(null);
+  const [user_nm, setName] = useState("");
+  const [user_nicknm, setNickname] = useState("");
+
+  useEffect(() => {
+    // 사용자 정보 가져오기
+    const fetchUserInfo = async () => {
+      try {
+        const response = await fetch("/api/users/me", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserData(data);
+        } else {
+          console.error("유저 정보를 가져오는데 실패했습니다.");
+          setUserData(mockUserData);
+        }
+      } catch (error) {
+        console.error("에러 발생:", error);
+        setUserData(mockUserData);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch("/api/users/me", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+         user_nm: user_nm || undefined,
+          user_nicknm: user_nicknm || undefined,
+        }),
+      });
+
+      if (response.ok) {
+        alert("수정이 완료되었습니다.");
+        window.location.reload();
+      } else {
+        alert("수정에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("에러 발생:", error);
+    }
+  };
+
+  if (!userData) return <div>로딩 중...</div>;
+
   return (
     <div>
       <Nav />
@@ -57,7 +115,7 @@ const Account = () => {
           {/* 아이디 */}
           <div>
             <h5> 아이디 </h5>
-            <span className="user-id">{user.ID}</span>
+            <span className="user-id">{userData.user_id}</span>
           </div>
 
           {/* 이름 */}
@@ -65,10 +123,12 @@ const Account = () => {
             <h5> 이름 </h5>
             <input
               type="text"
-              class="input-field"
+              className="input-field"
               maxLength="10"
               name="userjoin_name"
-              // placeholder="이름"
+              placeholder={userData.user_nm}
+              value={user_nm}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
 
@@ -77,26 +137,23 @@ const Account = () => {
             <h5> 닉네임 </h5>
             <input
               type="text"
-              class="input-field"
+              className="input-field"
               maxLength="10"
               name="userjoin_nickname"
-              // placeholder="닉네임"
+              placeholder={userData.user_nicknm}
+              value={user_nicknm}
+              onChange={(e) => setNickname(e.target.value)}
             />
           </div>
 
           {/* 휴대폰 번호 */}
           <div>
             <h5> 휴대폰 번호 </h5>
-            <input
-              type="text"
-              class="input-field"
-              maxLength="11"
-              name="userjoin_tel"
-            />
+            <span className="user-id">{userData.user_phonenum}</span>
           </div>
 
           <div>
-            <button type="submit" id="accountbutton">
+            <button type="submit" id="accountbutton" onClick={handleSubmit}>
               저장
             </button>
           </div>
