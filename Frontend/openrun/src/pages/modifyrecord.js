@@ -1,6 +1,6 @@
 // api 연결 X ver => api 연결 버전 구현 O
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Nav from "../components/nav";
 import events from "../mocks/events"; // 경로는 실제 파일 위치에 맞게 조정
 import "../css/eventdetail.css";
@@ -18,6 +18,7 @@ const Modifyrecord = () => {
   const [cast, setCast] = useState("");
   const [cost, setCost] = useState("");
   const [memo, setMemo] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     //   const fetchEventDetail = async () => {
@@ -51,6 +52,9 @@ const Modifyrecord = () => {
   }, [id]);
 
   const handleSave = async () => {
+
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
     const updatedRecord = {
       pfmcalender_nm: name,
       pfmcalender_date: date,
@@ -65,13 +69,16 @@ const Modifyrecord = () => {
     try {
       const res = await fetch(`/api/calendar/me/${id}`, {
         method: "PUT", // 또는 PATCH
-        headers: { "Content-Type": "application/json" },
+        headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }), // 토큰이 있을 때만 헤더에 추가
+      },
         body: JSON.stringify(updatedRecord),
       });
 
       if (res.ok) {
         alert("수정이 완료되었습니다.");
-        // navigate("/"); 등으로 이동 가능
+        navigate(`/detail/${id}`);
       } else {
         alert("수정에 실패했습니다.");
       }

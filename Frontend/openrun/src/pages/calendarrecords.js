@@ -17,7 +17,7 @@ const Calendarrecords = () => {
   // 관극 기록 API 호출
   useEffect(() => {
     const fetchCalendarData = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       try {
         const res = await fetch("/api/calendar/me", {
           method: "GET",

@@ -3,25 +3,39 @@
 body {
   height: 100%;
   margin: 0;
+  padding: 0;
+  
 }
 
 .layout {
   display: grid;
   grid-template-columns: 400px 600px;
   grid-template-rows: 300px 200px 100px;
-  height: 90%;
+  height: 100vh;
   padding: 0px 200px; /* 바깥쪽 여백 */
   gap: 10px;
   box-sizing: border-box;
   flex-direction: column;
-  
+  overflow: hidden;
 }
 
-#title {
+#left-title {
   text-decoration: underline;
   text-decoration-color: #ffd049;
   text-underline-offset: 4px;
-  margin-bottom: 20px;
+  margin-top: 50px;
+}
+
+#righttop-title {
+  text-decoration: underline;
+  text-decoration-color: #ffd049;
+  text-underline-offset: 4px;
+}
+
+#rightbottom-title {
+  text-decoration: underline;
+  text-decoration-color: #ffd049;
+  text-underline-offset: 4px;
 }
 
 .left {
@@ -44,7 +58,6 @@ body {
   background-color: white;
   padding: 16px;
   flex-direction: column;
-  
 }
 
 .banner {
@@ -185,6 +198,7 @@ body {
 
 .community-list {
   width: 90%;
+  margin-bottom: 20px;
 }
 
 .community-item {
@@ -195,7 +209,7 @@ body {
   
   border-radius: 10px;
   padding: 12px;
-  margin-bottom: 12px; /* 다음 항목과 간격 */
+  margin-bottom: 16px; /* 다음 항목과 간격 */
   box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 약간의 그림자 */
   height: 55px;
 }
@@ -236,3 +250,4 @@ body {
   margin-right: 3px;
   margin-top: 12px;
 }
+

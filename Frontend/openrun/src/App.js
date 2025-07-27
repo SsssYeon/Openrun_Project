@@ -24,6 +24,7 @@ import Modifyrecord from "./pages/modifyrecord";
 import Mylikescalendar from "./pages/mylikescalendar";
 import Myreport from "./pages/myreport";
 import PrivateRoute from "./components/privateroute";
+import Community from "./pages/community";
 
 // import Counter from"./pages/counter";
 // import Input from"./pages/input";
@@ -36,19 +37,18 @@ function App() {
       {/* <nav><Link to="/main2">Main2</Link> </nav> 
       <nav><Link to="/main">Main</Link> </nav> */}
 
-      
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/nav" element={<Nav />} />
-          <Route path="/userjoin" element={<Userjoin />} />
-          <Route path="/findid" element={<Findid />} />
-          <Route path="/findpw" element={<Findpw />} />
-          <Route path="/findpwresult" element={<Findpwresult />} />
-          <Route path="/findidresult" element={<Findidresult />} />
-          <Route path="/main" element={<Main />} />
-          <Route path="/main2" element={<Main2 />} />
-          <Route
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/nav" element={<Nav />} />
+        <Route path="/userjoin" element={<Userjoin />} />
+        <Route path="/findid" element={<Findid />} />
+        <Route path="/findpw" element={<Findpw />} />
+        <Route path="/findpwresult" element={<Findpwresult />} />
+        <Route path="/findidresult" element={<Findidresult />} />
+        <Route path="/main" element={<Main />} />
+        <Route path="/main2" element={<Main2 />} />
+        <Route
           path="/calendarrecords"
           element={
             <PrivateRoute>
@@ -56,8 +56,8 @@ function App() {
             </PrivateRoute>
           }
         />
-          <Route path="/detail/:id" element={<Eventdetail />} />
-         <Route
+        <Route path="/detail/:id" element={<Eventdetail />} />
+        <Route
           path="/mypage"
           element={
             <PrivateRoute>
@@ -65,14 +65,14 @@ function App() {
             </PrivateRoute>
           }
         />
-          <Route path="/account" element={<Account />} />
-          <Route path="/passwordchange" element={<Passwordchange />} />
-          <Route path="/myposts" element={<Myposts />} />
-          <Route path="/favorites" element={<Favorites />} />
-          <Route path="/performance/:id" element={<Performancedetail />} />
-          <Route path="/addrecord" element={<Addrecord />} />
-          <Route path="/modifyrecord/:id" element={<Modifyrecord />} />
-          <Route
+        <Route path="/account" element={<Account />} />
+        <Route path="/passwordchange" element={<Passwordchange />} />
+        <Route path="/myposts" element={<Myposts />} />
+        <Route path="/favorites" element={<Favorites />} />
+        <Route path="/performance/:id" element={<Performancedetail />} />
+        <Route path="/addrecord" element={<Addrecord />} />
+        <Route path="/modifyrecord/:id" element={<Modifyrecord />} />
+        <Route
           path="/mylikescalendar"
           element={
             <PrivateRoute>
@@ -80,7 +80,7 @@ function App() {
             </PrivateRoute>
           }
         />
-          <Route
+        <Route
           path="/myreport"
           element={
             <PrivateRoute>
@@ -88,8 +88,9 @@ function App() {
             </PrivateRoute>
           }
         />
-        </Routes>
-      
+              <Route path="/community" element={<Community />} />
+      </Routes>
+
     </div>
   );
 }

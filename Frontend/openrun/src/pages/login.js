@@ -8,6 +8,7 @@ import Nav from "../components/nav.js";
 const Login = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  const [autoLogin, setAutoLogin] = useState(false); // ✅ 자동 로그인 여부
   const navigate = useNavigate(); // 로그인 성공 후 페이지 이동용
 
   const handleLogin = async (e) => {
@@ -32,9 +33,10 @@ const Login = () => {
       const data = await response.json();
       // 예시: 토큰 저장
 
-      localStorage.setItem("token", data.user_local_token);
-      localStorage.setItem("userId", data.user_id);
-      localStorage.setItem("nickname", data.user_nicknm);
+      const storage = autoLogin ? localStorage : sessionStorage;
+      storage.setItem("token", data.user_local_token);
+      storage.setItem("userId", data.user_id);
+      storage.setItem("nickname", data.user_nicknm);
 
       alert(`${data.user_nicknm}님 환영합니다!`);
       navigate("/"); // 홈 또는 마이페이지 등으로 이동
@@ -47,13 +49,14 @@ const Login = () => {
   useEffect(() => {
     if (
       process.env.NODE_ENV === "development" &&
-      !localStorage.getItem("token")
+      !localStorage.getItem("token") &&
+      !sessionStorage.getItem("token")
     ) {
       localStorage.setItem("token", "dummy-token");
       localStorage.setItem("userId", "testuser");
       localStorage.setItem("nickname", "테스트계정");
     }
-  }, []); // 임시 코드 로그인된 상태로 만들기 위해 토큰 자동 삽입, 추후 주석처리 예정
+  }, []); // 임시 코드 로그인된 상태로 만들기 위해 토큰 자동 삽입, 추후 주석처리 예정 -> 백 개발 시 주석처리하고 진행해주세요!
 
   return (
     <div>
@@ -87,6 +90,19 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             ></input>
+
+            {/* ✅ 자동 로그인 체크박스 추가 */}
+            <div style={{ marginTop: "15px", marginBottom: "5px" }}>
+              <label className="auto-login-label">
+                <input
+                  type="checkbox"
+                  checked={autoLogin}
+                  onChange={(e) => setAutoLogin(e.target.checked)}
+                />
+                &nbsp;자동 로그인
+              </label>
+            </div>
+
             <button id="loginBut" type="submit">
               로그인
             </button>

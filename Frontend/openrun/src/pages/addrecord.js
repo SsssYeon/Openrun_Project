@@ -3,7 +3,6 @@
 import React, { useRef, useState } from "react";
 import Nav from "../components/nav";
 import "../css/eventdetail.css";
-import performances from "../mocks/performances"; // 공연 정보 데이터
 
 const Addrecord = () => {
   const [name, setName] = useState("");
@@ -56,8 +55,14 @@ const Addrecord = () => {
     }
 
     try {
+      const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+
       const res = await fetch("/api/calendar/me", {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`, // 👈 토큰 포함
+        },
         body: formData,
       });
 

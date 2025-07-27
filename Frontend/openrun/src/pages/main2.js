@@ -8,45 +8,46 @@ import poster3 from "../components/poster3.jpg";
 import logo2 from "../components/logo2.png";
 
 const Main2 = () => {
+
   return (
-    <div className="layout">
-      <div className="left">
-        <h3 id="title">오픈런 랭킹</h3>
-        <div class="ranking section">
-          <div class="ranking-item">
-            <div class="rank-num">1</div>
-            <div class="ranking-info">
-              <div class="title">지킬앤하이드</div>
-              <div class="date">2024.11.29 ~ 2025.05.18</div>
-            </div>
-            <img src={poster1} alt="지킬앤하이드 포스터" />
+    <div className="main2-container">
+      <div className="layout">
+        <div className="left">
+          <div className="section-title">
+            <h3 id="left-title">오픈런 랭킹</h3>
           </div>
-
-          <div class="ranking-item">
-            <div class="rank-num">2</div>
-            <div class="ranking-info">
-              <div class="title">랭보</div>
-              <div class="date">2025.02.19 ~ 2025.05.18</div>
+          <div class="ranking section">
+            <div class="ranking-item">
+              <div class="rank-num">1</div>
+              <div class="ranking-info">
+                <div class="title">지킬앤하이드</div>
+                <div class="date">2024.11.29 ~ 2025.05.18</div>
+              </div>
+              <img src={poster1} alt="지킬앤하이드 포스터" />
             </div>
-            <img src={poster2} alt="랭보 포스터" />
-          </div>
 
-          <div class="ranking-item">
-            <div class="rank-num">3</div>
-            <div class="ranking-info">
-              <div class="title">메디슨 카운티의 다리</div>
-              <div class="date">2025.05.01 ~ 2025.07.13</div>
+            <div class="ranking-item">
+              <div class="rank-num">2</div>
+              <div class="ranking-info">
+                <div class="title">랭보</div>
+                <div class="date">2025.02.19 ~ 2025.05.18</div>
+              </div>
+              <img src={poster2} alt="랭보 포스터" />
             </div>
-            <img src={poster3} alt="메디슨 포스터" />
+
+            <div class="ranking-item">
+              <div class="rank-num">3</div>
+              <div class="ranking-info">
+                <div class="title">메디슨 카운티의 다리</div>
+                <div class="date">2025.05.01 ~ 2025.07.13</div>
+              </div>
+              <img src={poster3} alt="메디슨 포스터" />
+            </div>
           </div>
         </div>
-      </div>
 
-    
-
-      
         <div className="right-top">
-          <h3 id="title">오픈런 추천 공연</h3>
+          <h3 id="righttop-title">오픈런 추천 공연</h3>
 
           <div class="recommend-list">
             <div class="recommend-card">
@@ -80,7 +81,7 @@ const Main2 = () => {
         </div>
 
         <div className="right-bottom">
-          <h3 id="title">최근 커뮤니티 글</h3>
+          <h3 id="rightbottom-title">최근 커뮤니티 글</h3>
 
           <div class="community-list">
             <div class="community-item">
@@ -104,9 +105,10 @@ const Main2 = () => {
             </div>
           </div>
         </div>
-      
-      <div className="banner">
-        <h3 id="title">배너가 들어갈 공간입니다!</h3>
+
+        <div className="banner">
+          <h3 id="title">배너가 들어갈 공간입니다!</h3>
+        </div>
       </div>
     </div>
   );

@@ -13,9 +13,18 @@ function Eventdetail() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token"); // 토큰 가져오기
+
     const fetchEventDetail = async () => {
       try {
-        const res = await fetch(`/api/calendar/me/${id}`);
+        const res = await fetch(`/api/calendar/me/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // 토큰 포함
+          },
+        });
         if (!res.ok) throw new Error("API 응답 오류");
         const data = await res.json();
         setEvent(data);

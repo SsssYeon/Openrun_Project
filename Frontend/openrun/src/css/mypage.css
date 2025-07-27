@@ -42,6 +42,24 @@
   text-decoration-color: #ffd049;
 }
 
+/* 로그아웃, 회원탈퇴 버튼도 a 태그처럼 보이게 */
+.menu-item li .text-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: #333;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.menu-item li .text-button:hover {
+  text-decoration: underline;
+  text-decoration-color: #ffd049;
+}
+
 .mypage-right {
   min-width: 700px;
   height: 540px;

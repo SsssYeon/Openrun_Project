@@ -18,7 +18,7 @@ div h5 {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -40%);
+  transform: translate(-50%, 25%);
 }
 
 h1#login_title {
@@ -38,6 +38,17 @@ h1#login_title {
   border: 2px solid lightgrey;
   border-radius: 10px;
   padding: 0 10px;
+}
+
+.auto-login-label {
+  color: rgb(107, 107, 107); /* 아이디/비밀번호 글자와 동일 */
+  font-size: 13px;           /* 적절한 크기 (필요 시 조정) */
+  font-family: "SUIT-Medium"; /* 다른 곳과 동일한 폰트 */
+  user-select: none;         /* 클릭 시 텍스트 선택 방지 (선택 사항) */
+  vertical-align: middle; /* ✅ 추가: 체크박스와 글자 수직 정렬 */
+  display: flex;           /* ✅ 추가: 체크박스와 글자를 같은 라인에 정렬 */
+  align-items: center;     /* ✅ 추가: 세로 가운데 정렬 */
+  gap: 5px;                /* ✅ 선택: 체크박스와 글자 사이 간격 */
 }
 
 #loginBut {
