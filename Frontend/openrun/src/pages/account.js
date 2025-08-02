@@ -49,7 +49,7 @@ const Account = () => {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${getToken()}`,
         },
         body: JSON.stringify({
           user_nm: user_nm || undefined,
@@ -75,7 +75,7 @@ const Account = () => {
     if (!confirmed) return;
 
     try {
-      const token = localStorage.getItem("token");
+      const token = getToken();
       if (!token) throw new Error("로그인 상태가 아닙니다.");
 
       const response = await fetch("/api/auth/logout", {
@@ -92,6 +92,7 @@ const Account = () => {
       }
 
       localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
     } catch (error) {
@@ -106,12 +107,13 @@ const Account = () => {
       fetch("/api/users/me", {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${getToken()}`,
         },
       })
         .then((res) => {
           if (res.ok) {
             localStorage.clear(); // 모든 사용자 정보 제거
+            sessionStorage.clear();
             alert("회원 탈퇴가 완료되었습니다.");
             navigate("/"); // 홈 또는 탈퇴 완료 페이지로 이동
           } else {

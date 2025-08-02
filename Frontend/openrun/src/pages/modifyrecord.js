@@ -1,4 +1,4 @@
-// api 연결 X ver => api 연결 버전 구현 O
+// 오픈런 랭킹, 오픈런 추천 공연 api 연결 완료 / 추후 커뮤니티 및 배너 수정 예정
 
 import { useParams, useNavigate } from "react-router-dom";
 import Nav from "../components/nav";

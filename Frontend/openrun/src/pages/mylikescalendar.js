@@ -1,4 +1,4 @@
-// 검색 기능만 연결 완료 api 연결 X 버전 => api 연결 버전 다시 만들어야 함
+// api 연결 완료 버전 => 인덱스 0~2까지 노출
 
 import Nav from "../components/nav.js";
 import "../css/mylikescalendar.css";
@@ -6,12 +6,13 @@ import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import { useNavigate } from "react-router-dom";
-import favorites from "../mocks/favorites.js"; // 예시 JSON 데이터
+import favoritesMock from "../mocks/favorites.js"; // 예시 JSON 데이터
 import performances from "../mocks/performances.js";
 
 const Mylikescalendar = () => {
   const [events, setEvents] = useState([]); // 전체 관극 기록
   const [selectedDateEvents, setSelectedDateEvents] = useState([]);
+  const [favorites, setFavorites] = useState([]); // 우측에 표시할 관심 공연
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredPerformances, setFilteredPerformances] = useState([]);
   const navigate = useNavigate();
@@ -24,17 +25,61 @@ const Mylikescalendar = () => {
 
   // 관극 기록 API 호출
   useEffect(() => {
-    const formatted = favorites.map((item) => ({
-      id: item.id, // ❗️eventClick 등에서 id가 필요함
-      pfm_doc_id: item.pfm_doc_id,
-      title: item.title,
-      start: item.start,
-      end: addOneDay(item.end),
-      poster: item.poster,
-      className: item.className, // ✅ className 포함
-    }));
-    setEvents(formatted);
-    setSelectedDateEvents(formatted);
+    const fetchFavorites = async () => {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/calendar/like", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (!res.ok) throw new Error("API 요청 실패");
+
+        const data = await res.json(); // userLikeList 배열 포함
+        const likeList = data.userLikeList || [];
+        const topFavorites = likeList.slice(0, 3); // 원하는 개수만큼
+
+        // 전체 달력에 들어갈 공연 (관심 공연 전체)
+        const calendarEvents = topFavorites.map((item, index) => ({
+          id: item.id,
+          pfm_doc_id: item.pfm_doc_id,
+          title: item.title,
+          start: item.start,
+          end: addOneDay(item.end),
+          poster: item.poster,
+          className: `favorite-${(index % 3) + 1}`,
+        }));
+
+        setEvents(calendarEvents);
+        setSelectedDateEvents(calendarEvents);
+        setFavorites(topFavorites);
+
+        // 오른쪽 하단에 표시할 상위 3개 관심 공연
+        setFavorites(likeList.slice(0, 3));
+      } catch (error) {
+        console.error("관심 공연 API 실패:", error);
+        // ✅ fallback: mocks 사용
+        const fallbackEvents = favoritesMock.map((item) => ({
+          ...item,
+          end: addOneDay(item.end),
+        }));
+
+        setEvents(fallbackEvents);
+        setSelectedDateEvents(fallbackEvents);
+        setFavorites(favoritesMock.slice(0, 3));
+      }
+    };
+
+    fetchFavorites();
   }, []);
 
   // 날짜 클릭 시 해당 날짜의 이벤트만 추출
@@ -67,6 +112,12 @@ const Mylikescalendar = () => {
         console.error("API 실패, mocks로 대체:", error);
 
         // mocks로 대체
+        const fallbackTop = favoritesMock.slice(0, 3);
+        const fallbackEvents = fallbackTop.map((item, index) => ({
+          ...item,
+          end: addOneDay(item.end),
+          className: `favorite-${(index % 3) + 1}`,
+        }));
         const fallback = performances.filter(
           ({ pfm_cast, pfm_nm, pfm_fclty_nm }) => {
             const term = searchTerm.toLowerCase();
@@ -78,6 +129,9 @@ const Mylikescalendar = () => {
           }
         );
         setFilteredPerformances(fallback);
+        setEvents(fallbackEvents);
+        setSelectedDateEvents(fallbackEvents);
+        setFavorites(fallbackTop);
       }
     };
 
@@ -155,7 +209,7 @@ const Mylikescalendar = () => {
               </button>
             </div>
             <div className="favorite-items-container">
-              {favorites.slice(0, 3).map((fav, index) => (
+              {favorites.map((fav, index) => (
                 <div
                   key={fav.id}
                   className={`favorite-item favorite-${index + 1}`}

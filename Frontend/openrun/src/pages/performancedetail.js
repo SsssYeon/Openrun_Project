@@ -1,4 +1,5 @@
-// api를 통해 찾지 못했을 시 mocks 데이터에서 찾도록
+// api를 통해 찾지 못했을 시 mocks 데이터에서 찾도록 
+// 공연 상세정보 - 관심공연 추가 / 삭제 및 관심공연 등록되어 있을 시 채워진 하트 노출되게 수정 완료
 
 import { useParams } from "react-router-dom";
 import Nav from "../components/nav";
@@ -70,12 +71,18 @@ const Performancedetail = () => {
       }
 
     const fetchFavoriteStatus = async () => {
-      const userId = localStorage.getItem("user_id");
-      if (!userId) return;
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (!token) return;
       try {
         const response = await fetch(
-          `/api/performances/${id}/interest?user_id=현재_로그인_사용자_ID`
-        );
+          `/api/performances/${id}/interest`,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+       if (!response.ok) throw new Error("관심 여부 조회 실패");
+
         const data = await response.json();
         setIsFavorite(data.isLiked); // 또는 true/false 반환 구조에 따라 수정
       } catch (error) {
@@ -90,9 +97,9 @@ const Performancedetail = () => {
   if (!performance) return <div>해당 공연을 찾을 수 없습니다.</div>;
 
   const toggleFavorite = async () => {
-    const userId = localStorage.getItem("user_id");
+    const token = localStorage.getItem("token")|| sessionStorage.getItem("token");
 
-    if (!userId) {
+    if (!token) {
       alert("로그인 후 이용해주세요.");
       return;
     }
@@ -107,10 +114,10 @@ const Performancedetail = () => {
         method: newFavoriteStatus ? "POST" : "DELETE",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: newFavoriteStatus
           ? JSON.stringify({
-              user_id: "현재_로그인_사용자_ID", // 실제 사용자 ID로 교체
               likecalender_nm: performance.api_prfnm,
               likecalender_timestamp: new Date().toISOString(),
             })

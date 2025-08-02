@@ -1,13 +1,15 @@
-// api 연결 완료, api 연결 안됐을 때 mocks 데이터 사용 (오픈런 고인물)
+// 닉네임 불러오는 것만 api 연결 완료, api 연결 안됐을 때 mocks 데이터 사용 (오픈런 고인물)
 
 import React, { useEffect, useState } from "react";
 import Nav from "../components/nav";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import userData from "../mocks/users";
+import favoritesMock from "../mocks/favorites"; // 예시 관심 공연 데이터 임포트
 import "../css/mypage.css";
 
 const MyPage = () => {
   const [user, setUser] = useState(null);
+  const [interests, setInterests] = useState([]); // 관심 공연 상태 추가
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,22 +17,42 @@ const MyPage = () => {
       try {
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
-        const response = await fetch("/api/users/me", {
+        // 1) 유저 기본 정보 가져오기 (닉네임 등)
+        const userResponse = await fetch("/api/users/me", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        if (!response.ok) {
+        if (!userResponse.ok) {
           throw new Error("인증 실패 또는 서버 오류");
         }
 
-        const data = await response.json();
-        setUser(data);
+        const data = await userResponse.json();
+        setUser(userData);
+
+        // 2) 관심 공연 0~2번 인덱스 가져오기
+        const interestResponse = await fetch("/api/users/me/interests", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!interestResponse.ok) {
+          throw new Error("관심 공연 요청 실패");
+        }
+
+        const interestData = await interestResponse.json();
+        // 관심 공연이 userLikeList 배열이라면, 0~2까지만 slice
+        setInterests(interestData.userLikeList?.slice(0, 3) || []);
       } catch (error) {
-        console.error("유저 정보 불러오기 실패, 예시 데이터로 대체:", error);
-        setUser(userData); // ← 예시 데이터로 대체
+        console.error("유저 정보 또는 관심 공연 불러오기 실패:", error);
+        setUser(userData); // 예시 데이터로 대체
+
+        // 예시 데이터에도 관심 공연 정보가 있으면 상위 3개만 추출
+        setInterests(favoritesMock?.slice(0, 3) || []);
       }
     };
 
@@ -157,14 +179,19 @@ const MyPage = () => {
               <div className="mypage-right-middle">
                 <h3 className="user-title">나의 관심 공연</h3>
                 <div className="user-favorite">
-                  {user.favorites.map((show) => (
+                  {interests.length === 0 && <p>관심 공연이 없습니다.</p>}
+                  {interests.map((show) => (
                     <div key={show.id} className="user-favorite-content">
                       <img
-                        src={show.thumbnail}
+                        src={show.poster}
                         alt={show.title}
                         className="user-favorite-poster"
                       />
-                      <p className="user-favorite-title">{show.title}</p>
+                      <p className="user-favorite-title">
+                        {show.title.length > 7
+                          ? show.title.slice(0, 7) + "..."
+                          : show.title}
+                      </p>
                     </div>
                   ))}
                 </div>

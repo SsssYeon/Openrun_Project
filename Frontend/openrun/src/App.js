@@ -88,9 +88,8 @@ function App() {
             </PrivateRoute>
           }
         />
-              <Route path="/community" element={<Community />} />
+        <Route path="/community" element={<Community />} />
       </Routes>
-
     </div>
   );
 }
