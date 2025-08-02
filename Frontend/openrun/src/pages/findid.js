@@ -123,6 +123,7 @@ const Findid = () => {
       <div>
         <Nav />
       </div>
+      <div className="findid-container">
       <form onSubmit={handleSubmit}>
         <div>
           <h2 id="userjoin_title"> 아이디 찾기 </h2>
@@ -187,6 +188,7 @@ const Findid = () => {
           </button>
         </div>
       </form>
+    </div>
     </div>
   );
 };

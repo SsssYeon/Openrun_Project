@@ -12,15 +12,27 @@ div > div {
     margin-bottom: 3px; 
 }
 
-form {
+.userjoin-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px); /* Nav가 60px이라면 */
+  padding-top: 500px; /* Nav 겹침 방지용 */
+}
+
+.findid-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px); /* Nav가 60px이라면 */
+  padding-top: 60px; /* Nav 겹침 방지용 */
+}
+
+.userjoin-form {
     width: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, 10%);
     border-radius: 20px;
     padding: 20px;
     background-color: #ffffff;

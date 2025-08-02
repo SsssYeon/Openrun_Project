@@ -188,6 +188,7 @@ const Userjoin = () => {
   return (
     <div>
       <Nav />
+      <div className="userjoin-container">
       <form onSubmit={handleSubmit}>
         <h2 id="userjoin_title">회원가입</h2>
         <div className="userjoin">
@@ -316,6 +317,7 @@ const Userjoin = () => {
           </button>
         </div>
       </form>
+    </div>
     </div>
   );
 };

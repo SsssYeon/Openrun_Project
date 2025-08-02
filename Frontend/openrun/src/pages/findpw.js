@@ -120,6 +120,7 @@ const Findpw = () => {
       <div>
         <Nav />
       </div>
+      <div className="findid-container">
       <form onSubmit={handleSubmit}>
         <div>
           <h2 id="userjoin_title"> 비밀번호 찾기 </h2>
@@ -188,6 +189,7 @@ const Findpw = () => {
           </button>
         </div>
       </form>
+    </div>
     </div>
   );
 };

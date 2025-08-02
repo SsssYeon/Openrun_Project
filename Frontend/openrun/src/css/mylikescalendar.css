@@ -1,12 +1,13 @@
+
 .mylikescalendarbox {
   display: flex;
   height: calc(100vh - 60px); /* 전체 화면 높이에서 Nav 높이 뺌 */
-  gap: 10px;
+  gap: 50px;
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: hidden;
   grid-template-columns: 400px 500px;
-  margin: 100px 200px;
+  margin-top: 100px;
 }
 
 .mylikescalendar {
@@ -90,7 +91,7 @@
 .mylikes-right {
   min-width: 500px;
   height: 100vh;
-  margin: -100px 0 0 50px;
+  margin: -100px 0 0 0px;
   flex-direction: column;
   display: flex;
   justify-content: center;
@@ -122,7 +123,7 @@
   height: 250px; /* 고정 높이 */
   overflow-y: auto; /* 내부 세로 스크롤 가능 */
   padding: 8px 12px;
-  margin-top: 100px;
+  margin-top: 40px;
   font-size: 14px;
 }
 

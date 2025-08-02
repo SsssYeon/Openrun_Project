@@ -8,6 +8,13 @@ div h5 {
   color: rgb(107, 107, 107);
 }
 
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px); /* Nav 높이만큼 빼줌 (Nav 높이가 60px 가정) */
+}
+
 .loginForm {
   width: 600px;
   height: auto;
@@ -15,10 +22,6 @@ div h5 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, 25%);
 }
 
 h1#login_title {

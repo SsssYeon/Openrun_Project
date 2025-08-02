@@ -63,59 +63,61 @@ const Login = () => {
       <div>
         <Nav />
       </div>
-      <form className="loginForm" onSubmit={handleLogin}>
-        <div>
+      <div className="login-container">
+        <form className="loginForm" onSubmit={handleLogin}>
           <div>
-            <h2 id="login_title">로그인</h2>
-          </div>
-        </div>
-        <div>
-          <div className="input">
-            <h5> 아이디 </h5>
-            <input
-              type="text"
-              className="userId"
-              id="userId"
-              placeholder="아이디"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              autoFocus
-            ></input>
-            <h5> 비밀번호 </h5>
-            <input
-              type="password"
-              className="password"
-              id="password"
-              placeholder="비밀번호"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            ></input>
-
-            {/* ✅ 자동 로그인 체크박스 추가 */}
-            <div style={{ marginTop: "15px", marginBottom: "5px" }}>
-              <label className="auto-login-label">
-                <input
-                  type="checkbox"
-                  checked={autoLogin}
-                  onChange={(e) => setAutoLogin(e.target.checked)}
-                />
-                &nbsp;자동 로그인
-              </label>
-            </div>
-
-            <button id="loginBut" type="submit">
-              로그인
-            </button>
-            <div className="link">
-              <NavLink to="/findid">아이디 찾기</NavLink>
-              <span>&nbsp;|&nbsp;</span>
-              <NavLink to="/findpw">비밀번호 찾기</NavLink>
-              <span>&nbsp;|&nbsp;</span>
-              <NavLink to="/userjoin"> 회원가입</NavLink>
+            <div>
+              <h2 id="login_title">로그인</h2>
             </div>
           </div>
-        </div>
-      </form>
+          <div>
+            <div className="input">
+              <h5> 아이디 </h5>
+              <input
+                type="text"
+                className="userId"
+                id="userId"
+                placeholder="아이디"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                autoFocus
+              ></input>
+              <h5> 비밀번호 </h5>
+              <input
+                type="password"
+                className="password"
+                id="password"
+                placeholder="비밀번호"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              ></input>
+
+              {/* ✅ 자동 로그인 체크박스 추가 */}
+              <div style={{ marginTop: "15px", marginBottom: "5px" }}>
+                <label className="auto-login-label">
+                  <input
+                    type="checkbox"
+                    checked={autoLogin}
+                    onChange={(e) => setAutoLogin(e.target.checked)}
+                  />
+                  &nbsp;자동 로그인
+                </label>
+              </div>
+
+              <button id="loginBut" type="submit">
+                로그인
+              </button>
+              <div className="link">
+                <NavLink to="/findid">아이디 찾기</NavLink>
+                <span>&nbsp;|&nbsp;</span>
+                <NavLink to="/findpw">비밀번호 찾기</NavLink>
+                <span>&nbsp;|&nbsp;</span>
+                <NavLink to="/userjoin"> 회원가입</NavLink>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

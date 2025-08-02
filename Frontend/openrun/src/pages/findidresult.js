@@ -11,7 +11,7 @@ const Findidresult = () => {
   const { userId } = location.state || {}; // 전달받은 값
 
   return (
-    <div>
+    <div className="findidresult-container">
       <form className="findidresultform">
         <NavLink to="/">
           <img src={logo} alt="로고" className="findidresult_logo" />

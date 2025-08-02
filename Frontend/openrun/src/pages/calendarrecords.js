@@ -17,7 +17,8 @@ const Calendarrecords = () => {
   // 관극 기록 API 호출
   useEffect(() => {
     const fetchCalendarData = async () => {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       try {
         const res = await fetch("/api/calendar/me", {
           method: "GET",
@@ -97,80 +98,82 @@ const Calendarrecords = () => {
       <div>
         <Nav />
       </div>
-      <div className="flex">
-        {/* 좌측 달력 */}
-        <div className="calendar">
-          <FullCalendar
-            plugins={[dayGridPlugin]}
-            initialView="dayGridMonth"
-            events={events}
-            eventContent={renderEventContent}
-            dateClick={handleDateClick}
-            eventClick={handleEventClick}
-            height={700}
-            contentHeight="auto"
-            contentWidth="auto"
-            dayMaxEventRows={false}
-            fixedWeekCount={true} // 주 수 고정 해제
-            showNonCurrentDates={false}
-            handleWindowResize={false}
-            eventDidMount={handleEventDidMount}
-            headerToolbar={{
-              left: "prev",
-              center: "title",
-              right: "next", // 'today' 제거됨
-            }}
-          />
-        </div>
-
-        {/* 우측 상세 정보 요약 카드 */}
-        <div className="tickets">
-          <div className="searchmytickets">
-            <input
-              type="text"
-              placeholder="배우, 공연명, 공연장을 검색하세요"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+      <div className="calendar-page-container">
+        <div className="flex">
+          {/* 좌측 달력 */}
+          <div className="calendar">
+            <FullCalendar
+              plugins={[dayGridPlugin]}
+              initialView="dayGridMonth"
+              events={events}
+              eventContent={renderEventContent}
+              dateClick={handleDateClick}
+              eventClick={handleEventClick}
+              height={700}
+              contentHeight="auto"
+              contentWidth="auto"
+              dayMaxEventRows={false}
+              fixedWeekCount={true} // 주 수 고정 해제
+              showNonCurrentDates={false}
+              handleWindowResize={false}
+              eventDidMount={handleEventDidMount}
+              headerToolbar={{
+                left: "prev",
+                center: "title",
+                right: "next", // 'today' 제거됨
+              }}
             />
           </div>
 
-          <div className="mytickets-scroll">
-            <div className="mytickets">
-              {(searchTerm ? filteredEvents : selectedDateEvents).map(
-                (event) => (
-                  <div
-                    key={event.id}
-                    className="ticket"
-                    onClick={() => navigate(`/detail/${event.id}`)}
-                  >
-                    <div className="ticketscontent">
-                      <img
-                        src={event.poster}
-                        alt={event.title}
-                        className="ticketspicture"
-                      />
-                      <div>
-                        <h3 className="ticketsinfomations">{event.title}</h3>
-                        <p>날짜: {event.start}</p>
-                        <p>시간: {event.time}</p>
-                        <p>장소: {event.location}</p>
-                        <p>좌석: {event.seat}</p>
-                        <p>출연진: {event.cast}</p>
+          {/* 우측 상세 정보 요약 카드 */}
+          <div className="tickets">
+            <div className="searchmytickets">
+              <input
+                type="text"
+                placeholder="배우, 공연명, 공연장을 검색하세요"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <div className="mytickets-scroll">
+              <div className="mytickets">
+                {(searchTerm ? filteredEvents : selectedDateEvents).map(
+                  (event) => (
+                    <div
+                      key={event.id}
+                      className="ticket"
+                      onClick={() => navigate(`/detail/${event.id}`)}
+                    >
+                      <div className="ticketscontent">
+                        <img
+                          src={event.poster}
+                          alt={event.title}
+                          className="ticketspicture"
+                        />
+                        <div>
+                          <h3 className="ticketsinfomations">{event.title}</h3>
+                          <p>날짜: {event.start}</p>
+                          <p>시간: {event.time}</p>
+                          <p>장소: {event.location}</p>
+                          <p>좌석: {event.seat}</p>
+                          <p>출연진: {event.cast}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )
-              )}
+                  )
+                )}
+              </div>
             </div>
           </div>
         </div>
+        <button
+          className="floating-add-button"
+          onClick={() => navigate("/addrecord")} // 원하는 경로로 수정
+        >
+          <span className="plus-symbol">+</span>
+        </button>
       </div>
-      <button
-        className="floating-add-button"
-        onClick={() => navigate("/addrecord")} // 원하는 경로로 수정
-      >
-        <span className="plus-symbol">+</span>
-      </button>
     </div>
   );
 };

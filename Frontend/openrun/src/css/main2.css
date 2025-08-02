@@ -1,18 +1,18 @@
 /* main 2번째 화면*/
 
 body {
-  height: 100%;
+  height: 100vh;
   margin: 0;
-  padding: 0;
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .layout {
   display: grid;
   grid-template-columns: 400px 600px;
   grid-template-rows: 300px 200px 100px;
-  height: 100vh;
-  padding: 0px 200px; /* 바깥쪽 여백 */
+  height: 100%;
   gap: 10px;
   box-sizing: border-box;
   flex-direction: column;

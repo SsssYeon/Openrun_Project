@@ -1,12 +1,20 @@
+.calendar-page-container {
+  display: flex;
+  justify-content: center; /* 가로 중앙 */
+  align-items: center;     /* 세로 중앙 */
+  height: calc(100vh - 60px); /* Nav 제외한 화면 높이 */
+margin-top: 100px; /* Nav 아래로 밀기 */
+}
+
 .flex {
   display: flex;
-  height: calc(100vh - 60px); /* 전체 화면 높이에서 Nav 높이 뺌 */
-  gap: 10px;
+  height: 100%; /* 전체 화면 높이에서 Nav 높이 뺌 */
+  gap: 50px;
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: hidden;
   grid-template-columns: 400px 500px;
-  margin: 100px 200px;
+
 }
 
 /* 좌측 달력 */
@@ -86,7 +94,6 @@
 .tickets {
   min-width: 500px;
   height: 100vh;
-  margin: 0 200px 0 50px;
   flex-direction: column;
   display: flex;
   justify-content: center;
@@ -101,7 +108,9 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  
 }
+
 
 .searchmytickets input {
   width: 100%;
