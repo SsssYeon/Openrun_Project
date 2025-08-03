@@ -3,23 +3,23 @@ import poster2 from "../components/poster2.jpg";
 import poster3 from "../components/poster3.jpg";
 
 const reports = {
-  totalViewCount: 10,
-  totalWorksCount: 7,
-  frequentWorks: [
-    { title: "랭보", count: 4, poster: poster1 },
-    { title: "알라딘", count: 3, poster: poster2 },
-    { title: "심야식당", count: 2, poster: poster3 },
-    { title: "무인도 탈출기", count: 2 },
-    { title: "라흐헤스트", count: 2 },
+  total_view: 10,
+  unique_pfm: 7,
+  most_view_pfm: [
+    { pfm_nm: "랭보", pfm_cnt: 4, pfm_poster: poster1 },
+    { pfm_nm: "알라딘", pfm_cnt: 3, pfm_poster: poster2 },
+    { pfm_nm: "심야식당", pfm_cnt: 2, pfm_poster: poster3 },
+    { pfm_nm: "무인도 탈출기", pfm_cnt: 2 },
+    { pfm_nm: "라흐헤스트", pfm_cnt: 2 },
   ],
-  frequentActors: [
-    { name: "김이후", count: 5 },
-    { name: "이종석", count: 3 },
-    { name: "최재림", count: 2 },
-    { name: "차지연", count: 2 },
-    { name: "강홍석", count: 2 },
-    { name: "서경수", count: 2 },
-    { name: "박은태", count: 1 },
+  most_view_actor: [
+    { actor_nm: "김이후", actor_cnt: 5 },
+    { actor_nm: "이종석", actor_cnt: 3 },
+    { actor_nm: "최재림", actor_cnt: 2 },
+    { actor_nm: "차지연", actor_cnt: 2 },
+    { actor_nm: "강홍석", actor_cnt: 2 },
+    { actor_nm: "서경수", actor_cnt: 2 },
+    { actor_nm: "박은태", actor_cnt: 1 },
   ],
 };
 
