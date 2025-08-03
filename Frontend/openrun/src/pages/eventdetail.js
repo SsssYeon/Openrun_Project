@@ -117,6 +117,9 @@ function Eventdetail() {
               <strong>가격:</strong>{" "}
               {event.pfmcalender_cost?.toLocaleString() || " "}
             </p>
+            <p>
+              <strong>예매처:</strong> {event.pfmcalender_bookingsite || " "}
+            </p>
           </div>
           <div className="event-review">
             <h3 className="title-center">관람 후기</h3>

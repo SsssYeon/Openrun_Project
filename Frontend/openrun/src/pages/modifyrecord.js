@@ -17,6 +17,7 @@ const Modifyrecord = () => {
   const [seat, setSeat] = useState("");
   const [cast, setCast] = useState("");
   const [cost, setCost] = useState("");
+  const [bookingsite, setBookingsite] = useState("");
   const [memo, setMemo] = useState("");
   const navigate = useNavigate();
 
@@ -47,6 +48,7 @@ const Modifyrecord = () => {
       setCast(found.pfmcalender_today_cast || "");
       setCost(found.pfmcalender_cost || "");
       setMemo(found.pfmcalender_memo || "");
+      setBookingsite(found.pfmcalender_bookingsite || "");
     }
     setLoading(false);
   }, [id]);
@@ -64,6 +66,7 @@ const Modifyrecord = () => {
       pfmcalender_today_cast: cast,
       pfmcalender_cost: Number(cost),
       pfmcalender_memo: memo,
+      pfmcalender_bookingsite: bookingsite,
     };
 
     try {
@@ -147,6 +150,10 @@ const Modifyrecord = () => {
                 value={cost}
                 onChange={(e) => setCost(e.target.value)}
               />
+            </div>
+            <div className="modifyrecord-row">
+              <strong>예매처: </strong>
+              <input value={bookingsite} onChange={(e) => setBookingsite(e.target.value)} />
             </div>
           </div>
           <div className="event-review">
