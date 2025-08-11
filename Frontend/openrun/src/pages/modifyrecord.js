@@ -22,35 +22,54 @@ const Modifyrecord = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    //   const fetchEventDetail = async () => {
-    //     try {
-    //       const res = await fetch(`/api/calendar/me/${id}`);
-    //       const data = await res.json();
-    //       setEvent(data);
-    //     } catch (error) {
-    //       console.error("관극 기록을 불러오는 데 실패했습니다:", error);
-    //     } finally {
-    //       setLoading(false);
-    //     }
-    //   };
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+const fetchEventDetail = async () => {
+      try {
+        const res = await fetch(`/api/calendar/me/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        });
 
-    //   fetchEventDetail();
-    // }, [id]);
+        if (!res.ok) throw new Error("API 응답 오류");
+        const data = await res.json();
 
-    const found = events.find((item) => String(item.pfmcalender_doc_no) === id);
-    if (found) {
-      setEvent(found);
-      setName(found.pfmcalender_nm || "");
-      setDate(found.pfmcalender_date || "");
-      setTime(found.pfmcalender_time || "");
-      setLocation(found.pfmcalender_location || "");
-      setSeat(found.pfmcalender_seat || "");
-      setCast(found.pfmcalender_today_cast || "");
-      setCost(found.pfmcalender_cost || "");
-      setMemo(found.pfmcalender_memo || "");
-      setBookingsite(found.pfmcalender_bookingsite || "");
-    }
-    setLoading(false);
+        setEvent(data);
+        setName(data.pfmcalender_nm || "");
+        setDate(data.pfmcalender_date || "");
+        setTime(data.pfmcalender_time || "");
+        setLocation(data.pfmcalender_location || "");
+        setSeat(data.pfmcalender_seat || "");
+        setCast(data.pfmcalender_today_cast || "");
+        setCost(data.pfmcalender_cost || "");
+        setMemo(data.pfmcalender_memo || "");
+        setBookingsite(data.pfmcalender_bookingsite || "");
+      } catch (error) {
+        console.warn("API 불러오기 실패, mocks 데이터로 대체:", error);
+        const found = events.find(
+          (item) => String(item.pfmcalender_doc_no) === id
+        );
+        if (found) {
+          setEvent(found);
+          setName(found.pfmcalender_nm || "");
+          setDate(found.pfmcalender_date || "");
+          setTime(found.pfmcalender_time || "");
+          setLocation(found.pfmcalender_location || "");
+          setSeat(found.pfmcalender_seat || "");
+          setCast(found.pfmcalender_today_cast || "");
+          setCost(found.pfmcalender_cost || "");
+          setMemo(found.pfmcalender_memo || "");
+          setBookingsite(found.pfmcalender_bookingsite || "");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEventDetail();
   }, [id]);
 
   const handleSave = async () => {

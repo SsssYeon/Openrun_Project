@@ -25,6 +25,8 @@ import Mylikescalendar from "./pages/mylikescalendar";
 import Myreport from "./pages/myreport";
 import PrivateRoute from "./components/privateroute";
 import Community from "./pages/community";
+import Terms from "./pages/terms";
+import Privacy from "./pages/privacy";
 
 // import Counter from"./pages/counter";
 // import Input from"./pages/input";
@@ -89,6 +91,8 @@ function App() {
           }
         />
         <Route path="/community" element={<Community />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
       </Routes>
     </div>
   );

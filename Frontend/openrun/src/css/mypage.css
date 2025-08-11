@@ -144,8 +144,15 @@
   gap: 12px;
 }
 
-.community-list{
-  margin-top:20px;
+.community-list {
+  margin-top: 20px;
+  justify-content: center;
+  display: flex;
+  /* margin 이외의 것은 중앙정렬 위해 추가한 것 */
+}
+
+#mypage-notice {
+  text-align: center;
 }
 
 .user-community-content {
@@ -177,8 +184,8 @@
   min-width: 700px;
   border: 1px solid lightgrey;
   border-radius: 16px;
-  
-  padding:30px;
+
+  padding: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -186,7 +193,7 @@
 }
 
 #account_title {
-  margin-bottom:0px;
+  margin-bottom: 0px;
   text-align: center;
   color: black;
 }
@@ -197,8 +204,7 @@
   box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 4px;
-  font-size:13px;
-
+  font-size: 13px;
 }
 
 .user-id {
@@ -210,7 +216,7 @@
   border-radius: 4px;
   background-color: #f9f9f9; /* 입력창처럼 배경 설정 (선택) */
   color: #333;
-  font-size:13px;
+  font-size: 13px;
 }
 
 #accountbutton {
@@ -225,20 +231,19 @@
   margin: 20px 0 50px 0;
 }
 
-.passwordchange-content{
-  padding : 20px;
+.passwordchange-content {
+  padding: 20px;
 }
 
-#accountbutton{
-  margin-top : 50px;
+#accountbutton {
+  margin-top: 50px;
 }
 
 .show-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 16px;
-   padding: 20px 50px;
-   
+  padding: 20px 50px;
 }
 
 .show-card {

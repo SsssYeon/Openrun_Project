@@ -46,17 +46,17 @@ const Login = () => {
     }
   };
 
-  useEffect(() => {
-    if (
-      process.env.NODE_ENV === "development" &&
-      !localStorage.getItem("token") &&
-      !sessionStorage.getItem("token")
-    ) {
-      localStorage.setItem("token", "dummy-token");
-      localStorage.setItem("userId", "testuser");
-      localStorage.setItem("nickname", "테스트계정");
-    }
-  }, []); // 임시 코드 로그인된 상태로 만들기 위해 토큰 자동 삽입, 추후 주석처리 예정 -> 백 개발 시 주석처리하고 진행해주세요!
+  // useEffect(() => {
+  //   if (
+  //     process.env.NODE_ENV === "development" &&
+  //     !localStorage.getItem("token") &&
+  //     !sessionStorage.getItem("token")
+  //   ) {
+  //     localStorage.setItem("token", "dummy-token");
+  //     localStorage.setItem("userId", "testuser");
+  //     localStorage.setItem("nickname", "테스트계정");
+  //   }
+  // }, []); // 임시 코드 로그인된 상태로 만들기 위해 토큰 자동 삽입, 추후 주석처리 예정 -> 백 개발 시 주석처리하고 진행해주세요!
 
   return (
     <div>

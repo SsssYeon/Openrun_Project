@@ -3,6 +3,7 @@
 import React, { useRef, useState } from "react";
 import Nav from "../components/nav";
 import "../css/eventdetail.css";
+import { useNavigate } from "react-router-dom";
 
 const Addrecord = () => {
   const [name, setName] = useState("");
@@ -15,6 +16,7 @@ const Addrecord = () => {
   const [memo, setMemo] = useState("");
   const [posterFile, setPosterFile] = useState(null);
   const [posterPreview, setPosterPreview] = useState("/default-poster.png");
+  const navigate = useNavigate();
 
   const handleTitleChange = (e) => {
     setName(e.target.value);
@@ -56,7 +58,7 @@ const Addrecord = () => {
 
     try {
       const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+        localStorage.getItem("token") || sessionStorage.getItem("token");
 
       const res = await fetch("/api/calendar/me", {
         method: "POST",
@@ -68,6 +70,7 @@ const Addrecord = () => {
 
       if (res.ok) {
         alert("기록이 저장되었습니다.");
+        navigate("/calendarrecords");
       } else {
         alert("기록 저장에 실패했습니다.");
       }

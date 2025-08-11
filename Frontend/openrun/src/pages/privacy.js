@@ -1,23 +1,81 @@
-// 마이페이지 - 나의 글 => api 연결 필요
+// 마이페이지 - 계정 설정 => api 연결 완료
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Nav from "../components/nav";
 import { Link, useNavigate } from "react-router-dom";
-// import userData from "../mocks/users";
+import mockUserData from "../mocks/users";
 import "../css/mypage.css";
-import poster1 from "../components/poster1.jpg";
-import logo2 from "../components/logo2.png";
 
-const Myposts = () => {
+const Privacy = () => {
+  const [userData, setUserData] = useState(null);
+  const [user_nm, setName] = useState("");
+  const [user_nicknm, setNickname] = useState("");
   const navigate = useNavigate();
+
+  const getToken = () =>
+    localStorage.getItem("token") || sessionStorage.getItem("token");
+
+  useEffect(() => {
+    // 사용자 정보 가져오기
+    const fetchUserInfo = async () => {
+      try {
+        const response = await fetch("/api/users/me", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserData(data);
+        } else {
+          console.error("유저 정보를 가져오는데 실패했습니다.");
+          setUserData(mockUserData);
+        }
+      } catch (error) {
+        console.error("에러 발생:", error);
+        setUserData(mockUserData);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch("/api/users/me", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify({
+          user_nm: user_nm || undefined,
+          user_nicknm: user_nicknm || undefined,
+        }),
+      });
+
+      if (response.ok) {
+        alert("수정이 완료되었습니다.");
+        window.location.reload();
+      } else {
+        alert("수정에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("에러 발생:", error);
+    }
+  };
+
+  if (!userData) return <div>로딩 중...</div>;
 
   const handleLogout = async () => {
     const confirmed = window.confirm("로그아웃 하시겠습니까?");
     if (!confirmed) return;
 
     try {
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
+      const token = getToken();
       if (!token) throw new Error("로그인 상태가 아닙니다.");
 
       const response = await fetch("/api/auth/logout", {
@@ -34,6 +92,7 @@ const Myposts = () => {
       }
 
       localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
     } catch (error) {
@@ -45,12 +104,10 @@ const Myposts = () => {
   const handleWithdraw = () => {
     const confirmed = window.confirm("회원 탈퇴 하시겠습니까?");
     if (confirmed) {
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
       fetch("/api/users/me", {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${getToken()}`,
         },
       })
         .then((res) => {
@@ -118,36 +175,11 @@ const Myposts = () => {
         </div>
 
         <div className="account-right">
-          <div>
-            <h3 id="account_title">나의 글</h3>
-          </div>
-
-          <div class="community-list">
-            <h3 id ="mypage-notice"> 추후 구현 예정입니다! </h3>
-            {/* <div class="community-item">
-              <div class="content">
-                <div class="title">지킬앤하이드 후기</div>
-                <div class="subtext">지킬을 보고 왔습니다...</div>
-              </div>
-              <div class="date">25.05.01</div>
-              <img src={poster1} alt="썸네일" class="thumb" />
-            </div>
-
-            <div class="community-item">
-              <div class="content">
-                <div class="title">링아센 좌석 후기</div>
-                <div class="subtext">
-                  가성비석 다녀왔습니다! 시야는 좋은데 음향이...
-                </div>
-              </div>
-              <div class="date">25.03.29</div>
-              <img src={logo2} alt="썸네일" class="thumb" />
-            </div> */}
-          </div>
+          개인정보 처리 방침 페이지입니다!
         </div>
       </div>
     </div>
   );
 };
 
-export default Myposts;
+export default Privacy;

@@ -94,12 +94,10 @@
   margin: -100px 0 0 0px;
   flex-direction: column;
   display: flex;
-  justify-content: center;
+   justify-content: flex-start;
 }
 
 .searchperformances {
-  display: flex;
-  align-items: center;
   margin-bottom: 16px;
   background-color: #fff;
   position: sticky;
@@ -116,6 +114,11 @@
   outline: none;
 }
 
+.search-section {
+  display: flex;
+  flex-direction: column;
+}
+
 .search-results {
   background-color: #fff;
   border: 1px solid #ccc;
@@ -123,7 +126,7 @@
   height: 250px; /* 고정 높이 */
   overflow-y: auto; /* 내부 세로 스크롤 가능 */
   padding: 8px 12px;
-  margin-top: 10px;
+  margin-top: 100px;
   font-size: 14px;
 }
 
@@ -238,3 +241,4 @@
 .favorite-item.favorite-3 p {
   border-bottom: 4px solid #dcf9c5;
 }
+

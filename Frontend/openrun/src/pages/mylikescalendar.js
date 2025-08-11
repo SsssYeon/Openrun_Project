@@ -169,32 +169,34 @@ const Mylikescalendar = () => {
 
         {/* 우측 검색창 및 관심 공연 */}
         <div className="mylikes-right">
-          <div className="searchperformances">
-            <input
-              type="text"
-              placeholder="배우, 공연명, 공연장을 검색하세요"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div className="search-results">
-            {searchTerm === "" ? (
-              <p>궁금한 공연의 제목을 입력해주세요</p>
-            ) : filteredPerformances.length === 0 ? (
-              <p>검색 결과가 없습니다.</p>
-            ) : (
-              filteredPerformances.map((performance) => (
-                <div
-                  key={performance.pfm_doc_id}
-                  className="result-item"
-                  onClick={() =>
-                    navigate(`/performance/${performance.pfm_doc_id}`)
-                  }
-                >
-                  {performance.pfm_nm}
-                </div>
-              ))
-            )}
+          <div className="search-section">
+            <div className="searchperformances">
+              <input
+                type="text"
+                placeholder="배우, 공연명, 공연장을 검색하세요"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="search-results">
+              {searchTerm === "" ? (
+                <p>궁금한 공연의 제목을 입력해주세요</p>
+              ) : filteredPerformances.length === 0 ? (
+                <p>검색 결과가 없습니다.</p>
+              ) : (
+                filteredPerformances.map((performance) => (
+                  <div
+                    key={performance.pfm_doc_id}
+                    className="result-item"
+                    onClick={() =>
+                      navigate(`/performance/${performance.pfm_doc_id}`)
+                    }
+                  >
+                    {performance.pfm_nm}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
 
           <div className="favorites-list">
@@ -203,7 +205,7 @@ const Mylikescalendar = () => {
               <button
                 className="favorites-button"
                 onClick={() => navigate("/favorites")}
-                type="button"
+                type="all-favorite-button"
               >
                 모두 보기
               </button>
