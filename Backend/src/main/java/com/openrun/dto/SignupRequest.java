@@ -9,38 +9,18 @@ public class SignupRequest {
 
     public SignupRequest() {}
 
-    public String getUser_id() {
-        return user_id;
-    }
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
-    }
+    public String getUser_id() { return user_id; }
+    public void setUser_id(String user_id) { this.user_id = user_id; }
 
-    public String getUser_pw() {
-        return user_pw;
-    }
-    public void setUser_pw(String user_pw) {
-        this.user_pw = user_pw;
-    }
+    public String getUser_pw() { return user_pw; }
+    public void setUser_pw(String user_pw) { this.user_pw = user_pw; }
 
-    public String getUser_nm() {
-        return user_nm;
-    }
-    public void setUser_nm(String user_nm) {
-        this.user_nm = user_nm;
-    }
+    public String getUser_nm() { return user_nm; }
+    public void setUser_nm(String user_nm) { this.user_nm = user_nm; }
 
-    public String getUser_nicknm() {
-        return user_nicknm;
-    }
-    public void setUser_nicknm(String user_nicknm) {
-        this.user_nicknm = user_nicknm;
-    }
+    public String getUser_nicknm() { return user_nicknm; }
+    public void setUser_nicknm(String user_nicknm) { this.user_nicknm = user_nicknm; }
 
-    public String getUser_phonenum() {
-        return user_phonenum;
-    }
-    public void setUser_phonenum(String user_phonenum) {
-        this.user_phonenum = user_phonenum;
-    }
+    public String getUser_phonenum() { return user_phonenum; }
+    public void setUser_phonenum(String user_phonenum) { this.user_phonenum = user_phonenum; }
 }
