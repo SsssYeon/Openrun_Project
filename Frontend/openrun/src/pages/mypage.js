@@ -17,7 +17,13 @@ const MyPage = () => {
       try {
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
-        // 1) 유저 기본 정보 가져오기 (닉네임 등)
+        
+          if (!token) {
+        // 토큰이 없으면 로그인 페이지로 이동
+        navigate("/login");
+        return; // 함수 종료
+      }
+          // 1) 유저 기본 정보 가져오기 (닉네임 등)
         const userResponse = await fetch("/api/users/me", {
           method: "GET",
           headers: {
