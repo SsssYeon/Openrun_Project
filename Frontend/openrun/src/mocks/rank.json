@@ -1,0 +1,21 @@
+
+  [
+    {
+      "id": 1,
+      "title": "지킬앤하이드",
+      "rank": 1,
+      "posterUrl": "../components/poster1.gif"
+    },
+    {
+      "id": 2,
+      "title": "랭보",
+      "rank": 2,
+      "posterUrl": "../components/poster2.gif"
+    },
+    {
+        "id": 3,
+        "title": "매디슨 카운티의 다리",
+        "rank": 3,
+        "posterUrl": "../components/poster3.gif"
+    }
+  ]

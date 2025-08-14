@@ -1,0 +1,92 @@
+* {
+  box-sizing: border-box;
+  font-family: "SUIT-Medium";
+}
+
+div h5 {
+  margin-bottom: 3px;
+  color: rgb(107, 107, 107);
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px); /* Nav 높이만큼 빼줌 (Nav 높이가 60px 가정) */
+}
+
+.loginForm {
+  width: 600px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+h1#login_title {
+  margin-bottom: 10px; /* 로그인 글자와 아래 요소 간격 */
+}
+
+.input {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.userId,
+.password {
+  width: 400px;
+  height: 50px;
+  border: 2px solid lightgrey;
+  border-radius: 10px;
+  padding: 0 10px;
+}
+
+.auto-login-label {
+  color: rgb(107, 107, 107); /* 아이디/비밀번호 글자와 동일 */
+  font-size: 13px;           /* 적절한 크기 (필요 시 조정) */
+  font-family: "SUIT-Medium"; /* 다른 곳과 동일한 폰트 */
+  user-select: none;         /* 클릭 시 텍스트 선택 방지 (선택 사항) */
+  vertical-align: middle; /* ✅ 추가: 체크박스와 글자 수직 정렬 */
+  display: flex;           /* ✅ 추가: 체크박스와 글자를 같은 라인에 정렬 */
+  align-items: center;     /* ✅ 추가: 세로 가운데 정렬 */
+  gap: 5px;                /* ✅ 선택: 체크박스와 글자 사이 간격 */
+}
+
+#loginBut {
+  background-color: #ffd049;
+  color: black;
+  border: none;
+  border-radius: 10px;
+  font-size: 17px;
+  height: 50px;
+  width: 400px;
+  margin: 20px 0 30px 0;
+}
+
+/* #loginBut:hover {
+    background-color: #f8d1dd;} /* 마우스 호버 시 색상 변경 */
+
+.link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+}
+
+.link a {
+  text-decoration: none; /* 밑줄 제거 */
+  color: rgb(107, 107, 107); /* 색상 변경 */
+  margin: 0px 15px 0 15px;
+}
+
+.link a:hover {
+  color: #ffd049; /* 마우스 호버 시 색상 변경 */
+}
+
+.login-logo {
+  height: 80px; /* 원하는 크기로 조정 */
+  margin-bottom: 40px; /* 아래 여백으로 로그인 폼과 간격 */
+  cursor: pointer;
+}
