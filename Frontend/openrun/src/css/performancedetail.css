@@ -1,0 +1,57 @@
+.performance-detail {
+  max-width: 900px;
+  margin: 100px auto;
+  padding: 20px;
+  flex-direction: row;
+  align-items: center;
+  gap: 50px;
+  display: flex;
+}
+
+.performance_poster {
+  width: 270px;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.performance-info-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* content 위, review 아래 배치 */
+  flex: 1;
+  height: 100%;
+  gap: 10px;
+  border: 2px solid lightgrey;
+  padding: 10px 30px;
+  border-radius: 16px;
+}
+
+.performance-title-center {
+  text-align: center;
+}
+
+.poster-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.favorite-toggle {
+  text-align: center;
+}
+
+/* 하트를 포스터 우측 상단에 고정 */
+.heart-button {
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #e91e63;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.heart-button:hover {
+  transform: scale(1.2);
+}
