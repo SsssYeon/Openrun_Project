@@ -1,10 +1,22 @@
 package com.openrun.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class SignupRequest {
+
+    @JsonProperty("user_id")
     private String user_id;
+
+    @JsonProperty("user_pw")
     private String user_pw;
+
+    @JsonProperty("user_nm")
     private String user_nm;
+
+    @JsonProperty("user_nicknm")
     private String user_nicknm;
+
+    @JsonProperty("user_phonenum")
     private String user_phonenum;
 
     public SignupRequest() {}

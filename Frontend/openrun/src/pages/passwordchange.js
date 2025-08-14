@@ -40,7 +40,7 @@ const Passwordchange = () => {
 
     // 4. PATCH 요청 (토큰 필요)
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const response = await fetch("/api/users/me/password", {
         method: "PATCH",
         headers: {

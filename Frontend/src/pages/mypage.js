@@ -13,51 +13,38 @@ const MyPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token =
-          localStorage.getItem("token") || sessionStorage.getItem("token");
-        // 1) 유저 기본 정보 가져오기 (닉네임 등)
-        const userResponse = await fetch("http://localhost:8080/api/users/me", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!userResponse.ok) {
-          throw new Error("인증 실패 또는 서버 오류");
-        }
-
-        const data = await userResponse.json();
-        setUser(userData);
-
-        // 2) 관심 공연 0~2번 인덱스 가져오기
-        const interestResponse = await fetch("http://localhost:8080/api/users/me/interests", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!interestResponse.ok) {
-          throw new Error("관심 공연 요청 실패");
-        }
-
-        const interestData = await interestResponse.json();
-        // 관심 공연이 userLikeList 배열이라면, 0~2까지만 slice
-        setInterests(interestData.userLikeList?.slice(0, 3) || []);
-      } catch (error) {
-        console.error("유저 정보 또는 관심 공연 불러오기 실패:", error);
-        setUser(userData); // 예시 데이터로 대체
-
-        // 예시 데이터에도 관심 공연 정보가 있으면 상위 3개만 추출
-        setInterests(favoritesMock?.slice(0, 3) || []);
+  const fetchUserAndInterests = async () => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return;
       }
-    };
 
-    fetchUser();
-  }, [navigate]);
+      // 1) 유저 정보 가져오기
+      const userRes = await fetch(`/api/users/me?user_local_token=${token}`);
+      if (!userRes.ok) throw new Error("유저 정보 조회 실패");
+
+      const userData = await userRes.json();
+      setUser(userData);
+
+      // 2) 관심 공연 가져오기 (user_id 기반)
+      const interestRes = await fetch(`/api/users/me/interests?user_id=${userData.user_id}`);
+      if (!interestRes.ok) throw new Error("관심 공연 조회 실패");
+
+      const interestData = await interestRes.json();
+      setInterests(interestData.user_like_list?.slice(0, 3) || []);
+    } catch (error) {
+      console.error(error);
+      // 실패 시 mock 데이터 fallback
+      setUser(userData); // import userData from mocks/users
+      setInterests(favoritesMock?.slice(0, 3) || []);
+    }
+  };
+
+  fetchUserAndInterests();
+}, [navigate]);
 
   if (!user) return <div>로딩 중...</div>;
 
@@ -70,7 +57,7 @@ const MyPage = () => {
         localStorage.getItem("token") || sessionStorage.getItem("token");
       if (!token) throw new Error("로그인 상태가 아닙니다.");
 
-      const response = await fetch("http://localhost:8080/api/auth/logout", {
+      const response = await fetch("/api/auth/logout", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

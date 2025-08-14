@@ -36,7 +36,7 @@ const Userjoin = () => {
 
     try {
       const response = await fetch(
-        `/api/auth/check-id?user_id=${formData.user_id}`
+        `http://localhost:8080/api/auth/check-id?user_id=${formData.user_id}`
       );
       const data = await response.json();
 
@@ -65,7 +65,7 @@ const Userjoin = () => {
     }
 
     try {
-      const res = await fetch("/api/auth/verify/send", {
+      const res = await fetch("http://localhost:8080/api/auth/verify/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +97,7 @@ const Userjoin = () => {
     }
 
     try {
-      const res = await fetch("/api/auth/verify/check", {
+      const res = await fetch("http://localhost:8080/api/auth/verify/check", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -156,7 +156,7 @@ const Userjoin = () => {
     }
 
     try {
-      const response = await fetch("/api/auth/signup", {
+      const response = await fetch("http://localhost:8080/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

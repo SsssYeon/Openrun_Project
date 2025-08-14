@@ -13,51 +13,44 @@ const MyPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token =
-          localStorage.getItem("token") || sessionStorage.getItem("token");
-        // 1) 유저 기본 정보 가져오기 (닉네임 등)
-        const userResponse = await fetch("/api/users/me", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (!token) {
+        navigate("/login");
+        return;
+    }
+    
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (!token) return navigate("/login");
 
-        if (!userResponse.ok) {
-          throw new Error("인증 실패 또는 서버 오류");
-        }
+      const userResponse = await fetch("/api/users/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        const data = await userResponse.json();
-        setUser(userData);
+      if (!userResponse.ok) throw new Error("유저 정보 호출 실패");
 
-        // 2) 관심 공연 0~2번 인덱스 가져오기
-        const interestResponse = await fetch("/api/users/me/interests", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      const data = await userResponse.json();
+      setUser(data); // 정상 데이터만 여기서 세팅
 
-        if (!interestResponse.ok) {
-          throw new Error("관심 공연 요청 실패");
-        }
+      const interestResponse = await fetch("/api/users/me/interests", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        const interestData = await interestResponse.json();
-        // 관심 공연이 userLikeList 배열이라면, 0~2까지만 slice
-        setInterests(interestData.userLikeList?.slice(0, 3) || []);
-      } catch (error) {
-        console.error("유저 정보 또는 관심 공연 불러오기 실패:", error);
-        setUser(userData); // 예시 데이터로 대체
+      if (!interestResponse.ok) throw new Error("관심 공연 호출 실패");
 
-        // 예시 데이터에도 관심 공연 정보가 있으면 상위 3개만 추출
-        setInterests(favoritesMock?.slice(0, 3) || []);
-      }
-    };
+      const interestData = await interestResponse.json();
+      setInterests(interestData.userLikeList?.slice(0, 3) || []);
+    } catch (error) {
+      console.error(error);
+      // 오직 API 호출 실패 시에만 mock 데이터 사용
+      setUser(userData);
+      setInterests(favoritesMock?.slice(0, 3) || []);
+    }
+  };
 
-    fetchUser();
-  }, [navigate]);
+  fetchUser();
+}, []);
 
   if (!user) return <div>로딩 중...</div>;
 

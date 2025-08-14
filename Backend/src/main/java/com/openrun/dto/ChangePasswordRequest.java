@@ -1,8 +1,16 @@
 package com.openrun.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ChangePasswordRequest {
+
+    @JsonProperty("user_id")
     private String user_id;
+
+    @JsonProperty("currentPassword")
     private String currentPassword;
+
+    @JsonProperty("newPassword")
     private String newPassword;
 
     public ChangePasswordRequest() {}

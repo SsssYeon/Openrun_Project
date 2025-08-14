@@ -12,198 +12,213 @@ import com.openrun.dto.LoginRequest;
 import com.openrun.dto.SignupRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class AuthService {
 
+
+    private final Firestore firestore = FirestoreClient.getFirestore();
+    @Autowired
+    private HttpSession session;
+
+    // 회원가입
     public void signup(SignupRequest request) throws Exception {
         try {
             UserRecord.CreateRequest createRequest = new UserRecord.CreateRequest()
-                    .setEmail(request.getUser_id() + "@openrun.temp") // 임시 이메일 생성
+                    .setEmail(request.getUser_id() + "@openrun.temp")
                     .setPassword(request.getUser_pw());
 
             UserRecord userRecord = FirebaseAuth.getInstance().createUser(createRequest);
 
-            Firestore firestore = FirestoreClient.getFirestore();
-            DocumentReference docRef = firestore.collection("UserData").document(userRecord.getUid());
+            Firestore db = FirestoreClient.getFirestore();
+            DocumentReference docRef = db.collection("UserData").document(userRecord.getUid());
 
             Map<String, Object> userData = new HashMap<>();
-            userData.put("user_doc_no", 0);  // 자동증가 필요하면 별도 구현
-            userData.put("user_id", request.getUser_id());
-            userData.put("user_pw", request.getUser_pw());
-            userData.put("user_nm", request.getUser_nm());
-            userData.put("user_nicknm", request.getUser_nicknm());
-            userData.put("user_phonenum", request.getUser_phonenum());
-            userData.put("user_local_token", "");
-            userData.put("user_kakao_token", "");
-            userData.put("user_timestamp", Timestamp.now());
+            userData.put("userId", request.getUser_id());
+            userData.put("userPw", request.getUser_pw());
+            userData.put("userName", request.getUser_nm());
+            userData.put("userNickname", request.getUser_nicknm());
+            userData.put("userPhoneNumber", request.getUser_phonenum());
+            userData.put("userAutoLoginToken", "");
+            userData.put("userKakaoToken", "");
+            userData.put("userLikeList", new ArrayList<String>());
+            userData.put("userPrivacyPolicyAgree", 0);
+            userData.put("userState", 1);
+            userData.put("userTimeStamp", Timestamp.now());
 
             docRef.set(userData).get();
-
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("회원가입 처리 중 오류 발생: " + e.getMessage());
         }
     }
 
+    // ID 중복 확인
     public boolean isEmailDuplicate(String userId) throws Exception {
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference users = db.collection("UserData");
 
-        QuerySnapshot snapshot = users.whereEqualTo("user_id", userId).get().get();
-
+        QuerySnapshot snapshot = users.whereEqualTo("userId", userId).get().get();
         return !snapshot.isEmpty();
     }
 
-    public Map<String, String> login(LoginRequest request) throws Exception {
+    // 로그인
+    public Map<String, Object> login(LoginRequest request) throws Exception {
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference users = db.collection("UserData");
 
-        Query query = users.whereEqualTo("user_id", request.getUser_id());
-        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        List<QueryDocumentSnapshot> documents = users
+                .whereEqualTo("userId", request.getUser_id())
+                .get().get().getDocuments();
 
-        List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
-        if (documents.isEmpty()) {
-            throw new Exception("존재하지 않는 사용자입니다.");
-        }
+        if (documents.isEmpty()) throw new Exception("존재하지 않는 사용자입니다.");
 
         DocumentSnapshot userDoc = documents.get(0);
-        String savedPassword = userDoc.getString("user_pw");
+        String savedPassword = userDoc.getString("userPw"); // DB 필드명 userPw
 
         if (!Objects.equals(savedPassword, request.getUser_pw())) {
             throw new Exception("비밀번호가 일치하지 않습니다.");
         }
 
+        // 토큰 생성 및 DB 업데이트
         String autoLoginToken = UUID.randomUUID().toString();
+        userDoc.getReference().update("userAutoLoginToken", autoLoginToken).get();
 
-        DocumentReference userRef = userDoc.getReference();
-        Map<String, Object> updateData = new HashMap<>();
-        updateData.put("user_local_token", autoLoginToken);
-        userRef.update(updateData).get();
-
-        Map<String, String> result = new HashMap<>();
+        // 프론트 기준 반환 데이터
+        Map<String, Object> result = new HashMap<>();
         result.put("user_local_token", autoLoginToken);
-        result.put("user_nicknm", userDoc.getString("user_nicknm"));
+        result.put("user_nicknm", userDoc.getString("userNickname"));
+        result.put("user_id", userDoc.getString("userId"));
+        result.put("user_nm", userDoc.getString("userName"));
+        result.put("user_phonenum", userDoc.getString("userPhoneNumber"));
 
         return result;
     }
 
-    public Map<String, String> autoLogin(String token) throws Exception {
+    // 자동 로그인
+    public Map<String, Object> autoLogin(String token) throws Exception {
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference users = db.collection("UserData");
 
-        Query query = users.whereEqualTo("user_local_token", token);
-        ApiFuture<QuerySnapshot> querySnapshot = query.get();
-
-        List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
-        if (documents.isEmpty()) {
-            throw new Exception("유효하지 않은 자동 로그인 토큰입니다.");
-        }
+        Query query = users.whereEqualTo("userAutoLoginToken", token);
+        List<QueryDocumentSnapshot> documents = query.get().get().getDocuments();
+        if (documents.isEmpty()) throw new Exception("유효하지 않은 자동 로그인 토큰입니다.");
 
         DocumentSnapshot userDoc = documents.get(0);
 
-        Map<String, String> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         result.put("user_local_token", token);
-        result.put("user_nicknm", userDoc.getString("user_nicknm"));
-        result.put("user_id", userDoc.getString("user_id"));
+        result.put("user_nicknm", userDoc.getString("userNickname"));
+        result.put("user_id", userDoc.getString("userId"));
+        result.put("user_nm", userDoc.getString("userName"));
+        result.put("user_phonenum", userDoc.getString("userPhoneNumber"));
+
         return result;
     }
 
+    // 로그아웃
+    public ResponseEntity<String> logout(String userId) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference users = db.collection("UserData");
+
+        Query query = users.whereEqualTo("user_id", userId);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        QuerySnapshot snapshot = querySnapshot.get();
+        List<QueryDocumentSnapshot> documents = snapshot.getDocuments();
+
+        if (documents.isEmpty()) {
+            return ResponseEntity.badRequest().body("존재하지 않는 사용자입니다.");
+        }
+
+        DocumentReference userDoc = documents.get(0).getReference();
+        userDoc.update("user_local_token", null).get(); // 토큰 초기화
+
+        return ResponseEntity.ok("로그아웃이 완료되었습니다.");
+    }
+
+    //아이디 찾기
     public String findUserId(String userName, String userPhoneNumber) throws Exception {
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference users = db.collection("UserData");
 
-        Query query = users
-                .whereEqualTo("user_nm", userName)
-                .whereEqualTo("user_phonenum", userPhoneNumber);
-        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        Query query = users.whereEqualTo("userName", userName)
+                .whereEqualTo("userPhoneNumber", userPhoneNumber);
+        List<QueryDocumentSnapshot> documents = query.get().get().getDocuments();
 
-        List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
         if (documents.isEmpty()) {
             throw new Exception("해당 정보와 일치하는 사용자가 없습니다.");
         }
 
-        DocumentSnapshot userDoc = documents.get(0);
-        return userDoc.getString("user_id");
+        return documents.get(0).getString("userId"); // DB 기준 필드명
     }
 
+    //비밀번호 초기화
     public String resetPassword(String userId, String userName, String userPhoneNumber) throws Exception {
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference users = db.collection("UserData");
 
-        Query query = users
-                .whereEqualTo("user_id", userId)
-                .whereEqualTo("user_nm", userName)
-                .whereEqualTo("user_phonenum", userPhoneNumber);
-        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        Query query = users.whereEqualTo("userId", userId)
+                .whereEqualTo("userName", userName)
+                .whereEqualTo("userPhoneNumber", userPhoneNumber);
+        List<QueryDocumentSnapshot> documents = query.get().get().getDocuments();
 
-        List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
         if (documents.isEmpty()) {
             throw new Exception("입력한 정보와 일치하는 사용자가 없습니다.");
         }
 
         DocumentSnapshot userDoc = documents.get(0);
         String uid = userDoc.getId();
-
         String tempPassword = UUID.randomUUID().toString().substring(0, 8);
 
+        // FirebaseAuth 비밀번호 업데이트
         UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid)
                 .setPassword(tempPassword);
         FirebaseAuth.getInstance().updateUser(request);
 
-        DocumentReference docRef = users.document(uid);
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("user_pw", tempPassword);
-        docRef.update(updates).get();
+        // Firestore 비밀번호 업데이트
+        userDoc.getReference().update("userPw", tempPassword).get();
 
         return tempPassword;
     }
 
+    // 비밀번호 변경
     public String changePassword(ChangePasswordRequest request) throws Exception {
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference users = db.collection("UserData");
 
-        Query query = users.whereEqualTo("user_id", request.getUser_id())
-                .whereEqualTo("user_pw", request.getCurrentPassword());
-        ApiFuture<QuerySnapshot> querySnapshot = query.get();
-        List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
+        Query query = users.whereEqualTo("userId", request.getUser_id())
+                .whereEqualTo("userPw", request.getCurrentPassword());
+        List<QueryDocumentSnapshot> documents = query.get().get().getDocuments();
 
-        if (documents.isEmpty()) {
-            throw new Exception("현재 비밀번호가 일치하지 않습니다.");
-        }
+        if (documents.isEmpty()) throw new Exception("현재 비밀번호가 일치하지 않습니다.");
 
-        DocumentReference userDoc = documents.get(0).getReference();
-        userDoc.update("user_pw", request.getNewPassword());
-
+        documents.get(0).getReference().update("userPw", request.getNewPassword()).get();
         return "비밀번호가 성공적으로 변경되었습니다.";
     }
 
-    @Autowired
-    private HttpSession session;
-
+    // 회원 탈퇴
     public String deleteAccount(DeleteAccountRequest request) throws Exception {
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference users = db.collection("UserData");
 
-        Query query = users
-                .whereEqualTo("user_id", request.getUser_id())
-                .whereEqualTo("user_pw", request.getPassword());
+        Query query = users.whereEqualTo("userId", request.getUser_id())
+                .whereEqualTo("userPw", request.getPassword());
+        List<QueryDocumentSnapshot> documents = query.get().get().getDocuments();
 
-        ApiFuture<QuerySnapshot> querySnapshot = query.get();
-        List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
-
-        if (documents.isEmpty()) {
-            throw new Exception("아이디 또는 비밀번호가 잘못되었습니다.");
-        }
+        if (documents.isEmpty()) throw new Exception("아이디 또는 비밀번호가 잘못되었습니다.");
 
         DocumentReference userDoc = documents.get(0).getReference();
-        userDoc.update("user_local_token", null);
+        userDoc.update("userAutoLoginToken", null).get();
         userDoc.delete().get();
-        session.invalidate();
 
+        session.invalidate();
         return "회원 탈퇴가 완료되었습니다. 모든 로그인 정보가 삭제되었습니다.";
     }
 }
