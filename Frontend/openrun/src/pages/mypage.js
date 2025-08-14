@@ -18,7 +18,6 @@ const MyPage = () => {
         navigate("/login");
         return;
     }
-    
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -40,7 +39,7 @@ const MyPage = () => {
       if (!interestResponse.ok) throw new Error("관심 공연 호출 실패");
 
       const interestData = await interestResponse.json();
-      setInterests(interestData.userLikeList?.slice(0, 3) || []);
+      setInterests(interestData.slice(0, 3) || []);
     } catch (error) {
       console.error(error);
       // 오직 API 호출 실패 시에만 mock 데이터 사용
@@ -174,16 +173,14 @@ const MyPage = () => {
                 <div className="user-favorite">
                   {interests.length === 0 && <p>관심 공연이 없습니다.</p>}
                   {interests.map((show) => (
-                    <div key={show.id} className="user-favorite-content">
+                    <div key={show.pfm_doc_id} className="user-favorite-content">
                       <img
                         src={show.poster}
                         alt={show.title}
                         className="user-favorite-poster"
                       />
                       <p className="user-favorite-title">
-                        {show.title.length > 7
-                          ? show.title.slice(0, 7) + "..."
-                          : show.title}
+                        {show.title.length > 7 ? show.title.slice(0, 7) + "..." : show.title}
                       </p>
                     </div>
                   ))}

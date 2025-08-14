@@ -100,7 +100,6 @@ public class AuthController {
         try {
             String tempPw = authService.resetPassword(
                     req.get("user_id"),
-                    req.get("user_nm"),
                     req.get("user_phonenum")
             );
             return ResponseEntity.ok(Map.of("temp_pw", tempPw, "message", "임시 비밀번호로 재설정되었습니다."));

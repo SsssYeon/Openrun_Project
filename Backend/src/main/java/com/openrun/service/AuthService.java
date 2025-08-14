@@ -160,12 +160,11 @@ public class AuthService {
     }
 
     //비밀번호 초기화
-    public String resetPassword(String userId, String userName, String userPhoneNumber) throws Exception {
+    public String resetPassword(String userId, String userPhoneNumber) throws Exception {
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference users = db.collection("UserData");
 
         Query query = users.whereEqualTo("userId", userId)
-                .whereEqualTo("userName", userName)
                 .whereEqualTo("userPhoneNumber", userPhoneNumber);
         List<QueryDocumentSnapshot> documents = query.get().get().getDocuments();
 
