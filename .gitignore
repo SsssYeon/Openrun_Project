@@ -4,6 +4,11 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+.idea/
+!.idea/codeStyles/
+!.idea/runConfigurations/
+
+**/firebase-service-key.json
 
 **/firebase-service-key.json
 
