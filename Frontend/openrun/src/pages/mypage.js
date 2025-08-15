@@ -19,7 +19,7 @@ const MyPage = () => {
           localStorage.getItem("token") || sessionStorage.getItem("token");
 
         if (!token) return navigate("/login", { replace: true });
-        // 1) 유저 기본 정보 가져오기 (닉네임 등)
+
         const userResponse = await fetch("/api/users/me", {
           method: "GET",
           headers: {
@@ -33,17 +33,7 @@ const MyPage = () => {
 
         const data = await userResponse.json();
         setUser(data);
-      } catch (error) {
-        console.error("유저 정보 또는 관심 공연 불러오기 실패:", error);
-        setUser(userData); // 예시 데이터로 대체
-      }
-      try {
-        // 관심 공연
-        // 2) 관심 공연 0~2번 인덱스 가져오기
-         const token =
-          localStorage.getItem("token") || sessionStorage.getItem("token");
 
-        
         const interestResponse = await fetch("/api/users/me/interests", {
           method: "GET",
           headers: {
@@ -52,18 +42,19 @@ const MyPage = () => {
         });
 
         if (!interestResponse.ok) {
-          throw new Error("관심 공연 요청 실패");
+          throw new Error("관심 공연 호출 실패");
         }
 
         const interestData = await interestResponse.json();
-        // 관심 공연이 userLikeList 배열이라면, 0~2까지만 slice
-        setInterests(interestData.userLikeList?.slice(0, 3) || []);
+        setInterests(interestData.slice(0, 3) || []);
       } catch (error) {
-        setInterests(favoritesMock.slice(0, 3));
+        console.error(error);
+        setUser(userData);
+        setInterests(favoritesMock?.slice(0, 3) || []);
       }
     };
 
-    fetchUser();
+    fetchUser(); // <-- 함수 호출은 여기
   }, [navigate]);
 
   if (!user) return <div>로딩 중...</div>;
@@ -92,6 +83,8 @@ const MyPage = () => {
 
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
+
+      setUser(null);
 
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
