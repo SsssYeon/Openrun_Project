@@ -1,5 +1,3 @@
-// 닉네임 불러오는 것만 api 연결 완료, api 연결 안됐을 때 mocks 데이터 사용 (오픈런 고인물)
-
 import React, { useEffect, useState } from "react";
 import Nav from "../components/nav";
 import { Link, NavLink, useNavigate } from "react-router-dom";
@@ -13,43 +11,49 @@ const MyPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    if (!token) {
-        navigate("/login");
-        return;
-    }
-  const fetchUser = async () => {
-    try {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      if (!token) return navigate("/login");
+    const fetchUser = async () => {
+      try {
+        const token =
+          localStorage.getItem("token") || sessionStorage.getItem("token");
 
-      const userResponse = await fetch("/api/users/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        if (!token) return navigate("/login", { replace: true });
 
-      if (!userResponse.ok) throw new Error("유저 정보 호출 실패");
+        const userResponse = await fetch("/api/users/me", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      const data = await userResponse.json();
-      setUser(data); // 정상 데이터만 여기서 세팅
+        if (!userResponse.ok) {
+          throw new Error("인증 실패 또는 서버 오류");
+        }
 
-      const interestResponse = await fetch("/api/users/me/interests", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        const data = await userResponse.json();
+        setUser(data);
 
-      if (!interestResponse.ok) throw new Error("관심 공연 호출 실패");
+        const interestResponse = await fetch("/api/users/me/interests", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      const interestData = await interestResponse.json();
-      setInterests(interestData.slice(0, 3) || []);
-    } catch (error) {
-      console.error(error);
-      // 오직 API 호출 실패 시에만 mock 데이터 사용
-      setUser(userData);
-      setInterests(favoritesMock?.slice(0, 3) || []);
-    }
-  };
+        if (!interestResponse.ok) {
+          throw new Error("관심 공연 호출 실패");
+        }
 
-  fetchUser();
-}, []);
+        const interestData = await interestResponse.json();
+        setInterests(interestData.slice(0, 3) || []);
+      } catch (error) {
+        console.error(error);
+        setUser(userData);
+        setInterests(favoritesMock?.slice(0, 3) || []);
+      }
+    };
+
+    fetchUser(); // <-- 함수 호출은 여기
+  }, [navigate]);
 
   if (!user) return <div>로딩 중...</div>;
 
@@ -76,6 +80,10 @@ const MyPage = () => {
       }
 
       localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+
+      setUser(null);
+
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
     } catch (error) {
@@ -173,14 +181,16 @@ const MyPage = () => {
                 <div className="user-favorite">
                   {interests.length === 0 && <p>관심 공연이 없습니다.</p>}
                   {interests.map((show) => (
-                    <div key={show.pfm_doc_id} className="user-favorite-content">
+                    <div key={show.id} className="user-favorite-content">
                       <img
                         src={show.poster}
                         alt={show.title}
                         className="user-favorite-poster"
                       />
                       <p className="user-favorite-title">
-                        {show.title.length > 7 ? show.title.slice(0, 7) + "..." : show.title}
+                        {show.title.length > 7
+                          ? show.title.slice(0, 7) + "..."
+                          : show.title}
                       </p>
                     </div>
                   ))}
@@ -190,7 +200,7 @@ const MyPage = () => {
               {/* 나의 글 */}
               <div className="mypage-right-bottom">
                 <h3 className="user-title">나의 글</h3>
-                <h4 id ="mypage-notice"> 추후 구현 예정입니다! </h4>
+                <h4 id="mypage-notice"> 추후 구현 예정입니다! </h4>
                 {/* <div className="user-community">
                   {user.posts.map((post) => (
                     <div key={post.id} className="user-community-content">

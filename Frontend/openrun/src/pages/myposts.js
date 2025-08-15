@@ -1,16 +1,75 @@
-// 마이페이지 - 나의 글 => api 연결 필요
+// 마이페이지 - 비밀번호 변경 => api 연결 완료
 
-import React from "react";
+import React, { useState } from "react";
 import Nav from "../components/nav";
 import { Link, useNavigate } from "react-router-dom";
 // import userData from "../mocks/users";
 import "../css/mypage.css";
-import poster1 from "../components/poster1.jpg";
-import logo2 from "../components/logo2.png";
 
-const Myposts = () => {
+const Passwordchange = () => {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const navigate = useNavigate();
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // 1. 빈칸 여부 확인
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      alert("모든 항목을 입력해주세요.");
+      return;
+    }
+
+    // 2. 새 비밀번호 유효성 검사 (영문, 숫자, 특수문자 포함 8자 이상)
+    const pwRegex =
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?]).{8,}$/;
+    if (!pwRegex.test(newPassword)) {
+      alert(
+        "새 비밀번호는 영문, 숫자, 특수기호를 포함한 8자 이상이어야 합니다."
+      );
+      return;
+    }
+
+    // 3. 새 비밀번호와 확인 일치 여부
+    if (newPassword !== confirmPassword) {
+      alert("새 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    // 4. PATCH 요청 (토큰 필요)
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const response = await fetch("/api/users/me/password", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword: currentPassword,
+          newPassword: newPassword,
+        }),
+      });
+
+      if (response.ok) {
+        alert("비밀번호가 성공적으로 변경되었습니다.");
+        navigate("/account");
+      } else if (response.status === 401) {
+        alert("현재 비밀번호가 일치하지 않습니다.");
+      } else {
+        const error = await response.json();
+        alert(
+          "오류가 발생했습니다: " + (error.message || "다시 시도해주세요.")
+        );
+      }
+    } catch (error) {
+      alert("서버 요청 중 오류가 발생했습니다.");
+      console.error(error);
+    }
+  };
+  
   const handleLogout = async () => {
     const confirmed = window.confirm("로그아웃 하시겠습니까?");
     if (!confirmed) return;
@@ -34,6 +93,7 @@ const Myposts = () => {
       }
 
       localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
     } catch (error) {
@@ -119,30 +179,50 @@ const Myposts = () => {
 
         <div className="account-right">
           <div>
-            <h3 id="account_title">나의 글</h3>
+            <h3 id="account_title">비밀번호 변경</h3>
           </div>
-
-          <div class="community-list">
-            <h3 id ="mypage-notice"> 추후 구현 예정입니다! </h3>
-            {/* <div class="community-item">
-              <div class="content">
-                <div class="title">지킬앤하이드 후기</div>
-                <div class="subtext">지킬을 보고 왔습니다...</div>
-              </div>
-              <div class="date">25.05.01</div>
-              <img src={poster1} alt="썸네일" class="thumb" />
+          <div className="passwordchange-content">
+            {/* 현재 비밀번호 */}
+            <div>
+              <h5> 현재 비밀번호 </h5>
+              <input
+                type="password"
+                class="input-field"
+                maxLength="15"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
             </div>
 
-            <div class="community-item">
-              <div class="content">
-                <div class="title">링아센 좌석 후기</div>
-                <div class="subtext">
-                  가성비석 다녀왔습니다! 시야는 좋은데 음향이...
-                </div>
-              </div>
-              <div class="date">25.03.29</div>
-              <img src={logo2} alt="썸네일" class="thumb" />
-            </div> */}
+            {/* 새 비밀번호 */}
+            <div>
+              <h5> 새 비밀번호 </h5>
+              <input
+                type="password"
+                class="input-field"
+                maxLength="15"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+
+            {/* 새 비밀번호 확인 */}
+            <div>
+              <h5> 새 비밀번호 확인 </h5>
+              <input
+                type="password"
+                class="input-field"
+                maxLength="15"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <button type="submit" id="accountbutton" onClick={handleSubmit}>
+                저장
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -150,4 +230,4 @@ const Myposts = () => {
   );
 };
 
-export default Myposts;
+export default Passwordchange;
