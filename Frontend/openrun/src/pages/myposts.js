@@ -34,6 +34,8 @@ const Myposts = () => {
       }
 
       localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+      
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
     } catch (error) {

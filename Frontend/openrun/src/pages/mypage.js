@@ -1,4 +1,4 @@
-// 닉네임 불러오는 것만 api 연결 완료, api 연결 안됐을 때 mocks 데이터 사용 (오픈런 고인물)
+// 마이페이지, api 연동 완료
 
 import React, { useEffect, useState } from "react";
 import Nav from "../components/nav";
@@ -17,13 +17,9 @@ const MyPage = () => {
       try {
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
-        
-          if (!token) {
-        // 토큰이 없으면 로그인 페이지로 이동
-        navigate("/login");
-        return; // 함수 종료
-      }
-          // 1) 유저 기본 정보 가져오기 (닉네임 등)
+
+        if (!token) return navigate("/login", { replace: true });
+        // 1) 유저 기본 정보 가져오기 (닉네임 등)
         const userResponse = await fetch("/api/users/me", {
           method: "GET",
           headers: {
@@ -36,9 +32,18 @@ const MyPage = () => {
         }
 
         const data = await userResponse.json();
-        setUser(userData);
-
+        setUser(data);
+      } catch (error) {
+        console.error("유저 정보 또는 관심 공연 불러오기 실패:", error);
+        setUser(userData); // 예시 데이터로 대체
+      }
+      try {
+        // 관심 공연
         // 2) 관심 공연 0~2번 인덱스 가져오기
+         const token =
+          localStorage.getItem("token") || sessionStorage.getItem("token");
+
+        
         const interestResponse = await fetch("/api/users/me/interests", {
           method: "GET",
           headers: {
@@ -54,11 +59,7 @@ const MyPage = () => {
         // 관심 공연이 userLikeList 배열이라면, 0~2까지만 slice
         setInterests(interestData.userLikeList?.slice(0, 3) || []);
       } catch (error) {
-        console.error("유저 정보 또는 관심 공연 불러오기 실패:", error);
-        setUser(userData); // 예시 데이터로 대체
-
-        // 예시 데이터에도 관심 공연 정보가 있으면 상위 3개만 추출
-        setInterests(favoritesMock?.slice(0, 3) || []);
+        setInterests(favoritesMock.slice(0, 3));
       }
     };
 
@@ -90,6 +91,8 @@ const MyPage = () => {
       }
 
       localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
     } catch (error) {
@@ -206,7 +209,7 @@ const MyPage = () => {
               {/* 나의 글 */}
               <div className="mypage-right-bottom">
                 <h3 className="user-title">나의 글</h3>
-                <h4 id ="mypage-notice"> 추후 구현 예정입니다! </h4>
+                <h4 id="mypage-notice"> 추후 구현 예정입니다! </h4>
                 {/* <div className="user-community">
                   {user.posts.map((post) => (
                     <div key={post.id} className="user-community-content">
