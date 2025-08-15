@@ -34,10 +34,11 @@ const MyPage = () => {
         const data = await userResponse.json();
         setUser(data);
 
-        const interestResponse = await fetch("/api/users/me/interests", {
+         const interestResponse = await fetch("/api/calendar/like", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         });
 
