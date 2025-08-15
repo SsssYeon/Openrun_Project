@@ -1,15 +1,17 @@
 //api 연결 O
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "../css/login.css";
 import { NavLink, useNavigate } from "react-router-dom";
 import Nav from "../components/nav.js";
+import { TokenContext } from "../components/tokencontext";
 
 const Login = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [autoLogin, setAutoLogin] = useState(false); // ✅ 자동 로그인 여부
   const navigate = useNavigate(); // 로그인 성공 후 페이지 이동용
+const { setToken } = useContext(TokenContext);
 
   const handleLogin = async (e) => {
     e.preventDefault(); // 폼 제출 기본 동작 막기
@@ -37,6 +39,8 @@ const Login = () => {
       storage.setItem("token", data.user_local_token);
       storage.setItem("userId", data.user_id);
       storage.setItem("nickname", data.user_nicknm);
+
+      setToken(data.user_local_token);
 
       alert(`${data.user_nicknm}님 환영합니다!`);
       navigate("/"); // 홈 또는 마이페이지 등으로 이동

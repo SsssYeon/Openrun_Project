@@ -1,19 +1,18 @@
 // 마이페이지 - 관심공연 => api 연결 완료 
 // 하트 주석처리해놓음 (2학기)
 
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Nav from "../components/nav";
 import { Link, useNavigate } from "react-router-dom";
 import "../css/mypage.css";
 import mockFavorites from "../mocks/favorites";
+import { TokenContext } from "../components/tokencontext";
 
 const Favorites = () => {
+  const { token, setToken } = useContext(TokenContext);
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const token =
-    localStorage.getItem("token") || sessionStorage.getItem("token");
 
   useEffect(() => {
     if (!token) {
@@ -71,7 +70,8 @@ const Favorites = () => {
 
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
-
+      setToken(null);
+      
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
     } catch (error) {
@@ -84,7 +84,7 @@ const Favorites = () => {
     const confirmed = window.confirm("회원 탈퇴 하시겠습니까?");
     if (confirmed) {
       const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token"); // 여기에 토큰 가져오기 추가
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       fetch("/api/users/me", {
         method: "DELETE",
         headers: {
@@ -95,6 +95,7 @@ const Favorites = () => {
           if (res.ok) {
             localStorage.clear(); // 모든 사용자 정보 제거
             sessionStorage.clear();
+            setToken(null); // TokenContext 초기화
             alert("회원 탈퇴가 완료되었습니다.");
             navigate("/"); // 홈 또는 탈퇴 완료 페이지로 이동
           } else {

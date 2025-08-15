@@ -1,12 +1,14 @@
 // 이용 약관
 
-import React, { useState, useEffect } from "react";
+import React, { useContext,useState, useEffect } from "react";
 import Nav from "../components/nav";
 import { Link, useNavigate } from "react-router-dom";
 import mockUserData from "../mocks/users";
 import "../css/mypage.css";
+import { TokenContext } from "../components/tokencontext";
 
 const Terms = () => {
+  const { token, setToken } = useContext(TokenContext);
   const [userData, setUserData] = useState(null);
   const [user_nm, setName] = useState("");
   const [user_nicknm, setNickname] = useState("");
@@ -75,7 +77,8 @@ const Terms = () => {
     if (!confirmed) return;
 
     try {
-      const token = getToken();
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       if (!token) throw new Error("로그인 상태가 아닙니다.");
 
       const response = await fetch("/api/auth/logout", {
@@ -93,6 +96,8 @@ const Terms = () => {
 
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
+      setToken(null);
+      
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
     } catch (error) {
@@ -104,16 +109,19 @@ const Terms = () => {
   const handleWithdraw = () => {
     const confirmed = window.confirm("회원 탈퇴 하시겠습니까?");
     if (confirmed) {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       fetch("/api/users/me", {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${token}`,
         },
       })
         .then((res) => {
           if (res.ok) {
             localStorage.clear(); // 모든 사용자 정보 제거
             sessionStorage.clear();
+            setToken(null); // TokenContext 초기화
             alert("회원 탈퇴가 완료되었습니다.");
             navigate("/"); // 홈 또는 탈퇴 완료 페이지로 이동
           } else {

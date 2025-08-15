@@ -1,24 +1,25 @@
 // 마이페이지, api 연동 완료
 
-import React, { useEffect, useState } from "react";
+import React, { useContext,  useEffect, useState } from "react";
 import Nav from "../components/nav";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import userData from "../mocks/users";
 import favoritesMock from "../mocks/favorites"; // 예시 관심 공연 데이터 임포트
 import "../css/mypage.css";
+import { TokenContext } from "../components/tokencontext";
 
 const MyPage = () => {
+   const { token, setToken } = useContext(TokenContext);
   const [user, setUser] = useState(null);
   const [interests, setInterests] = useState([]); // 관심 공연 상태 추가
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!token) return;
     const fetchUser = async () => {
+       setUser(null);         // 이전 상태 초기화
+      setInterests([]);
       try {
-        const token =
-          localStorage.getItem("token") || sessionStorage.getItem("token");
-
-        if (!token) return navigate("/login", { replace: true });
 
         const userResponse = await fetch("/api/users/me", {
           method: "GET",
@@ -26,7 +27,7 @@ const MyPage = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-
+    
         if (!userResponse.ok) {
           throw new Error("인증 실패 또는 서버 오류");
         }
@@ -55,7 +56,7 @@ const MyPage = () => {
     };
 
     fetchUser(); // <-- 함수 호출은 여기
-  }, [navigate]);
+  }, [token]);
 
   if (!user) return <div>로딩 중...</div>;
 
@@ -83,9 +84,8 @@ const MyPage = () => {
 
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
-
-      setUser(null);
-
+      setToken(null);
+      
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
     } catch (error) {
@@ -109,6 +109,7 @@ const MyPage = () => {
           if (res.ok) {
             localStorage.clear(); // 모든 사용자 정보 제거
             sessionStorage.clear();
+            setToken(null); // TokenContext 초기화
             alert("회원 탈퇴가 완료되었습니다.");
             navigate("/"); // 홈 또는 탈퇴 완료 페이지로 이동
           } else {

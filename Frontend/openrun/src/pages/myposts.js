@@ -1,14 +1,17 @@
 // 마이페이지 - 나의 글 => api 연결 필요
 
-import React from "react";
+import React, { useContext} from "react";
 import Nav from "../components/nav";
 import { Link, useNavigate } from "react-router-dom";
 // import userData from "../mocks/users";
 import "../css/mypage.css";
 import poster1 from "../components/poster1.jpg";
 import logo2 from "../components/logo2.png";
+import { TokenContext } from "../components/tokencontext";
+
 
 const Myposts = () => {
+  const { token, setToken } = useContext(TokenContext);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -35,6 +38,7 @@ const Myposts = () => {
 
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
+      setToken(null);
       
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
@@ -59,6 +63,7 @@ const Myposts = () => {
           if (res.ok) {
             localStorage.clear(); // 모든 사용자 정보 제거
             sessionStorage.clear();
+            setToken(null); // TokenContext 초기화
             alert("회원 탈퇴가 완료되었습니다.");
             navigate("/"); // 홈 또는 탈퇴 완료 페이지로 이동
           } else {

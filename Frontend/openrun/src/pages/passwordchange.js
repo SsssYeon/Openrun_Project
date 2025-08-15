@@ -1,12 +1,14 @@
 // 마이페이지 - 비밀번호 변경 => api 연결 완료
 
-import React, { useState } from "react";
+import React, { useContext,useState } from "react";
 import Nav from "../components/nav";
 import { Link, useNavigate } from "react-router-dom";
 // import userData from "../mocks/users";
 import "../css/mypage.css";
+import { TokenContext } from "../components/tokencontext";
 
 const Passwordchange = () => {
+  const { token, setToken } = useContext(TokenContext);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -94,6 +96,8 @@ const Passwordchange = () => {
 
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
+      setToken(null);
+      
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
     } catch (error) {
@@ -117,6 +121,7 @@ const Passwordchange = () => {
           if (res.ok) {
             localStorage.clear(); // 모든 사용자 정보 제거
             sessionStorage.clear();
+            setToken(null); // TokenContext 초기화
             alert("회원 탈퇴가 완료되었습니다.");
             navigate("/"); // 홈 또는 탈퇴 완료 페이지로 이동
           } else {
