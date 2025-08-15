@@ -47,6 +47,7 @@ const MyPage = () => {
         }
 
         const interestData = await interestResponse.json();
+        const likeList = interestData.userLikeList || [];
         setInterests(interestData.slice(0, 3) || []);
       } catch (error) {
         console.error(error);
