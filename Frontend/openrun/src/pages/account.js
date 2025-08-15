@@ -1,6 +1,6 @@
 // 마이페이지 - 계정 설정 => api 연결 완료
 
-import React, { useContext,useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Nav from "../components/nav";
 import { Link, useNavigate } from "react-router-dom";
 import mockUserData from "../mocks/users";
@@ -8,50 +8,48 @@ import "../css/mypage.css";
 import { TokenContext } from "../components/tokencontext";
 
 const Account = () => {
-   const { token, setToken } = useContext(TokenContext);
+  const { token, setToken } = useContext(TokenContext);
   const [userData, setUserData] = useState(null);
   const [user_nm, setName] = useState("");
   const [user_nicknm, setNickname] = useState("");
   const navigate = useNavigate();
 
-  const getToken = () =>
-    localStorage.getItem("token") || sessionStorage.getItem("token");
+  // 사용자 정보 가져오기
+  const fetchUserInfo = async () => {
+    if (!token) return;
+    try {
+      const response = await fetch("/api/users/me", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  useEffect(() => {
-    // 사용자 정보 가져오기
-    const fetchUserInfo = async () => {
-      try {
-        const response = await fetch("/api/users/me", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getToken()}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUserData(data);
-        } else {
-          console.error("유저 정보를 가져오는데 실패했습니다.");
-          setUserData(mockUserData);
-        }
-      } catch (error) {
-        console.error("에러 발생:", error);
+      if (response.ok) {
+        const data = await response.json();
+        setUserData(data);
+      } else {
+        console.error("유저 정보를 가져오는데 실패했습니다.");
         setUserData(mockUserData);
       }
-    };
-
+    } catch (error) {
+      console.error("에러 발생:", error);
+      setUserData(mockUserData);
+    }
+  };
+  useEffect(() => {
     fetchUserInfo();
   }, []);
 
   const handleSubmit = async () => {
+    if (!token) return;
     try {
       const response = await fetch("/api/users/me", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           user_nm: user_nm || undefined,
@@ -61,7 +59,9 @@ const Account = () => {
 
       if (response.ok) {
         alert("수정이 완료되었습니다.");
-        window.location.reload();
+        setName(""); // input 초기화
+        setNickname(""); // input 초기화
+        fetchUserInfo(); // 수정 후 최신 정보 재호출
       } else {
         alert("수정에 실패했습니다.");
       }
@@ -77,8 +77,7 @@ const Account = () => {
     if (!confirmed) return;
 
     try {
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
+      
       if (!token) throw new Error("로그인 상태가 아닙니다.");
 
       const response = await fetch("/api/auth/logout", {
@@ -94,12 +93,10 @@ const Account = () => {
         throw new Error(data.message || "서버에서 로그아웃 처리 실패");
       }
 
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("token");
       setToken(null);
-      
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
+
     } catch (error) {
       alert(`로그아웃 오류: ${error.message}`);
       console.error("로그아웃 실패:", error);
@@ -108,15 +105,18 @@ const Account = () => {
 
   const handleWithdraw = () => {
     const confirmed = window.confirm("회원 탈퇴 하시겠습니까?");
+    if (!confirmed) return;
+
     if (confirmed) {
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
+       if (!token) throw new Error("로그인 상태가 아닙니다.");
+
       fetch("/api/users/me", {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
+      
         .then((res) => {
           if (res.ok) {
             localStorage.clear(); // 모든 사용자 정보 제거

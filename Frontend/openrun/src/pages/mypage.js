@@ -14,7 +14,7 @@ const MyPage = () => {
   const [interests, setInterests] = useState([]); // 관심 공연 상태 추가
   const navigate = useNavigate();
 
-  useEffect(() => {
+  useEffect((currentToken) => {
     if (!token) return;
     const fetchUser = async () => {
        setUser(null);         // 이전 상태 초기화
@@ -24,7 +24,7 @@ const MyPage = () => {
         const userResponse = await fetch("/api/users/me", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${currentToken}`,
           },
         });
     
