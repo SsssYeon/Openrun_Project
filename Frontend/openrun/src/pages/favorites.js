@@ -24,7 +24,7 @@ const Favorites = () => {
 
     const fetchFavorites = async () => {
       try {
-        const response = await fetch("/api/users/me/interests", {
+        const response = await fetch("/api/calendar/like", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -35,7 +35,8 @@ const Favorites = () => {
         if (!response.ok) throw new Error("API 요청 실패");
 
         const data = await response.json();
-        setFavorites(data); // 관심 공연이 없으면 빈 배열로 처리됨
+        const likeList = data.userLikeList || [];
+        setFavorites(likeList);; // 관심 공연이 없으면 빈 배열로 처리됨
       } catch (error) {
         console.error("API 오류 발생, mocks 데이터 사용:", error);
         setFavorites(mockFavorites);

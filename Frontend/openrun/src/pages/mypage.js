@@ -34,10 +34,11 @@ const MyPage = () => {
         const data = await userResponse.json();
         setUser(data);
 
-        const interestResponse = await fetch("/api/users/me/interests", {
+        const interestResponse = await fetch("/api/calendar/like", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         });
 
@@ -46,7 +47,8 @@ const MyPage = () => {
         }
 
         const interestData = await interestResponse.json();
-        setInterests(interestData.slice(0, 3) || []);
+        const likeList = interestData.userLikeList || [];
+        setInterests(likeList.slice(0, 3)); // 상위 3개만 표시
       } catch (error) {
         console.error(error);
         setUser(userData);
