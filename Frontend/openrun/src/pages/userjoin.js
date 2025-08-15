@@ -175,7 +175,7 @@ const Userjoin = () => {
 
       if (response.ok) {
         alert("회원가입 성공!");
-        // navigate("/login");
+        navigate("/login");
       } else {
         alert(`회원가입 실패: ${data.message}`);
       }
