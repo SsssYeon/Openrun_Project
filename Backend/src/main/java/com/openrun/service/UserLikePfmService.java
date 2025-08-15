@@ -37,24 +37,17 @@ public class UserLikePfmService {
                     mt20id = item.toString();
                 }
 
-                System.out.println("[DEBUG] 관심공연 ID 조회: " + mt20id);
-
                 // 공연 상세 정보 가져오기
                 Map<String, Object> detail = getPerformanceDetail(mt20id);
                 if (detail != null) {
-                    System.out.println("[DEBUG] 상세 정보 조회 성공: " + detail.get("prfnm"));
                     favorites.add(Map.of(
                             "id", mt20id,
                             "poster", detail.get("poster"),
                             "title", detail.get("prfnm")
                     ));
-                } else {
-                    System.out.println("[DEBUG] 상세 조회 결과 없음: " + mt20id);
                 }
             }
         }
-
-        System.out.println("[DEBUG] 최종 관심공연 리스트: " + favorites.size() + "개");
         return favorites;
     }
 
