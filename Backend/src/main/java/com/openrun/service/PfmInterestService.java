@@ -31,6 +31,7 @@ public class PfmInterestService {
         return querySnapshot.getDocuments().get(0).getReference();
     }
 
+
     public boolean isLiked(String token, String pfmId) {
         try {
             DocumentReference userDoc = getUserDocumentByToken(token);
@@ -48,6 +49,7 @@ public class PfmInterestService {
             return false;
         }
     }
+
 
     public void toggleInterest(String token, String pfmId) {
         try {

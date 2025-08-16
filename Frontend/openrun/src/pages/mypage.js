@@ -1,4 +1,4 @@
-// 닉네임 불러오는 것만 api 연결 완료, api 연결 안됐을 때 mocks 데이터 사용 (오픈런 고인물)
+// 마이페이지, api 연동 완료
 
 import React, { useEffect, useState } from "react";
 import Nav from "../components/nav";
@@ -17,7 +17,9 @@ const MyPage = () => {
       try {
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
-        // 1) 유저 기본 정보 가져오기 (닉네임 등)
+
+        if (!token) return navigate("/login", { replace: true });
+
         const userResponse = await fetch("/api/users/me", {
           method: "GET",
           headers: {
@@ -30,33 +32,31 @@ const MyPage = () => {
         }
 
         const data = await userResponse.json();
-        setUser(userData);
+        setUser(data);
 
-        // 2) 관심 공연 0~2번 인덱스 가져오기
-        const interestResponse = await fetch("/api/users/me/interests", {
+        const interestResponse = await fetch("/api/calendar/like", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         });
 
         if (!interestResponse.ok) {
-          throw new Error("관심 공연 요청 실패");
+          throw new Error("관심 공연 호출 실패");
         }
 
         const interestData = await interestResponse.json();
-        // 관심 공연이 userLikeList 배열이라면, 0~2까지만 slice
-        setInterests(interestData.userLikeList?.slice(0, 3) || []);
+        const likeList = interestData.userLikeList || [];
+        setInterests(likeList.slice(0, 3)); // 상위 3개만 표시
       } catch (error) {
-        console.error("유저 정보 또는 관심 공연 불러오기 실패:", error);
-        setUser(userData); // 예시 데이터로 대체
-
-        // 예시 데이터에도 관심 공연 정보가 있으면 상위 3개만 추출
+        console.error(error);
+        setUser(userData);
         setInterests(favoritesMock?.slice(0, 3) || []);
       }
     };
 
-    fetchUser();
+    fetchUser(); // <-- 함수 호출은 여기
   }, [navigate]);
 
   if (!user) return <div>로딩 중...</div>;
@@ -84,6 +84,10 @@ const MyPage = () => {
       }
 
       localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+
+      setUser(null);
+
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
     } catch (error) {
@@ -200,7 +204,7 @@ const MyPage = () => {
               {/* 나의 글 */}
               <div className="mypage-right-bottom">
                 <h3 className="user-title">나의 글</h3>
-                <h4 id ="mypage-notice"> 추후 구현 예정입니다! </h4>
+                <h4 id="mypage-notice"> 추후 구현 예정입니다! </h4>
                 {/* <div className="user-community">
                   {user.posts.map((post) => (
                     <div key={post.id} className="user-community-content">

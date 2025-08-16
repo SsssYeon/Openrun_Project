@@ -8,6 +8,8 @@ import com.google.firebase.cloud.StorageClient;
 import com.openrun.dto.PfmCalendarDTO;
 import com.openrun.dto.PfmCalendarUpdateRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,46 +22,66 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PfmCalendarService {
 
     private static final String USER_COLLECTION   = "UserData";
     private static final String RECORD_COLLECTION = "RecordData";
 
     private final Firestore firestore;
+    private final StorageClient storageClient; // FirebaseConfig에서 주입됨
 
-    /* =============== 공통 유틸 =============== */
+    /** 개발용 더미 토큰/유저 설정(선택)함 */
+    @Value("${dev.default.token:}")
+    private String devDefaultToken;      // 예: dummy-token
+    @Value("${dev.default.userId:}")
+    private String devDefaultUserId;     // 예: testuser0815
+
+    /* ========== 공통 유틸 ========== */
 
     private String extractToken(String authHeader) {
-        if (authHeader == null || authHeader.isBlank()) return "dummy-token";
-        return authHeader.startsWith("Bearer ")
-                ? authHeader.substring(7).trim()
-                : authHeader.trim();
+        if (authHeader == null || authHeader.isBlank()) return null;
+        return authHeader.startsWith("Bearer ") ? authHeader.substring(7).trim() : authHeader.trim();
     }
 
-    /** 토큰 → UserData.userAutoLoginToken 매칭 → userID 반환. 없으면 dummy-token → testuser */
+    /** 토큰→UserData.userId(소문자 d) 반환함. RecordData.userDocumentId와 동일 문자열이어야 함 */
     private String getUserIdByToken(String authHeader) throws ExecutionException, InterruptedException {
         String token = extractToken(authHeader);
 
+        // 무토큰일 때 개발용 기본값 허용
+        if ((token == null || token.isBlank()) && !devDefaultToken.isBlank() && !devDefaultUserId.isBlank()) {
+            log.warn("[auth] empty token -> use dev default userId={}", devDefaultUserId);
+            return devDefaultUserId;
+        }
+        // 더미 토큰 매칭
+        if (token != null && !devDefaultToken.isBlank() && token.equals(devDefaultToken)) {
+            log.warn("[auth] dummy token matched -> userId={}", devDefaultUserId);
+            return devDefaultUserId.isBlank() ? null : devDefaultUserId;
+        }
+
+        // 정상 토큰 조회
         QuerySnapshot qs = firestore.collection(USER_COLLECTION)
                 .whereEqualTo("userAutoLoginToken", token)
-                .limit(1)
-                .get().get();
+                .limit(1).get().get();
 
-        if (!qs.isEmpty()) {
-            DocumentSnapshot userDoc = qs.getDocuments().get(0);
-            return userDoc.getString("userID"); // RecordData.userDocumentId와 동일해야 함
+        if (qs.isEmpty()) {
+            log.error("[auth] no user for token={}", token);
+            return null;
         }
-        if ("dummy-token".equals(token)) return "testuser";
-        return null;
+        String userId = qs.getDocuments().get(0).getString("userId"); // 주의: userId(소문자 d)
+        if (userId == null || userId.isBlank()) {
+            log.error("[auth] user doc has no userId field (docId={})", qs.getDocuments().get(0).getId());
+            return null;
+        }
+        return userId;
     }
 
-    private boolean isOwnerOrDevBypass(String userId, DocumentSnapshot doc, String token) {
-        String owner = doc.getString("userDocumentId");
-        if (Objects.equals(owner, userId)) return true;
-        if ("dummy-token".equals(token)) return true; // 개발 편의
-        return false;
+    /** 소유자 검증함 */
+    private boolean isOwner(String userId, DocumentSnapshot doc) {
+        return Objects.equals(doc.getString("userDocumentId"), userId);
     }
 
+    /** Firestore→DTO 매핑함 */
     private PfmCalendarDTO mapDocToDto(DocumentSnapshot doc) {
         PfmCalendarDTO dto = new PfmCalendarDTO();
         dto.setPfmcalender_doc_no(doc.getId());
@@ -67,62 +89,62 @@ public class PfmCalendarService {
         dto.setPfmcalender_date(doc.getString("pfmcalender_date"));
         dto.setPfmcalender_time(doc.getString("pfmcalender_time"));
 
-        // DB는 place, 응답은 location
         String place = doc.getString("pfmcalender_place");
-        String backup = doc.getString("pfmcalender_location");
-        dto.setPfmcalender_location(place != null ? place : backup);
+        String legacyLoc = doc.getString("pfmcalender_location");
+        dto.setPfmcalender_location(place != null ? place : legacyLoc);
 
-        String cast = doc.getString("pfmcalender_today_cast");
-        if (cast == null) cast = doc.getString("pfmcr_today_cast"); // 과거 오타 호환
-        dto.setPfmcalender_today_cast(cast);
-
+        dto.setPfmcalender_today_cast(doc.getString("pfmcalender_today_cast"));
         dto.setPfmcalender_seat(doc.getString("pfmcalender_seat"));
-
         Object costRaw = doc.get("pfmcalender_cost");
-        dto.setPfmcalender_cost(costRaw != null ? String.valueOf(costRaw) : null);
-
+        dto.setPfmcalender_cost(costRaw == null ? null : String.valueOf(costRaw));
         dto.setPfmcalender_memo(doc.getString("pfmcalender_memo"));
         dto.setPfmcalender_poster(doc.getString("pfmcalender_poster"));
         dto.setPfmcalender_bookingsite(doc.getString("pfmcalender_bookingsite"));
         return dto;
     }
 
-    private String uploadPosterImage(MultipartFile file) throws Exception {
+    /** 포스터 업로드함(버킷은 FirebaseConfig에서 기본 지정) */
+    private String uploadPosterImage(MultipartFile file) {
         if (file == null || file.isEmpty()) return null;
-        Bucket bucket = StorageClient.getInstance().bucket();
-        String blobName = "posters/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Blob blob = bucket.create(blobName, file.getBytes(), file.getContentType());
-        return String.format(
-                "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media",
-                bucket.getName(), URLEncoder.encode(blob.getName(), StandardCharsets.UTF_8)
-        );
-    }
-
-    private void putIfNotNull(Map<String, Object> map, String key, String value) {
-        if (value != null) map.put(key, value);
-    }
-
-    /** 문자열/숫자 모두 수용: "12,000" → 12000, "무료" → "무료" */
-    private void putCostSmart(Map<String, Object> map, String cost) {
-        if (cost == null || cost.isBlank()) return;
-        String trimmed = cost.trim().replace(",", "");
         try {
-            map.put("pfmcalender_cost", Integer.parseInt(trimmed));
-        } catch (NumberFormatException e) {
-            map.put("pfmcalender_cost", cost); // 숫자 아님 → 문자열로 저장
+            Bucket bucket = storageClient.bucket(); // 기본 버킷
+            if (bucket == null) {
+                log.error("[storage] default bucket is null");
+                return null;
+            }
+            String original = (file.getOriginalFilename() == null ? "poster" : file.getOriginalFilename()).replaceAll("\\s+", "_");
+            String blobName = "posters/" + UUID.randomUUID() + "_" + original;
+            String contentType = (file.getContentType() == null || file.getContentType().isBlank())
+                    ? "application/octet-stream" : file.getContentType();
+
+            Blob blob = bucket.create(blobName, file.getBytes(), contentType);
+
+            return "https://firebasestorage.googleapis.com/v0/b/"
+                    + bucket.getName() + "/o/"
+                    + URLEncoder.encode(blob.getName(), StandardCharsets.UTF_8)
+                    + "?alt=media";
+        } catch (Exception e) {
+            log.error("[storage] poster upload failed: {}", e.toString(), e);
+            return null; // 실패해도 저장은 진행
         }
     }
 
-    /* =============== 조회 =============== */
+    private void putIfNotNull(Map<String, Object> m, String k, String v) { if (v != null) m.put(k, v); }
+    private void putCostSmart(Map<String, Object> m, String cost) {
+        if (cost == null || cost.isBlank()) return;
+        String trimmed = cost.replace(",", "").trim();
+        try { m.put("pfmcalender_cost", Integer.parseInt(trimmed)); }
+        catch (NumberFormatException ignore) { m.put("pfmcalender_cost", cost); }
+    }
+
+    /* ========== 조회 ========== */
 
     public List<PfmCalendarDTO> getAllEventsForMe(String authHeader) throws Exception {
         String userId = getUserIdByToken(authHeader);
         if (userId == null) return List.of();
-
         QuerySnapshot qs = firestore.collection(RECORD_COLLECTION)
                 .whereEqualTo("userDocumentId", userId)
                 .get().get();
-
         List<PfmCalendarDTO> list = new ArrayList<>();
         for (DocumentSnapshot d : qs.getDocuments()) list.add(mapDocToDto(d));
         list.sort(Comparator.comparing(PfmCalendarDTO::getPfmcalender_date, Comparator.nullsLast(String::compareTo)));
@@ -132,14 +154,12 @@ public class PfmCalendarService {
     public PfmCalendarDTO getMyEventById(String authHeader, String id) throws Exception {
         String userId = getUserIdByToken(authHeader);
         if (userId == null) return null;
-
         DocumentSnapshot doc = firestore.collection(RECORD_COLLECTION).document(id).get().get();
-        if (!doc.exists()) return null;
-        if (!isOwnerOrDevBypass(userId, doc, extractToken(authHeader))) return null;
+        if (!doc.exists() || !isOwner(userId, doc)) return null;
         return mapDocToDto(doc);
     }
 
-    /* =============== 생성 (multipart – 프론트 Addrecord와 매칭) =============== */
+    /* ========== 생성 ========== */
 
     public String addMyEvent(String authHeader,
                              String name, String date, String time, String location,
@@ -147,17 +167,17 @@ public class PfmCalendarService {
                              MultipartFile posterFile) throws Exception {
 
         String userId = getUserIdByToken(authHeader);
-        if (userId == null) throw new IllegalStateException("사용자 식별 실패");
+        if (userId == null) throw new IllegalStateException("UNAUTHORIZED");
 
         Map<String, Object> data = new HashMap<>();
         data.put("userDocumentId", userId);
         data.put("pfmcalender_nm", name);
         data.put("pfmcalender_date", date);
-        if (time != null) data.put("pfmcalender_time", time);
+        putIfNotNull(data, "pfmcalender_time", time);
 
         if (location != null) {
             data.put("pfmcalender_place", location);
-            data.put("pfmcalender_location", location); // 호환용
+            data.put("pfmcalender_location", location); // 하위 호환
         }
         putIfNotNull(data, "pfmcalender_seat", seat);
         putIfNotNull(data, "pfmcalender_today_cast", cast);
@@ -177,11 +197,9 @@ public class PfmCalendarService {
         return ref.getId();
     }
 
-    /* =============== 생성 (간단 JSON – 필요시 사용) =============== */
-
     public String addMyEventJson(String authHeader, PfmCalendarUpdateRequest req) throws Exception {
         String userId = getUserIdByToken(authHeader);
-        if (userId == null) throw new IllegalStateException("사용자 식별 실패");
+        if (userId == null) throw new IllegalStateException("UNAUTHORIZED");
 
         Map<String, Object> data = new HashMap<>();
         data.put("userDocumentId", userId);
@@ -207,7 +225,7 @@ public class PfmCalendarService {
         return ref.getId();
     }
 
-    /* =============== 수정 (PUT JSON – 프론트 Modifyrecord와 매칭) =============== */
+    /* ========== 수정/삭제 ========== */
 
     public ResponseEntity<String> updateMyEventJsonResponse(String authHeader, String id, PfmCalendarUpdateRequest req) throws Exception {
         String result = updateMyEventJson(authHeader, id, req);
@@ -221,14 +239,13 @@ public class PfmCalendarService {
     }
 
     public String updateMyEventJson(String authHeader, String id, PfmCalendarUpdateRequest req) throws Exception {
-        String token  = extractToken(authHeader);
         String userId = getUserIdByToken(authHeader);
         if (userId == null) return "forbidden";
 
         DocumentReference ref = firestore.collection(RECORD_COLLECTION).document(id);
         DocumentSnapshot doc = ref.get().get();
         if (!doc.exists()) return "not_found";
-        if (!isOwnerOrDevBypass(userId, doc, token)) return "forbidden";
+        if (!isOwner(userId, doc)) return "forbidden";
 
         Map<String, Object> update = new HashMap<>();
         putIfNotNull(update, "pfmcalender_nm", req.getPfmcalender_nm());
@@ -249,8 +266,6 @@ public class PfmCalendarService {
         return "updated";
     }
 
-    /* =============== 삭제 =============== */
-
     public ResponseEntity<String> deleteMyEventResponse(String authHeader, String id) throws Exception {
         String result = deleteMyEvent(authHeader, id);
         return switch (result) {
@@ -262,17 +277,15 @@ public class PfmCalendarService {
     }
 
     public String deleteMyEvent(String authHeader, String id) throws Exception {
-        String token  = extractToken(authHeader);
         String userId = getUserIdByToken(authHeader);
         if (userId == null) return "forbidden";
 
         DocumentReference ref = firestore.collection(RECORD_COLLECTION).document(id);
         DocumentSnapshot doc = ref.get().get();
         if (!doc.exists()) return "not_found";
-        if (!isOwnerOrDevBypass(userId, doc, token)) return "forbidden";
+        if (!isOwner(userId, doc)) return "forbidden";
 
         ref.delete().get();
         return "deleted";
     }
 }
-

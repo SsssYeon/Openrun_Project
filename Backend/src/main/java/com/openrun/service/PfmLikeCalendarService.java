@@ -67,12 +67,11 @@ public class PfmLikeCalendarService {
 
         QuerySnapshot qs = q.get().get();
         if (!qs.isEmpty()) {
-            return qs.getDocuments().get(0).getId(); // ✅ 문서 ID 반환
+            return qs.getDocuments().get(0).getId(); // 문서 ID 반환
         }
 
-        if ("dummy-token".equals(token)) {
-            return devDefaultUserDocId;             // ✅ 개발 우회
-        }
+        //if ("dummy-token".equals(token)) return devDefaultUserDocId;             // 개발 우회
+
         return null;
     }
 
