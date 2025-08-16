@@ -59,6 +59,7 @@ out/
 
 # Package Files #
 *.jar
+!Backend/gradle/wrapper/gradle-wrapper.jar
 *.war
 *.nar
 *.ear
