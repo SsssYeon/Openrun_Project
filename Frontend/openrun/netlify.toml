@@ -1,10 +1,17 @@
 # netlify.toml
 [build]
-command = "npm run build"
+command = "npm ci && npm run build"
 publish  = "build"
 
+# API 프록시
 [[redirects]]
 from = "/api/*"
-to   = "https://openrun.onrender.com/api/:splat"
+to   = "https://openrun.onrender.com/api/:splat"  # Render 도메인
 status = 200
 force = true
+
+# SPA 라우팅
+[[redirects]]
+from = "/*"
+to   = "/index.html"
+status = 200
