@@ -2,8 +2,8 @@ name: Keep Render Awake
 
 on:
   schedule:
-    # UTC 기준. 10분마다
-    - cron: "*/12 * * * *"
+    # UTC 기준. 9분마다
+    - cron: "*/9 * * * *"
   workflow_dispatch:
 
 jobs:
