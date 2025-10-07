@@ -219,7 +219,12 @@ const Mylikescalendar = () => {
                   style={{ cursor: "pointer" }}
                 >
                   <img src={fav.poster} alt={fav.title} />
-                  <p>{fav.title}</p>
+                  <p>
+                    {" "}
+                    {fav.title.length > 9
+                      ? fav.title.slice(0, 9) + "..."
+                      : fav.title}
+                  </p>
                 </div>
               ))}
             </div>

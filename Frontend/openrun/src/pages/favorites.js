@@ -110,20 +110,20 @@ const Favorites = () => {
     }
   };
 
-  // const [likedStates, setLikedStates] = useState(() => {
-  //   const initialState = {};
-  //   favorites.forEach((fav) => {
-  //     initialState[fav.id] = false; // 백엔드에서 정보 받아와 기존에 저장되어 있는 정보대로 달력에 표시되고 있던 공연들만 채운 하트 표시 예정
-  //   });
-  //   return initialState;
-  // });
+  const [likedStates, setLikedStates] = useState(() => {
+    const initialState = {};
+    favorites.forEach((fav) => {
+      initialState[fav.id] = false; // 백엔드에서 정보 받아와 기존에 저장되어 있는 정보대로 달력에 표시되고 있던 공연들만 채운 하트 표시 예정
+    });
+    return initialState;
+  });
 
-  // const toggleHeart = (id) => {
-  //   setLikedStates((prev) => ({
-  //     ...prev,
-  //     [id]: !prev[id],
-  //   }));
-  // };
+  const toggleHeart = (id) => {
+    setLikedStates((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   return (
     <div>
@@ -185,12 +185,12 @@ const Favorites = () => {
                     onClick={() => navigate(`/performance/${show.pfm_doc_id}`)}
                     style={{ cursor: "pointer" }}
                   />
-                  {/* <span
+                  <span
                     className="heart-icon"
                     onClick={() => toggleHeart(show.id)}
                   >
                     {likedStates[show.id] ? "❤️" : "🤍"}
-                  </span> */}
+                  </span>
                 </div>
                 <p>{show.title}</p>
               </div>

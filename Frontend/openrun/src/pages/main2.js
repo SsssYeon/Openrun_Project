@@ -125,8 +125,7 @@ const Main2 = () => {
           <h3 id="rightbottom-title">최근 커뮤니티 글</h3>
 
           <div className="main2-community-list">
-            <h4 id ="mypage-notice"> 추후 구현 예정입니다! </h4>
-            {/* <div className="main2-community-item">
+            <div className="main2-community-item">
               <div className="content">
                 <div className="title">지킬앤하이드 후기</div>
                 <div className="subtext">지킬을 보고 왔습니다...</div>
@@ -144,7 +143,7 @@ const Main2 = () => {
               </div>
               <div className="date">25.03.29</div>
               <img src={logo2} alt="썸네일" className="thumb" />
-            </div> */}
+            </div>
           </div>
         </div>
 
