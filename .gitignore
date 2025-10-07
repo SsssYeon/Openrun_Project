@@ -1,9 +1,18 @@
 HELP.md
 .gradle
+.env
+.env.development
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+.idea/
+!.idea/codeStyles/
+!.idea/runConfigurations/
+
+**/firebase-service-key.json
+
+**/firebase-service-key.json
 
 ### STS ###
 .apt_generated
@@ -51,6 +60,7 @@ out/
 
 # Package Files #
 *.jar
+!Backend/gradle/wrapper/gradle-wrapper.jar
 *.war
 *.nar
 *.ear
