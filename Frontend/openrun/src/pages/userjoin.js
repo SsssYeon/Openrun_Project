@@ -5,6 +5,7 @@ import "../css/userjoin.css";
 import Nav from "../components/nav";
 import { NavLink, useNavigate } from "react-router-dom";
 
+
 const Userjoin = () => {
   const navigate = useNavigate(); // 로그인 성공 후 페이지 이동용
   const [formData, setFormData] = useState({

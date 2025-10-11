@@ -1,0 +1,15 @@
+name: Keep Render Awake
+
+on:
+  schedule:
+    # UTC 기준. 9분마다
+    - cron: "*/9 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render health
+        run: |
+          curl -sS -m 15 https://openrun.onrender.com/api/health || true

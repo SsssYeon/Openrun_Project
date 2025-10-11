@@ -11,19 +11,6 @@
   border-bottom: 3px solid #ffd049; /* 노란 밑줄 */
 }
 
-.dropdown-container {
-  text-align: right;
-  margin-bottom: 20px;
-}
-
-.dropdown-container select {
-  padding: 6px 12px;
-  border: 2px solid #ffd049;
-  border-radius: 4px;
-  background-color: white;
-  font-weight: bold;
-}
-
 .stats-boxes {
   display: flex;
   justify-content: space-around;

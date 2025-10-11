@@ -204,15 +204,15 @@ const MyPage = () => {
               {/* 나의 글 */}
               <div className="mypage-right-bottom">
                 <h3 className="user-title">나의 글</h3>
-                <h4 id="mypage-notice"> 추후 구현 예정입니다! </h4>
-                {/* <div className="user-community">
+                
+                <div className="user-community">
                   {user.posts.map((post) => (
                     <div key={post.id} className="user-community-content">
                       <div className="user-community-title">{post.title}</div>
                       <div className="user-community-date">{post.date}</div>
                     </div>
                   ))}
-                </div> */}
+                </div>
               </div>
             </div>
           </div>

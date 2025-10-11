@@ -1,16 +1,17 @@
 // api 연동 O, 연동 안되었을 시 mocks 데이터로 + 삭제 구현 완료
 
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Nav from "../components/nav";
 import eventsData from "../mocks/events"; // 경로는 실제 파일 위치에 맞게 조정
 import "../css/eventdetail.css";
-import React, { useState, useEffect } from "react";
 
 function Eventdetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   const token =
     localStorage.getItem("token") || sessionStorage.getItem("token"); // 토큰 가져오기
@@ -81,7 +82,7 @@ function Eventdetail() {
   };
 
   return (
-    <div>
+    <>
       <div>
         <Nav />
       </div>
@@ -135,7 +136,7 @@ function Eventdetail() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

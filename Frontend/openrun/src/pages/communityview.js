@@ -1,4 +1,4 @@
-// 커뮤니티 메인, 전체 글 -> api 연결 안해놓음
+// 시야 커뮤니티 -> api 연결 안해놓음
 
 import React from "react";
 import Nav from "../components/nav";
@@ -7,14 +7,18 @@ import "../css/community.css";
 import { communitydata } from "../mocks/communitymocks";
 import logo from "../components/logo2.png";
 
-const Community = () => {
+const CommunityView = () => {
   const navigate = useNavigate();
 
+  const viewPosts = communitydata.filter(
+    (post) => post.postTag && post.postTag.includes("시야")
+  );
+
   const dateTimeOptions = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  };
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    };
 
   return (
     <div>
@@ -47,11 +51,11 @@ const Community = () => {
         </div>
         <div className="community-right">
           <div>
-            <h3 id="community_title">전체 글</h3>
+            <h3 id="community_title">시야 커뮤니티</h3>
           </div>
 
           <div className="post-list">
-            {communitydata.map((post) => (
+            {viewPosts.map((post) => (
               <Link
                 to={`/community/${post.postDocumentId}`} // 상세 페이지로 이동 링크
                 key={post.postDocumentId}
@@ -83,10 +87,7 @@ const Community = () => {
                     <div className="post-meta">
                       <span className="post-nickname">{post.userNickname}</span>
                       <span className="post-date">
-                        {new Date(post.postTimeStamp).toLocaleString(
-                          "ko-KR",
-                          dateTimeOptions
-                        )}
+                        {new Date(post.postTimeStamp).toLocaleString("ko-KR", dateTimeOptions)}
                       </span>
                       <span className="post-comments">
                         💬 {post.commentCount}
@@ -123,4 +124,4 @@ const Community = () => {
   );
 };
 
-export default Community;
+export default CommunityView;

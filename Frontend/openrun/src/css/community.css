@@ -1,12 +1,214 @@
-.community {
-  min-width: 50px;
-
-  margin-top: 200px;
-    border-radius: 12px;
-     height: 540px;
+/* 전체 레이아웃 */
+.community-container {
+  display: flex;
+  margin: 100px 250px;
+  gap: 20px;
 }
 
-.community-notice {
-  
-  font-size: 25px;
+/* 왼쪽 메뉴 */
+.community-left {
+  flex: 0 0 200px;
+  display: flex;
+  border: 1px solid lightgrey;
+  border-radius: 16px;
+  padding: 25px;
+  flex-direction: column;
+  justify-content: center;
+  height: 540px;
+}
+
+.community-right {
+  min-width: 700px;
+  border: 1px solid lightgrey;
+  border-radius: 16px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 540px;
+}
+
+#community_title {
+  margin-bottom: 20px;
+  text-align: center;
+  color: black;
+}
+
+/* 게시글 리스트 컨테이너 */
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* 게시글 사이의 간격 */
+
+  /* 남은 수직 공간을 모두 차지하도록 flex-grow 설정 */
+  flex-grow: 1;
+
+  /* 여기서 스크롤을 발생시킵니다. */
+  overflow-y: auto;
+
+  /* 글 목록이 넘칠 때 스크롤바가 생기도록 설정 */
+
+  width: 600px;
+}
+
+/* 개별 게시글 링크 스타일 */
+.post-item-link {
+  text-decoration: none; /* Link 기본 밑줄 제거 */
+  color: inherit; /* 텍스트 색상 상속 */
+  transition: transform 0.2s; /* 호버 효과를 위한 트랜지션 */
+  height: 120px;
+}
+
+.post-item-link:hover .post-item {
+  background-color: #f9f9f9; /* 호버 시 배경색 변경 */
+  border-color: #ccc;
+}
+
+/* 개별 게시글 아이템 스타일 */
+.post-item {
+  padding: 15px 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+
+  /* 👇 이미지와 내용을 나란히 배치하기 위한 Flexbox 설정 */
+  display: flex;
+  justify-content: space-between; /* 이미지와 내용을 양 끝으로 분리 */
+  align-items: center; /* 세로 중앙 정렬 */
+}
+
+.post-content-wrap {
+  flex-grow: 1; /* 남은 공간을 내용이 모두 차지 */
+  padding-right: 20px; /* 이미지와의 간격 확보 */
+  /* 내용이 이미지 영역을 침범하지 않도록 max-width 설정도 고려할 수 있습니다. */
+}
+
+.post-item-header {
+  display: flex;
+
+  margin-bottom: 5px;
+  align-items: center; /* 태그와 제목을 수직 중앙 정렬 */
+}
+
+.post-tag {
+  background-color: #ffd049;
+
+  /* 글자색: 요청하신 검은색 */
+  color: #000000;
+
+  font-weight: 600; /* bold보다 살짝 얇게 설정 */
+  font-size: 0.8em; /* 글자 크기 조금 작게 조정 */
+
+  /* 박스 형태로 만들기 위한 패딩 */
+  padding: 3px 8px;
+
+  /* 둥근 모서리 적용 */
+  border-radius: 12px;
+
+  /* 인라인 블록으로 설정하여 패딩과 배경색이 적용되도록 합니다. */
+  display: inline-block;
+
+  margin-left: 8px;
+  flex-shrink: 0;
+
+  /* 텍스트 내용의 대괄호를 없애는 것을 추천하지만, 
+       JSX에서 대괄호가 유지되므로 여기서는 그대로 둡니다. */
+}
+
+.post-title {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin: 0;
+  color: #222;
+  white-space: nowrap; /* 제목이 한 줄로 표시되도록 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 넘치는 부분 ... 처리 */
+}
+
+.post-summary {
+  font-size: 0.9em;
+  color: #666;
+  margin: 5px 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.post-meta {
+  font-size: 0.8em;
+  color: #999;
+  display: flex;
+  gap: 15px;
+}
+
+.post-comments {
+  font-weight: bold;
+  color: #999; /* 댓글 수 강조 */
+}
+
+.post-image-preview {
+  /* 이미지 미리보기 영역 크기 고정 */
+  width: 70px;
+  height: 70px;
+
+  /* 둥근 모서리 또는 기타 디자인 */
+  border-radius: 4px;
+  overflow: hidden; /* 영역을 벗어나는 이미지 부분 숨김 */
+
+  flex-shrink: 0; /* 공간이 부족해도 이미지 영역은 크기가 줄어들지 않도록 고정 */
+}
+
+.post-thumbnail {
+  width: 100%;
+  height: 100%;
+  /* 이미지를 컨테이너에 맞게 채우고 비율 유지 */
+  object-fit: cover;
+}
+
+.communitysearch {
+  margin-bottom: 16px;
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-top: -5px;
+}
+
+.communitysearch input {
+  width: 480px;
+  padding: 6px 12px;
+  border: 2px solid #ffd049;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  height: 40px;
+}
+.communitysearch input::placeholder {
+    color: #666; /* 원하는 연한 회색 */
+    opacity: 1; /* 일부 브라우저에서 투명도가 적용되는 것을 방지합니다. */
+}
+
+.dropdown-container {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.dropdown-container select {
+  height: 40px;
+  padding: 6px 12px;
+  border: 2px solid #ffd049;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 14px;
+  color: #666;
+}
+
+.community-search {
+  /* ========================================================= */
+  /* [수정] 가로 정렬을 위한 Flexbox 속성 추가 */
+  display: flex;
+  align-items: center; /* 수직 중앙 정렬 */
+  gap: 16px; /* 두 요소 사이의 간격 설정 (16px) */
+  /* ========================================================= */
 }

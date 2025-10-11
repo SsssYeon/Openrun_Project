@@ -1,20 +1,73 @@
-// 커뮤니티 메인, 전체 글 -> api 연결 안해놓음
+// 커뮤니티 검색 -> api 연결 안해놓음
 
-import React from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import Nav from "../components/nav";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import "../css/community.css";
 import { communitydata } from "../mocks/communitymocks";
 import logo from "../components/logo2.png";
 
-const Community = () => {
+const CommunitySearch = () => {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // [수정] 기간 대신 태그를 선택하는 상태
+  const [selectedTag, setSelectedTag] = useState("전체");
+
+  const uniqueTags = useMemo(() => {
+    // "전체", "시야", "공연 후기", "공연 정보", "사담" 5가지 태그로 고정
+    return ["전체", "시야", "공연 후기", "공연 정보", "사담"];
+  }, []);
+
+  const handleTagChange = useCallback((e) => {
+    setSelectedTag(e.target.value);
+  }, []);
+
+  const displayedPosts = useMemo(() => {
+    let filtered = communitydata;
+
+    // 태그 필터링
+    if (selectedTag !== "전체") {
+      // "시야" 페이지이므로, 기본적으로 '시야'를 포함하고,
+      // 드롭다운에서 선택된 태그도 포함하는 글만 필터링합니다.
+      filtered = filtered.filter(
+        (communitydata) => communitydata.postTag && communitydata.postTag.includes(selectedTag)
+      );
+    }
+
+    // 검색어 필터링
+    if (searchTerm.trim() !== "") {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (communitydata) =>
+          (communitydata.postTitle &&
+            communitydata.postTitle.toLowerCase().includes(lowerCaseSearchTerm)) ||
+          (communitydata.postContent &&
+            communitydata.postContent.toLowerCase().includes(lowerCaseSearchTerm)) ||
+          (communitydata.userNickname &&
+            communitydata.userNickname.toLowerCase().includes(lowerCaseSearchTerm))
+      );
+    }
+
+    return filtered;
+  }, [communitydata, selectedTag, searchTerm]);
+  const handleSearch = () => {
+    // 이미 searchTerm 상태가 변경될 때마다 useMemo로 필터링되지만,
+    // 여기서는 명시적으로 검색을 시작하는 용도로 사용할 수 있습니다. (예: API 호출)
+    console.log("검색 실행:", searchTerm, "태그:", selectedTag);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   const dateTimeOptions = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  };
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    };
 
   return (
     <div>
@@ -46,12 +99,29 @@ const Community = () => {
           </div>
         </div>
         <div className="community-right">
-          <div>
-            <h3 id="community_title">전체 글</h3>
+          <div className="community-search">
+            <div className="dropdown-container">
+              <select value={selectedTag} onChange={handleTagChange}>
+                {uniqueTags.map((tag) => (
+                  <option key={tag} value={tag}>
+                    {tag}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="communitysearch">
+              <input
+                type="text"
+                placeholder="제목, 내용 또는 작성자를 검색하세요"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={handleKeyPress}
+              />
+            </div>
           </div>
 
           <div className="post-list">
-            {communitydata.map((post) => (
+            {displayedPosts.map((post) => (
               <Link
                 to={`/community/${post.postDocumentId}`} // 상세 페이지로 이동 링크
                 key={post.postDocumentId}
@@ -83,10 +153,7 @@ const Community = () => {
                     <div className="post-meta">
                       <span className="post-nickname">{post.userNickname}</span>
                       <span className="post-date">
-                        {new Date(post.postTimeStamp).toLocaleString(
-                          "ko-KR",
-                          dateTimeOptions
-                        )}
+                        {new Date(post.postTimeStamp).toLocaleString("ko-KR", dateTimeOptions)}
                       </span>
                       <span className="post-comments">
                         💬 {post.commentCount}
@@ -123,4 +190,4 @@ const Community = () => {
   );
 };
 
-export default Community;
+export default CommunitySearch;
