@@ -64,17 +64,17 @@
   color: #000000;
 
   font-weight: 600; /* bold보다 살짝 얇게 설정 */
-  font-size: 0.8em; /* 글자 크기 조금 작게 조정 */
+  font-size: 14px; /* 글자 크기 조금 작게 조정 */
 
   /* 박스 형태로 만들기 위한 패딩 */
-  padding: 3px 8px;
+  padding: 8px 12px;
 
   /* 둥근 모서리 적용 */
-  border-radius: 12px;
+  border-radius: 20px;
 
   /* 인라인 블록으로 설정하여 패딩과 배경색이 적용되도록 합니다. */
 
-  margin-left: 5px;
+  margin-left: 8px;
   flex-shrink: 0;
 }
 
@@ -144,40 +144,166 @@
 }
 
 .post-image-slider {
-    position: relative; /* 자식 요소인 버튼의 위치 기준 */
-    width: 220px; /* 포스터와 동일한 너비 */
-    height: 320px; /* 포스터 높이 + 상단 마진을 포함하도록 */
-    margin-top: 30px;
-    display: flex;
-    align-items: center; /* 버튼 수직 중앙 정렬을 위해 */
+  position: relative; /* 자식 요소인 버튼의 위치 기준 */
+  width: 220px; /* 포스터와 동일한 너비 */
+  height: 320px; /* 포스터 높이 + 상단 마진을 포함하도록 */
+  margin-top: 30px;
+  display: flex;
+  align-items: center; /* 버튼 수직 중앙 정렬을 위해 */
 }
 
 .slider-nav-btn {
-    position: absolute;
-    top: 50%; /* 수직 중앙 정렬 */
-    transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
-    color: lightgrey;
-    border: none;
-    cursor: pointer;
-    padding: 10px 5px;
-    font-size: 20px;
-    line-height: 1;
-    z-index: 10; /* 이미지 위에 표시 */
-    border-radius: 4px;
-    transition: background-color 0.2s;
+  position: absolute;
+  top: 50%; /* 수직 중앙 정렬 */
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+  color: lightgrey;
+  border: none;
+  cursor: pointer;
+  padding: 10px 5px;
+  font-size: 20px;
+  line-height: 1;
+  z-index: 10; /* 이미지 위에 표시 */
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
 /* 왼쪽 버튼 위치 */
 .prev-btn {
-    left: -30px; 
-    border-top-left-radius: 12px; /* 포스터 모서리에 맞춤 */
-    border-bottom-left-radius: 12px;
+  left: -30px;
+  border-top-left-radius: 12px; /* 포스터 모서리에 맞춤 */
+  border-bottom-left-radius: 12px;
 }
 
 /* 오른쪽 버튼 위치 */
 .next-btn {
-    right: -30px;
-    border-top-right-radius: 12px; /* 포스터 모서리에 맞춤 */
-    border-bottom-right-radius: 12px;
+  right: -30px;
+  border-top-right-radius: 12px; /* 포스터 모서리에 맞춤 */
+  border-bottom-right-radius: 12px;
+}
+
+.image-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.image-modal-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-image {
+  max-width: 500px;
+  max-height: 500px;
+  object-fit: contain;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  line-height: 1;
+}
+
+.modal-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 15px 10px;
+  cursor: pointer;
+  font-size: 24px;
+  z-index: 10;
+}
+
+.modal-prev-btn {
+  left: 10px;
+  border-top-left-radius: 12px; /* 포스터 모서리에 맞춤 */
+  border-bottom-left-radius: 12px;
+}
+.modal-next-btn {
+  right: 10px;
+  border-top-right-radius: 12px; /* 포스터 모서리에 맞춤 */
+  border-bottom-right-radius: 12px;
+}
+
+.modal-indicator {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* ⭐️ New Comment Menu Styles */
+.comment-menu-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #999;
+  cursor: pointer;
+  padding: 0 5px;
+  margin-left: auto; /* 오른쪽 끝으로 이동 */
+  line-height: 1;
+}
+.comment-menu-btn:hover {
+  color: #333;
+}
+.comment-menu-dropdown {
+  position: absolute;
+  top: 100;
+  right: -20px;
+  z-index: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+}
+.comment-menu-item {
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s;
+}
+.comment-menu-item:hover {
+  background-color: #f0f0f0;
+}
+.comment-menu-item.delete {
+  color: #dc3545;
+}
+.comment-menu-item.report {
+  color: #ffc107;
 }

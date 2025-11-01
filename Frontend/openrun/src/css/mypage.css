@@ -141,14 +141,20 @@
 .user-community {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
+  align-items: center;
 }
 
 .community-list {
+  
   margin-top: 20px;
-  justify-content: center;
+
   display: flex;
   /* margin 이외의 것은 중앙정렬 위해 추가한 것 */
+  flex-direction: column; /* ✅ 세로 방향 정렬 */
+
+  overflow-y: auto;
+  gap: 10px;
 }
 
 #mypage-notice {
@@ -162,6 +168,8 @@
   border-radius: 10px;
   padding: 10px 16px;
   background-color: #fafafa;
+  width: 500px;
+  
 }
 
 .user-community-title {

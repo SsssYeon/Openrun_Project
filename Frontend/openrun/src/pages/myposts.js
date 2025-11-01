@@ -6,10 +6,17 @@ import { Link, useNavigate } from "react-router-dom";
 // import userData from "../mocks/users";
 import "../css/mypage.css";
 import poster1 from "../components/poster1.jpg";
-import logo2 from "../components/logo2.png";
+import logo from "../components/logo2.png";
+import { communitydata } from "../mocks/communitymocks";
 
 const Myposts = () => {
   const navigate = useNavigate();
+
+  const dateTimeOptions = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  };
 
   const handleLogout = async () => {
     const confirmed = window.confirm("로그아웃 하시겠습니까?");
@@ -125,26 +132,65 @@ const Myposts = () => {
           </div>
 
           <div class="community-list">
-            <h3 id ="mypage-notice"> 추후 구현 예정입니다! </h3>
-            {/* <div class="community-item">
-              <div class="content">
-                <div class="title">지킬앤하이드 후기</div>
-                <div class="subtext">지킬을 보고 왔습니다...</div>
-              </div>
-              <div class="date">25.05.01</div>
-              <img src={poster1} alt="썸네일" class="thumb" />
-            </div>
-
-            <div class="community-item">
-              <div class="content">
-                <div class="title">링아센 좌석 후기</div>
-                <div class="subtext">
-                  가성비석 다녀왔습니다! 시야는 좋은데 음향이...
+            
+            {communitydata.map((post) => (
+              <Link
+                to={`/community/${post.postDocumentId}`} // 상세 페이지로 이동 링크
+                key={post.postDocumentId}
+                className="post-item-link"
+              >
+                <div className="post-item">
+                  <div className="post-content-wrap">
+                    <div className="post-item-header">
+                      <h4 className="post-title">
+                        {post.postTitle.length > 22
+                          ? post.postTitle.slice(0, 21) + "..."
+                          : post.postTitle}
+                      </h4>
+                      {post.postTag &&
+                        post.postTag.map((tag, index) => (
+                          <span
+                            key={index} // 배열을 순회할 때는 고유한 key를 지정해야 합니다.
+                            className="post-tag"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                    </div>
+                    <p className="post-summary">
+                      {post.postContent.length > 35
+                        ? post.postContent.slice(0, 34) + "..."
+                        : post.postContent}
+                    </p>
+                    <div className="post-meta">
+                      <span className="post-nickname">{post.userNickname}</span>
+                      <span className="post-date">
+                        {new Date(post.postTimeStamp).toLocaleString(
+                          "ko-KR",
+                          dateTimeOptions
+                        )}
+                      </span>
+                      <span className="post-comments">
+                        💬 {post.commentCount}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="post-image-preview">
+                    <img
+                      src={
+                        Array.isArray(post.postImage) &&
+                        post.postImage.length > 0
+                          ? post.postImage[0]
+                          : // 그렇지 않으면 (postImage가 배열이 아니거나 비어있으면) logo를 사용
+                            logo
+                      } // postImage가 있으면 사용, 없으면 logo 사용
+                      alt={post.postTitle}
+                      className="post-thumbnail"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div class="date">25.03.29</div>
-              <img src={logo2} alt="썸네일" class="thumb" />
-            </div> */}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

@@ -71,6 +71,7 @@
   border-radius: 8px;
   background-color: #fff;
   cursor: pointer;
+  width:570px;
 
   /* 👇 이미지와 내용을 나란히 배치하기 위한 Flexbox 설정 */
   display: flex;
@@ -102,10 +103,10 @@
 
   /* 박스 형태로 만들기 위한 패딩 */
   padding: 3px 8px;
-
+  
   /* 둥근 모서리 적용 */
   border-radius: 12px;
-
+  
   /* 인라인 블록으로 설정하여 패딩과 배경색이 적용되도록 합니다. */
   display: inline-block;
 

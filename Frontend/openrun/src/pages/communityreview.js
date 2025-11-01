@@ -114,7 +114,7 @@ const CommunityReview = () => {
 
           <button
             className="floating-add-button"
-            onClick={() => navigate("/addrecord")} // 커뮤니티 글 작성 페이지 구현 후 수정 예정
+            onClick={() => navigate("/communityaddpost")} // 커뮤니티 글 작성 페이지 구현 후 수정 예정
           >
             <span className="plus-symbol">+</span>
           </button>

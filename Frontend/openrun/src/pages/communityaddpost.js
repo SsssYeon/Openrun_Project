@@ -1,133 +1,151 @@
-// 커뮤니티 글 수정, 작업중...
+// 커뮤니티 글 작성, api 연결 X
 
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useRef, useState } from "react";
 import Nav from "../components/nav";
 import "../css/eventdetail.css";
-import { useNavigate, useParams } from "react-router-dom";
-import { communitydata } from "../mocks/communitymocks";
+import { useNavigate } from "react-router-dom";
 
-const Communitymodify = () => {
-  const { id } = useParams();
-  const numericId = parseInt(id, 10);
-
+const Communityaddpost = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [posterFiles, setPosterFiles] = useState([]);
   const [posterPreviews, setPosterPreviews] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [error, setError] = useState(null);
+   const [selectedTags, setSelectedTags] = useState([]); 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // ID가 없거나 모의 데이터가 없으면 종료
-    if (!id) return;
-
-    // 모의 데이터에서 해당 ID의 게시물 찾기
-    const postToModify = communitydata.find(
-      (post) =>
-        post.postDocumentId === id || post.postDocumentId === `post_${id}` // /modifypost/1 같은 경우 대비
-    );
-
-    if (postToModify) {
-      setTitle(postToModify.postTitle || "");
-      setContent(postToModify.postContent || "");
-      setSelectedTags(postToModify.postTag || []);
-      setPosterPreviews(postToModify.postImage || []);
-    } else {
-      console.error(`Post with ID ${id} not found.`);
-      setError("게시글을 찾을 수 없습니다.");
-    }
-    setIsLoaded(true);
-
-    // URL.createObjectURL로 생성된 리소스는 여기서 정리할 필요가 없습니다.
-    // 새로 추가되는 파일은 handleImageRemove/useEffect에서 정리해야 합니다.
-  }, [id, numericId]);
-
-  useEffect(() => {
-    const blobUrls = posterPreviews.filter((url) => url.startsWith("blob:"));
-    return () => {
-      blobUrls.forEach(URL.revokeObjectURL);
-    };
-  }, [posterPreviews]);
-
-  const fileInputRef = useRef(null);
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
   };
+
+  const fileInputRef = useRef(null); // input 참조
 
   const handleImageClick = () => {
     fileInputRef.current.click(); // 이미지 클릭 시 input 열기
   };
 
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
+    const files = e.target.files;
     if (files.length > 0) {
-      setPosterFiles((prev) => [...prev, ...files]);
-      const newPreviews = files.map((file) => URL.createObjectURL(file));
-      setPosterPreviews((prev) => [...prev, ...newPreviews]);
+      setPosterFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
+
+      const newPreviews = Array.from(files).map((file) =>
+        URL.createObjectURL(file)
+      );
+      setPosterPreviews((prevPreviews) => [...prevPreviews, ...newPreviews]);
+
+      // 새 이미지를 추가했으므로, 인덱스를 0으로 리셋 (새로 추가한 이미지를 바로 보여줄 필요는 없으므로 현 인덱스 유지도 가능)
+      // 여기서는 일반적으로 슬라이드를 첫 이미지로 리셋합니다.
+      setCurrentImageIndex(0);
     }
     e.target.value = null;
   };
+  const handleImageRemove = (e, indexToRemove) => {
+    e.stopPropagation(); // 버튼 클릭이 파일 입력창을 열지 않도록 방지
 
-  const handleImageRemove = (e, index) => {
-    e.stopPropagation();
+    // 새 배열 생성
+    const newFiles = posterFiles.filter((_, i) => i !== indexToRemove);
+    const newPreviews = posterPreviews.filter((_, i) => i !== indexToRemove);
 
-    const newPreviews = posterPreviews.filter((_, i) => i !== index);
+    setPosterFiles(newFiles);
     setPosterPreviews(newPreviews);
 
-    setCurrentImageIndex((prev) =>
-      newPreviews.length === 0 ? 0 : Math.min(prev, newPreviews.length - 1)
-    );
+    // 인덱스 조정
+    setCurrentImageIndex((prevIndex) => {
+      const newLength = newPreviews.length;
+      if (newLength === 0) return 0; // 남은 이미지가 없으면 0
+
+      // 현재 인덱스가 삭제된 인덱스보다 크거나 같다면 (배열이 당겨졌으므로) 인덱스를 하나 줄임
+      if (prevIndex > indexToRemove) {
+        return prevIndex - 1;
+      }
+      // 현재 인덱스가 유효한 범위를 벗어난 경우 (e.g. 마지막 이미지 삭제 시)
+      if (prevIndex >= newLength) {
+        return newLength - 1;
+      }
+
+      return prevIndex;
+    });
   };
 
   const handlePrevImage = (e) => {
     e.stopPropagation();
     setCurrentImageIndex(
-      (prev) => (prev - 1 + posterPreviews.length) % posterPreviews.length
+      (prevIndex) =>
+        (prevIndex - 1 + posterPreviews.length) % posterPreviews.length
     );
   };
 
   const handleNextImage = (e) => {
     e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev + 1) % posterPreviews.length);
-  };
-
-  const TAGS = ["시야", "공연 후기", "공연 정보", "사담"]; // ⭐️ 태그 목록 정의
-
-  const handleTagSelect = (tag) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    setCurrentImageIndex(
+      (prevIndex) => (prevIndex + 1) % posterPreviews.length
     );
   };
 
-  const handleSave = () => {
-    if (!title.trim() || !content.trim()) {
-      alert("제목과 내용을 모두 입력해주세요.");
+  const TAGS = ['시야', '공연 후기', '공연 정보', '사담']; // ⭐️ 태그 목록 정의
+
+  // ⭐️ [추가] 태그 선택 핸들러
+  const handleTagSelect = (tag) => {
+    setSelectedTags(prevTags => {
+      if (prevTags.includes(tag)) {
+        // 이미 선택된 태그면 배열에서 제거
+        return prevTags.filter(t => t !== tag);
+      } else {
+        // 선택되지 않은 태그면 배열에 추가
+        return [...prevTags, tag];
+      }
+    });
+  };
+
+  const handleSave = async () => {
+    if (!title || !content) {
+      alert("제목, 내용은 필수 입력입니다.");
       return;
     }
 
-    // 실제로는 PUT /api/community/:id 요청으로 수정 처리할 부분
-    console.log("✅ 수정 완료");
-    console.log({
-      id: numericId,
-      title,
-      content,
-      tags: selectedTags,
-      images: posterPreviews,
-      newFiles: posterFiles,
+    const formData = new FormData();
+    formData.append("postTitle", title);
+    formData.append("postContent", content);
+
+    selectedTags.forEach(tag => {
+        // 백엔드에서 배열로 인식하도록 postTag[] 또는 단순히 postTag로 여러 번 전송 (백엔드 프레임워크에 따라 다름)
+        formData.append("postTag", tag); 
     });
 
-    alert("수정이 완료되었습니다.");
-    navigate(`/community/${id}`);
+    posterFiles.forEach((file) => {
+      formData.append("postImage", file);
+    });
+
+    posterFiles.forEach((file) => {
+      formData.append("postImage", file); // 서버에서 배열로 받도록 처리 필요 (예: postImage[])
+    });
+
+    try {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      const res = await fetch("/api/calendar/me", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`, // 👈 토큰 포함
+        },
+        body: formData,
+      });
+
+      if (res.ok) {
+        alert("기록이 저장되었습니다.");
+        navigate("/calendarrecords");
+      } else {
+        alert("기록 저장에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("저장 요청 실패:", error);
+    }
   };
 
-  if (!isLoaded) return <div>로딩 중...</div>;
-  if (error) return <div>{error}</div>;
-
   const showNavigation = posterPreviews.length > 1;
+  
 
   return (
     <div>
@@ -148,8 +166,9 @@ const Communitymodify = () => {
             <img
               src="/default-poster.png"
               alt="포스터 추가 (클릭)"
-              className="poster"
+              className="add-post-poster"
               onClick={handleImageClick}
+              
             />
           )}
           {/* 2. 이미지가 1개 이상일 때: 슬라이더/단일 뷰 */}
@@ -158,7 +177,7 @@ const Communitymodify = () => {
             <div
               className="slider-container"
               style={{
-                flexDirection: "column", // ⭐️ 세로 정
+                flexDirection: "column",
                 display: "flex",
                 alignItems: "center",
 
@@ -258,56 +277,40 @@ const Communitymodify = () => {
               </button>
             </div> // ⭐️ slider-container 닫는 태그
           )}
+  
         </div>
         {/* poster-upload-area 닫는 태그 */}
         <div className="event-info-container">
           <div className="event-content">
-            <h3 className="title-center">커뮤니티 글 수정</h3>
+            <h3 className="title-center">커뮤니티 글 작성</h3>
 
             <div className="modifyrecord-row">
-              <div className="tag-selection-area" style={{ margin: "15px 0" }}>
-                <strong>태그: </strong>
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "8px",
-                    marginTop: "5px",
-                  }}
-                >
-                  {TAGS.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => handleTagSelect(tag)}
-                      // ⭐️ 선택 상태에 따른 스타일 변경
-                      style={{
-                        padding: "8px 12px",
-                        borderRadius: "20px",
-                        border: `1px solid ${
-                          selectedTags.includes(tag) ? "#ffd049" : "#ccc"
-                        }`,
-                        backgroundColor: selectedTags.includes(tag)
-                          ? "#ffd049"
-                          : "white",
-                        color: selectedTags.includes(tag) ? "black" : "black",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        transition: "0.2s",
-                        fontWeight: 600,
-
-                      }}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
+              <div className="tag-selection-area" style={{ margin: '15px 0' }}>
+              <strong>태그: </strong>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '5px' }}>
+                {TAGS.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => handleTagSelect(tag)}
+                    // ⭐️ 선택 상태에 따른 스타일 변경
+                   style={{
+                      padding: '8px 12px',
+                      borderRadius: '20px',
+                      border: `1px solid ${selectedTags.includes(tag) ? '#ccc' : '#ccc'}`,
+                      backgroundColor: selectedTags.includes(tag) ? '#ffd049' : 'white',
+                      color: selectedTags.includes(tag) ? 'black' : 'black',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      transition: '0.2s',
+                    }}
+                  >
+                    {tag}
+                  </button>
+                ))}
               </div>
+            </div>
               <strong>제목: </strong>
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="title-input"
-              />
+              <input value={title} onChange={handleTitleChange} />
             </div>
           </div>
 
@@ -322,7 +325,7 @@ const Communitymodify = () => {
           </div>
 
           <button onClick={handleSave} className="modifyrecord-button">
-            수정하기
+            저장
           </button>
         </div>
       </div>
@@ -330,4 +333,4 @@ const Communitymodify = () => {
   );
 };
 
-export default Communitymodify;
+export default Communityaddpost;

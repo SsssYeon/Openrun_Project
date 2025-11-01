@@ -32,6 +32,7 @@ import Communitychat from "./pages/communitychat";
 import Communitypost from "./pages/communitypost";
 import Communitymodify from "./pages/communitymodify";
 import Communitysearch from "./pages/communitysearch";
+import Communityaddpost from "./pages/communityaddpost";
 import Terms from "./pages/terms";
 import Privacy from "./pages/privacy";
 
@@ -106,6 +107,7 @@ function App() {
         <Route path="/community/:id" element={<Communitypost />} />
         <Route path="/modifypost/:id" element={<Communitymodify />} />
         <Route path="/communitysearch" element={<Communitysearch />} />
+         <Route path="/communityaddpost" element={<Communityaddpost />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
       </Routes>

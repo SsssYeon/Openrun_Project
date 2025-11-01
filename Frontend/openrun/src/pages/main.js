@@ -1,11 +1,12 @@
 // api를 통해 못 찾을 시 mocks 데이터에서 찾도록 설정
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import "../css/main.css"; // CSS 파일 연결
 import logo from "../components/logo.png";
 import Nav from "../components/nav.js";
 import performancesData from "../mocks/performances"; 
+import logo3 from "../components/logo3.png";
 
 const Main = () => {
   const [query, setQuery] = useState("");
@@ -51,7 +52,25 @@ const Main = () => {
   return (
     <div>
       <div>
-        <Nav />
+        <nav className="navbar">
+              <div className="nav-left">
+                <NavLink to="/">
+                  <img src={logo3} alt="로고" className="nav-logo" />
+                </NavLink>
+              </div>
+              <div className="nav-right">
+                <div className="nav-item-dropdown">
+                  <NavLink to="/calendarrecords" className="nav-item">내 달력</NavLink>{/* 로그인 시 내 달력으로, 로그인하지 않은 상태일 시 로그인 페이지로 */}
+                  <div className="dropdown-content">
+                    <NavLink to="/calendarrecords" className="dropdown-item">내 관극 기록</NavLink>
+                    <NavLink to="/mylikescalendar" className="dropdown-item">관심 공연</NavLink>
+                    <NavLink to="/myreport" className="dropdown-item">나의 통계</NavLink>
+                  </div>
+                </div>
+                <NavLink to="/community" className="nav-item">커뮤니티</NavLink>
+                <NavLink to="/mypage" className="nav-item">마이페이지</NavLink> {/* 로그인 시 마이페이지로, 로그인하지 않은 상태일 시 로그인 페이지로 */}
+              </div>
+            </nav>
       </div>
       <div className="search-container">
         <img src={logo} alt="Logo" className="logo" onClick={handleLogoClick} />

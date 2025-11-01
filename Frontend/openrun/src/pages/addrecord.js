@@ -158,7 +158,7 @@ const Addrecord = () => {
           </div>
 
           <div className="event-review">
-            <h3 className="title-center">관람 후기</h3>
+            <h3 className="title-center">내용</h3>
             <textarea
               className="review-item"
               value={memo}
