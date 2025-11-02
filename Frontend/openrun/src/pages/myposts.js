@@ -76,7 +76,7 @@ const Myposts = () => {
         localStorage.getItem("token") || sessionStorage.getItem("token");
       if (!token) throw new Error("로그인 상태가 아닙니다.");
 
-      const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      const response = await fetch(`/api/auth/logout`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -107,7 +107,7 @@ const Myposts = () => {
     if (confirmed) {
       const token =
         localStorage.getItem("token") || sessionStorage.getItem("token");
-      fetch(`${API_BASE_URL}/api/users/me`, {
+      fetch(`/api/users/me`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
