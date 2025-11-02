@@ -18,7 +18,7 @@ export const communitydata = [
     postContentSummary:
       "헤드윅 2024년 시즌 2층 A열 중앙 시야 후기입니다. 생각보다 무대가 잘 보...",
 
-    postTag: ["공연 후기", "시야"],
+    postTag: ["공연 후기", "공연 정보"],
 
     postTimeStamp: "2025-05-01T10:00:00Z",
 

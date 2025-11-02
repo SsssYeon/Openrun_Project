@@ -1,6 +1,6 @@
-// 마이페이지 - 나의 글 => api 연결 필요
+// 마이페이지 - 나의 글 => api 연결 완료
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Nav from "../components/nav";
 import { Link, useNavigate } from "react-router-dom";
 // import userData from "../mocks/users";
@@ -9,14 +9,63 @@ import poster1 from "../components/poster1.jpg";
 import logo from "../components/logo2.png";
 import { communitydata } from "../mocks/communitymocks";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE;
+
 const Myposts = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [myPosts, setMyPosts] = useState( communitydata);
+  const [loading, setLoading] = useState(true);
 
   const dateTimeOptions = {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
   };
+
+  useEffect(() => {
+    const fetchMyPosts = async () => {
+      setLoading(true);
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      if (!token) {
+        setLoading(false);
+        return navigate("/login", { replace: true });
+      }
+
+      try {
+        // ⭐️ [수정] API_BASE_URL을 사용하여 나의 글 리스트 API 호출
+        const postsResponse = await fetch(
+          `/api/users/me/posts`,
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (!postsResponse.ok) {
+          throw new Error("API_FAIL"); // 실패 시 Mock Fallback으로 이동
+        }
+
+        const postsData = await postsResponse.json();
+        setMyPosts(postsData.posts || []);
+      } catch (error) {
+        console.warn(
+          `[API FAIL] My posts API failed. Falling back to Mock data.`,
+          error.message
+        );
+        // API 호출 실패 시 Mock 데이터 사용
+        setMyPosts( communitydata);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMyPosts();
+  }, [navigate]);
+
+  if (loading) return <div>나의 글 목록을 불러오는 중입니다...</div>;
 
   const handleLogout = async () => {
     const confirmed = window.confirm("로그아웃 하시겠습니까?");
@@ -27,7 +76,7 @@ const Myposts = () => {
         localStorage.getItem("token") || sessionStorage.getItem("token");
       if (!token) throw new Error("로그인 상태가 아닙니다.");
 
-      const response = await fetch("/api/auth/logout", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -42,7 +91,9 @@ const Myposts = () => {
 
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
-      
+
+      setUser(null);
+
       alert("정상적으로 로그아웃되었습니다.");
       navigate("/"); // 로그인 페이지나 홈으로 이동
     } catch (error) {
@@ -56,7 +107,7 @@ const Myposts = () => {
     if (confirmed) {
       const token =
         localStorage.getItem("token") || sessionStorage.getItem("token");
-      fetch("/api/users/me", {
+      fetch(`${API_BASE_URL}/api/users/me`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -132,65 +183,70 @@ const Myposts = () => {
           </div>
 
           <div class="community-list">
-            
-            {communitydata.map((post) => (
-              <Link
-                to={`/community/${post.postDocumentId}`} // 상세 페이지로 이동 링크
-                key={post.postDocumentId}
-                className="post-item-link"
-              >
-                <div className="post-item">
-                  <div className="post-content-wrap">
-                    <div className="post-item-header">
-                      <h4 className="post-title">
-                        {post.postTitle.length > 22
-                          ? post.postTitle.slice(0, 21) + "..."
-                          : post.postTitle}
-                      </h4>
-                      {post.postTag &&
-                        post.postTag.map((tag, index) => (
-                          <span
-                            key={index} // 배열을 순회할 때는 고유한 key를 지정해야 합니다.
-                            className="post-tag"
-                          >
-                            {tag}
-                          </span>
-                        ))}
+            {myPosts.length === 0 ? (
+              <p className="no-posts-message">작성한 글이 없습니다.</p>
+            ) : (
+              myPosts.map((post) => (
+                <Link
+                  to={`/community/${post.postDocumentId}`} // 상세 페이지로 이동 링크
+                  key={post.postDocumentId}
+                  className="post-item-link"
+                >
+                  <div className="post-item">
+                    <div className="post-content-wrap">
+                      <div className="post-item-header">
+                        <h4 className="post-title">
+                          {post.postTitle.length > 22
+                            ? post.postTitle.slice(0, 21) + "..."
+                            : post.postTitle}
+                        </h4>
+                        {post.postTag &&
+                          post.postTag.map((tag, index) => (
+                            <span
+                              key={index} // 배열을 순회할 때는 고유한 key를 지정해야 합니다.
+                              className="post-tag"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                      </div>
+                      <p className="post-summary">
+                        {post.postContent.length > 35
+                          ? post.postContent.slice(0, 34) + "..."
+                          : post.postContent}
+                      </p>
+                      <div className="post-meta">
+                        <span className="post-nickname">
+                          {post.userNickname}
+                        </span>
+                        <span className="post-date">
+                          {new Date(post.postTimeStamp).toLocaleString(
+                            "ko-KR",
+                            dateTimeOptions
+                          )}
+                        </span>
+                        <span className="post-comments">
+                          💬 {post.commentCount}
+                        </span>
+                      </div>
                     </div>
-                    <p className="post-summary">
-                      {post.postContent.length > 35
-                        ? post.postContent.slice(0, 34) + "..."
-                        : post.postContent}
-                    </p>
-                    <div className="post-meta">
-                      <span className="post-nickname">{post.userNickname}</span>
-                      <span className="post-date">
-                        {new Date(post.postTimeStamp).toLocaleString(
-                          "ko-KR",
-                          dateTimeOptions
-                        )}
-                      </span>
-                      <span className="post-comments">
-                        💬 {post.commentCount}
-                      </span>
+                    <div className="post-image-preview">
+                      <img
+                        src={
+                          Array.isArray(post.postImage) &&
+                          post.postImage.length > 0
+                            ? post.postImage[0]
+                            : // 그렇지 않으면 (postImage가 배열이 아니거나 비어있으면) logo를 사용
+                              logo
+                        } // postImage가 있으면 사용, 없으면 logo 사용
+                        alt={post.postTitle}
+                        className="post-thumbnail"
+                      />
                     </div>
                   </div>
-                  <div className="post-image-preview">
-                    <img
-                      src={
-                        Array.isArray(post.postImage) &&
-                        post.postImage.length > 0
-                          ? post.postImage[0]
-                          : // 그렇지 않으면 (postImage가 배열이 아니거나 비어있으면) logo를 사용
-                            logo
-                      } // postImage가 있으면 사용, 없으면 logo 사용
-                      alt={post.postTitle}
-                      className="post-thumbnail"
-                    />
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))
+            )}
           </div>
         </div>
       </div>

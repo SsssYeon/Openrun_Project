@@ -107,7 +107,14 @@ function App() {
         <Route path="/community/:id" element={<Communitypost />} />
         <Route path="/modifypost/:id" element={<Communitymodify />} />
         <Route path="/communitysearch" element={<Communitysearch />} />
-         <Route path="/communityaddpost" element={<Communityaddpost />} />
+        <Route
+          path="/communityaddpost"
+          element={
+            <PrivateRoute>
+              <Communityaddpost />
+            </PrivateRoute>
+          }
+        />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
       </Routes>
