@@ -11,7 +11,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE;
 const apiService = {
   // ⭐️ GET: 게시글 상세 조회
   getPostDetail: async (token, postId) => {
-    const url = `${API_BASE_URL}/api/community/posts/${postId}`;
+    const url = `/api/community/posts/${postId}`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
