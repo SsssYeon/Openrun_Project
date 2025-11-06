@@ -6,6 +6,9 @@ import "../css/main2.css"; // CSS 파일 연결
 import poster1 from "../components/poster1.jpg";
 import poster2 from "../components/poster2.jpg";
 import poster3 from "../components/poster3.jpg";
+import poster4 from "../components/poster4.jpg";
+import poster5 from "../components/poster5.jpeg";
+import poster6 from "../components/poster6.jpg";
 
 import logo from "../components/logo2.png";
 
@@ -36,18 +39,18 @@ const fallbackRanking = [
 const fallbackRecommend = [
   {
     pfm_doc_id: 1,
-    catchphrase: "지금 이 순간, \n끝나지 않는 신화",
-    pfm_poster: poster1,
+    catchphrase: "우린 왜 그냥 스쳐 가지 않고 \n서로를 바라봤을까",
+    pfm_poster: poster4,
   },
   {
     pfm_doc_id: 2,
-    catchphrase: "그리하여 나는 벗어난다\n세상 모든 것으로부터",
-    pfm_poster: poster2,
+    catchphrase: "누군가 이 세상을 \n바로잡아야 한다",
+    pfm_poster: poster5,
   },
   {
     pfm_doc_id: 3,
-    catchphrase: "기나긴 시간을 건너,\n단 한 번의 순간",
-    pfm_poster: poster3,
+    catchphrase: "No day\nBut today",
+    pfm_poster: poster6,
   },
 ];
 
