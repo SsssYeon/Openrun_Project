@@ -344,3 +344,11 @@
 .heart-icon:hover {
   transform: scale(1.2);
 }
+
+.no-favorites-message-mypage {
+  text-align: center;
+  color: #888;
+  margin-bottom: 80px;
+  width: 500px;
+  /* 메시지가 부모 요소 중앙에 오도록 추가 조정 가능 */
+}

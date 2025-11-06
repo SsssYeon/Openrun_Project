@@ -11,6 +11,7 @@ const favorites = [
     end: "2025-07-09", // 종료일 다음날로 설정
     poster: poster1,
     className: 'favorite-1',
+    is_main_favorite : true,
   },
   {
     id: "2",

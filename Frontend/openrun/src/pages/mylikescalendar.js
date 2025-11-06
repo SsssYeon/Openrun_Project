@@ -1,4 +1,4 @@
-// api 연결 완료 버전 => 인덱스 0~2까지 노출
+// api 연결 완료 버전 => /api/calendar/like을 통해 달력에 노출되도록 한 공연의 정보만 받아옴(최대 3개)
 
 import Nav from "../components/nav.js";
 import "../css/mylikescalendar.css";
@@ -211,22 +211,27 @@ const Mylikescalendar = () => {
               </button>
             </div>
             <div className="favorite-items-container">
-              {favorites.map((fav, index) => (
-                <div
-                  key={fav.id}
-                  className={`favorite-item favorite-${index + 1}`}
-                  onClick={() => navigate(`/performance/${fav.pfm_doc_id}`)} // ✅ 이동 추가
-                  style={{ cursor: "pointer" }}
-                >
-                  <img src={fav.poster} alt={fav.title} />
-                  <p>
-                    {" "}
-                    {fav.title.length > 9
-                      ? fav.title.slice(0, 9) + "..."
-                      : fav.title}
-                  </p>
-                </div>
-              ))}
+              {favorites.length === 0 ? (
+                <p className="no-favorites-message">
+                  모두 보기를 누른 후 달력에 표시될 공연을 선택해주세요!
+                </p>
+              ) : (
+                favorites.map((fav, index) => (
+                  <div
+                    key={fav.id}
+                    className={`favorite-item favorite-${index + 1}`}
+                    onClick={() => navigate(`/performance/${fav.pfm_doc_id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <img src={fav.poster} alt={fav.title} />
+                    <p>
+                      {fav.title.length > 9
+                        ? fav.title.slice(0, 9) + "..."
+                        : fav.title}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

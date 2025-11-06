@@ -1,4 +1,4 @@
-// 나의 통계 => api 연결 필요
+// 나의 통계 => api 연결 완료
 
 import React, { useEffect, useState } from "react";
 import Nav from "../components/nav";
@@ -9,14 +9,8 @@ import "../css/myreport.css";
 import fallbackReports from "../mocks/reports";
 
 const Myreport = () => {
-  const [period, setPeriod] = useState("전체 기간");
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const handlePeriodChange = (e) => {
-    setPeriod(e.target.value);
-    // TODO: 기간 필터 적용 API가 있다면 여기에 반영
-  };
 
   useEffect(() => {
     const fetchStatistics = async () => {
@@ -57,14 +51,6 @@ const Myreport = () => {
     <div>
       <Nav />
       <div className="mystats-container">
-        {/* <div className="dropdown-container">
-          <select value={period} onChange={handlePeriodChange}>
-            <option>전체 기간</option>
-            <option>최근 1개월</option>
-            <option>최근 3개월</option>
-            <option>올해</option>
-          </select>
-        </div> */}
         <div className="stats-boxes">
           <div className="stat-box">
             <h3>관람 횟수</h3>
@@ -79,31 +65,14 @@ const Myreport = () => {
         <div className="details-container">
           <div className="frequent-section">
             <h3>자주 본 작품</h3>
-            <div className="frequent-posters">
-              {mostViewedWorks.slice(0, 3).map((work, index) => (
-                <div className="poster-item" key={index}>
-                  {work.pfm_poster && (
-                    <img
-                      src={work.pfm_poster}
-                      alt={`${work.pfm_nm} 포스터`}
-                    />
-                  )}
-                  <p>
-                    {work.pfm_nm}
-                    <br />
-                    {work.pfm_cnt}회
-                  </p>
-                </div>
-              ))}
-            </div>
-            <ul className="text-list">
-              {mostViewedWorks.slice(3).map((work, index) => (
+            <div className="text-list">
+              {mostViewedWorks.slice(0, 8).map((work, index) => (
                 <li key={index}>
                   <span className="text-left">{work.pfm_nm}</span>
                   <span className="text-right">{work.pfm_cnt}회</span>
                 </li>
               ))}
-            </ul>
+            </div>
           </div>
 
           <div className="frequent-section">

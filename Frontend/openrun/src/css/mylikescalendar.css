@@ -242,3 +242,10 @@
   border-bottom: 4px solid #dcf9c5;
 }
 
+.no-favorites-message {
+  text-align: center;
+  color: #888;
+  margin-bottom: 80px;
+  width: 100%;
+  /* 메시지가 부모 요소 중앙에 오도록 추가 조정 가능 */
+}
