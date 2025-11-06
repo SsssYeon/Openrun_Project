@@ -1,7 +1,6 @@
 // 홈 2번째 화면, 최근 커뮤니티 글 api 연결 완료
 // 오픈런 랭킹, 오픈런 추천 공연 어떻게 할지 결정 필요. 결정 후 수정 필요한 부분 수정 예정
 
-
 import React, { useEffect, useState } from "react";
 import "../css/main2.css"; // CSS 파일 연결
 import poster1 from "../components/poster1.jpg";
@@ -12,40 +11,43 @@ import logo from "../components/logo2.png";
 
 const fallbackRanking = [
   {
-    id: 1,
-    title: "지킬앤하이드",
-    date: "2024.11.29 ~ 2025.05.18",
-    image: poster1,
+    pfm_doc_id: 1,
+    pfm_nm: "지킬앤하이드",
+    pfm_start: "2024.11.29",
+    pfm_end: "2025.05.18",
+    pfm_poster: poster1,
   },
   {
-    id: 2,
-    title: "랭보",
-    date: "2025.02.19 ~ 2025.05.18",
-    image: poster2,
+    pfm_doc_id: 2,
+    pfm_nm: "랭보",
+    pfm_start: "2022.02.19",
+    pfm_end: "2025.05.18",
+    pfm_poster: poster2,
   },
   {
-    id: 3,
-    title: "메디슨 카운티의 다리",
-    date: "2025.05.01 ~ 2025.07.13",
-    image: poster3,
+    pfm_doc_id: 3,
+    pfm_nm: "메디슨 카운티의 다리",
+    pfm_start: "2025.05.01",
+    pfm_end: "2025.07.13",
+    pfm_poster: poster3,
   },
 ];
 
 const fallbackRecommend = [
   {
-    id: 1,
+    pfm_doc_id: 1,
     catchphrase: "지금 이 순간, \n끝나지 않는 신화",
-    image: poster1,
+    pfm_poster: poster1,
   },
   {
-    id: 2,
+    pfm_doc_id: 2,
     catchphrase: "그리하여 나는 벗어난다\n세상 모든 것으로부터",
-    image: poster2,
+    pfm_poster: poster2,
   },
   {
-    id: 3,
+    pfm_doc_id: 3,
     catchphrase: "기나긴 시간을 건너,\n단 한 번의 순간",
-    image: poster3,
+    pfm_poster: poster3,
   },
 ];
 
@@ -98,7 +100,6 @@ const fallbackCommunity = [
     postImage: [],
   },
 ];
-
 
 const dateTimeOptions = {
   year: "numeric",
@@ -162,13 +163,15 @@ const Main2 = () => {
           </div>
           <div className="ranking section">
             {rankingData.map((item, index) => (
-              <div className="ranking-item" key={item.id ?? index}>
+              <div className="ranking-item" key={item.pfm_doc_id ?? index}>
                 <div className="rank-num">{index + 1}</div>
                 <div className="ranking-info">
-                  <div className="title">{item.title}</div>
-                  <div className="date">{item.date}</div>
+                  <div className="title">{item.pfm_nm}</div>
+                  <div className="date">
+                    {item.pfm_start} ~ {item.pfm_end}
+                  </div>
                 </div>
-                <img src={item.image} alt={`${item.title} 포스터`} />
+                <img src={item.pfm_poster} alt={`${item.pfm_nm} 포스터`} />
               </div>
             ))}
           </div>
@@ -179,8 +182,8 @@ const Main2 = () => {
 
           <div className="recommend-list">
             {recommendData.map((item, index) => (
-              <div className="recommend-card" key={item.id ?? index}>
-                <img src={item.image} alt={`${index}번째 포스터`} />
+              <div className="recommend-card" key={item.pfm_id ?? index}>
+                <img src={item.pfm_poster} alt={`${index}번째 포스터`} />
                 <div className="card-text">
                   <div className="catchphrase">
                     {item.catchphrase.split("\n").map((line, idx) => (

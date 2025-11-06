@@ -31,6 +31,7 @@ const favorites = [
     poster: poster3,
     className: 'favorite-3',
   },
+  
 ];
 
 export default favorites;

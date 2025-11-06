@@ -282,7 +282,7 @@ const MyPage = () => {
                 <h3 className="user-title">나의 관심 공연</h3>
                 <div className="user-favorite">
                   {interests.length === 0 && <p>관심 공연이 없습니다.</p>}
-                  {interests.map((show) => (
+                  {interests.slice(0, 5).map((show) => (
                     <div key={show.id} className="user-favorite-content">
                       <img
                         src={show.poster}
