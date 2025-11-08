@@ -50,7 +50,7 @@ const Main = () => {
   };
 
   return (
-    <div>
+    <div className="main-page-container">
       <div>
         <nav className="navbar">
               <div className="nav-left">
@@ -72,20 +72,20 @@ const Main = () => {
               </div>
             </nav>
       </div>
-      <div className="search-container">
-        <img src={logo} alt="Logo" className="logo" onClick={handleLogoClick} />
-        <div className="search-box">
+      <div className="main-search-container">
+        <img src={logo} alt="Logo" className="main-logo" onClick={handleLogoClick} />
+        <div className="main-search-box">
           <input
             type="text"
             placeholder="궁금한 공연을 입력하세요"
-            className="search-input"
+            className="main-search-input"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
               setShowDropdown(true);
             }}
           />
-          <button className="search-icon"> ▼</button>
+          <button className="main-search-icon"> ▼</button>
 
           {showDropdown && query && (
             <ul className="main-dropdown">
@@ -100,7 +100,14 @@ const Main = () => {
                       setShowDropdown(false);
                     }}
                   >
-                    {item.pfm_nm}
+                    <span className="result-title">
+                      {item.pfm_nm.length > 14
+                        ? item.pfm_nm.slice(0, 13) + "..."
+                        : item.pfm_nm}
+                    </span>
+                    <span className="result-duration">
+                        {item.pfm_start} ~ {item.pfm_end}
+                    </span>
                   </li>
                 ))
               ) : (

@@ -143,6 +143,30 @@
   color: #333;
   border-bottom: 1px solid #f0f0f0;
   transition: background-color 0.2s ease;
+  
+  /* ⚠️ 추가/수정: 제목과 기간을 한 줄에 배치하고 공간을 분배합니다. */
+  display: flex;
+  justify-content: space-between; /* 양 끝 정렬 */
+  align-items: center;
+}
+
+/* 2. 제목 스타일 */
+.result-title {
+    /* 제목이 기간보다 많은 공간을 차지하도록 설정 */
+    flex-grow: 1; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left; /* ⬅️ 제목은 왼쪽 정렬 유지 */
+    padding-right: 10px; /* 제목과 기간 사이 간격 */
+}
+
+/* 3. 기간 스타일 (오른쪽 정렬) */
+.result-duration {
+    flex-shrink: 0; /* 기간은 줄어들지 않음 */
+    color: #666;
+    font-size: 12px;
+    text-align: right; /* ⬅️ 기간은 오른쪽 정렬 */
 }
 
 .result-item:last-child {

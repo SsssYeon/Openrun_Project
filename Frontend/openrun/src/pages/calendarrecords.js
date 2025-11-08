@@ -138,7 +138,10 @@ const Calendarrecords = () => {
 
             <div className="mytickets-scroll">
               <div className="mytickets">
-                {(searchTerm ? filteredEvents : selectedDateEvents).map(
+                {searchTerm === "" && events.length === 0 ? (
+                  <p className="no-records-message">관극 기록을 추가해보세요</p>
+                ) : 
+                (searchTerm ? filteredEvents : selectedDateEvents).map(
                   (event) => (
                     <div
                       key={event.id}
@@ -162,6 +165,9 @@ const Calendarrecords = () => {
                       </div>
                     </div>
                   )
+                )}
+                {searchTerm && filteredEvents.length === 0 && events.length > 0 && (
+                    <p className="no-records-message">검색 결과가 없습니다.</p>
                 )}
               </div>
             </div>
