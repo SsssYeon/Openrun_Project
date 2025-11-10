@@ -1,22 +1,40 @@
-.search-container {
+body {
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-page-container{
+  height: 500px;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden !important;
+}
+
+.main-search-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-bottom: 50px;
+  overflow: visible;
 }
 
-.logo {
+.main-logo {
   width: 350px;
   cursor: pointer;
   margin-bottom: 50px;
 }
 
-.search-box {
+.main-search-box {
   position: relative;
   width: 400px;
 }
 
-.search-input {
+.main-search-input {
   width: 100%;
   padding: 10px 40px 10px 12px;
   border: 5px solid #ffd049;
@@ -24,7 +42,7 @@
   font-size: 16px;
 }
 
-.search-icon {
+.main-search-icon {
   position: absolute;
   right: 10px;
   top: 9px;
@@ -55,6 +73,9 @@
   padding: 10px;
   cursor: pointer;
   list-style: none;
+   display: flex;
+  justify-content: space-between; /* 양 끝 정렬 */
+  align-items: center;
 }
 
 .main-dropdown-item:hover {
@@ -75,8 +96,5 @@
   background: none !important;
 }
 
-.main-section {
-  overflow: visible !important;
-  
-}
+
 

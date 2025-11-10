@@ -25,6 +25,14 @@ import Mylikescalendar from "./pages/mylikescalendar";
 import Myreport from "./pages/myreport";
 import PrivateRoute from "./components/privateroute";
 import Community from "./pages/community";
+import Communityview from "./pages/communityview";
+import Communityreview from "./pages/communityreview";
+import Communityinfo from "./pages/communityinfo";
+import Communitychat from "./pages/communitychat";
+import Communitypost from "./pages/communitypost";
+import Communitymodify from "./pages/communitymodify";
+import Communitysearch from "./pages/communitysearch";
+import Communityaddpost from "./pages/communityaddpost";
 import Terms from "./pages/terms";
 import Privacy from "./pages/privacy";
 
@@ -32,6 +40,7 @@ import Privacy from "./pages/privacy";
 // import Input from"./pages/input";
 // import Input2 from"./pages/input2";
 // import List from"./pages/list";
+// 뭐가 안될 것 같다 -> 환경변수를 확인!!!
 
 function App() {
   return (
@@ -91,6 +100,21 @@ function App() {
           }
         />
         <Route path="/community" element={<Community />} />
+        <Route path="/communityview" element={<Communityview />} />
+        <Route path="/communityreview" element={<Communityreview />} />
+        <Route path="/communityinfo" element={<Communityinfo />} />
+        <Route path="/communitychat" element={<Communitychat />} />
+        <Route path="/community/:id" element={<Communitypost />} />
+        <Route path="/modifypost/:id" element={<Communitymodify />} />
+        <Route path="/communitysearch" element={<Communitysearch />} />
+        <Route
+          path="/communityaddpost"
+          element={
+            <PrivateRoute>
+              <Communityaddpost />
+            </PrivateRoute>
+          }
+        />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
       </Routes>

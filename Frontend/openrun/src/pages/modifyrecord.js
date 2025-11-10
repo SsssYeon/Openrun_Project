@@ -24,7 +24,7 @@ const Modifyrecord = () => {
   useEffect(() => {
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
-const fetchEventDetail = async () => {
+    const fetchEventDetail = async () => {
       try {
         const res = await fetch(`/api/calendar/me/${id}`, {
           method: "GET",
@@ -73,8 +73,8 @@ const fetchEventDetail = async () => {
   }, [id]);
 
   const handleSave = async () => {
-
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
 
     const updatedRecord = {
       pfmcalender_nm: name,
@@ -92,9 +92,9 @@ const fetchEventDetail = async () => {
       const res = await fetch(`/api/calendar/me/${id}`, {
         method: "PUT", // 또는 PATCH
         headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }), // 토큰이 있을 때만 헤더에 추가
-      },
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }), // 토큰이 있을 때만 헤더에 추가
+        },
         body: JSON.stringify(updatedRecord),
       });
 
@@ -172,7 +172,10 @@ const fetchEventDetail = async () => {
             </div>
             <div className="modifyrecord-row">
               <strong>예매처: </strong>
-              <input value={bookingsite} onChange={(e) => setBookingsite(e.target.value)} />
+              <input
+                value={bookingsite}
+                onChange={(e) => setBookingsite(e.target.value)}
+              />
             </div>
           </div>
           <div className="event-review">
@@ -184,7 +187,9 @@ const fetchEventDetail = async () => {
               rows={6}
             />
           </div>
-          <button onClick={handleSave} className="modifyrecord-button">저장</button>
+          <button onClick={handleSave} className="modifyrecord-button">
+            저장
+          </button>
         </div>
       </div>
     </div>

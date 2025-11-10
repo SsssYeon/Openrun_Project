@@ -1,22 +1,26 @@
 import poster1 from "../components/poster1.jpg";
 import poster2 from "../components/poster2.jpg";
 import poster3 from "../components/poster3.jpg";
+import poster4 from "../components/poster4.jpg";
+import poster5 from "../components/poster5.jpeg";
+import poster6 from "../components/poster6.jpg";
+import poster7 from "../components/poster7.jpeg";
 
 const eventsData = [
   {
     pfmcalender_doc_no: 1,
     pfmcalender_nm: "매디슨 카운티의 다리",
     pfmcalender_date: "2025-04-10",
-    pfmcalender_time: "19:30",  // 시간이 별도 필드로 있으면 유지하거나 pfmcalender_date에 합쳐도 됩니다
+    pfmcalender_time: "19:30", // 시간이 별도 필드로 있으면 유지하거나 pfmcalender_date에 합쳐도 됩니다
     pfmcalender_today_cast: "차지연, 박은태",
     pfmcalender_seat: "2층 3열 6번",
     pfmcalender_cost: 80000,
-    pfmcalender_bookingsite: "인터파크",  // 예시
+    pfmcalender_bookingsite: "인터파크", // 예시
     pfmcalender_memo: "감동적이었어요",
     pfmcalender_share: 0, // 0=나만보기, 1=공유하기 예시
-    pfmcalender_timestamp: "2025-04-01T12:00:00" , // 예시, ISO 8601 형식
+    pfmcalender_timestamp: "2025-04-01T12:00:00", // 예시, ISO 8601 형식
     pfmcalender_location: "광림아트센터 BBCH홀",
-    pfmcalender_poster: poster3
+    pfmcalender_poster: poster3,
   },
   {
     pfmcalender_doc_no: 2,
@@ -31,7 +35,7 @@ const eventsData = [
     pfmcalender_share: 0,
     pfmcalender_timestamp: "2025-05-01T12:00:00",
     pfmcalender_location: "블루스퀘어 신한카드홀",
-    pfmcalender_poster: poster1
+    pfmcalender_poster: poster1,
   },
   {
     pfmcalender_doc_no: 3,
@@ -46,7 +50,7 @@ const eventsData = [
     pfmcalender_share: 0,
     pfmcalender_timestamp: "2025-05-15T12:00:00",
     pfmcalender_location: "대학로 TOM",
-    pfmcalender_poster: poster2
+    pfmcalender_poster: poster2,
   },
   {
     pfmcalender_doc_no: 4,
@@ -61,8 +65,53 @@ const eventsData = [
     pfmcalender_share: 0,
     pfmcalender_timestamp: "2025-06-01T12:00:00",
     pfmcalender_location: "대학로 TOM",
-    pfmcalender_poster: poster2
-  }
+    pfmcalender_poster: poster2,
+  },
+  {
+    pfmcalender_doc_no: 5,
+    pfmcalender_nm: "레드북",
+    pfmcalender_date: "2025-11-03",
+    pfmcalender_time: "19:30",
+    pfmcalender_today_cast: "민경아, 송원근, 조풍래, 한보라, 김대종, 장재웅, 이지윤, 노지연, 서은지",
+    pfmcalender_seat: "1층 B구역 13열 4번",
+    pfmcalender_cost: 30000,
+    pfmcalender_bookingsite: "예스24",
+    pfmcalender_memo: "",
+    pfmcalender_share: 0,
+    pfmcalender_timestamp: "2025-06-01T12:00:00",
+    pfmcalender_location: "유니버설 아트센터",
+    pfmcalender_poster: poster7,
+  },
+  {
+    pfmcalender_doc_no: 6,
+    pfmcalender_nm: "어쩌면 해피엔딩",
+    pfmcalender_date: "2025-11-08",
+    pfmcalender_time: "14:00",
+    pfmcalender_today_cast: "전성우, 박지연, 박세훈",
+    pfmcalender_seat: "1층 B구역 10열 10번",
+    pfmcalender_cost: 30000,
+    pfmcalender_bookingsite: "예스24",
+    pfmcalender_memo: "",
+    pfmcalender_share: 0,
+    pfmcalender_timestamp: "2025-06-01T12:00:00",
+    pfmcalender_location: "두산아트센터 연강홀",
+    pfmcalender_poster: poster4,
+  },
+  {
+    pfmcalender_doc_no: 7,
+    pfmcalender_nm: "데스노트",
+    pfmcalender_date: "2025-11-18",
+    pfmcalender_time: "19:30",
+    pfmcalender_today_cast: "조형균, 탕준상, 장은아, 양승리, 케이",
+    pfmcalender_seat: "2층 B구역 6열 8",
+    pfmcalender_cost: 30000,
+    pfmcalender_bookingsite: "예스24",
+    pfmcalender_memo: "",
+    pfmcalender_share: 0,
+    pfmcalender_timestamp: "2025-06-01T12:00:00",
+    pfmcalender_location: "디큐브 링크아트센터",
+    pfmcalender_poster: poster5,
+  },
 ];
 
 export default eventsData;

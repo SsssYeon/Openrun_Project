@@ -72,7 +72,7 @@
 .mypage-right-top {
   border: 1px solid lightgrey;
   border-radius: 16px;
-  padding: 30px;
+  padding: 20px;
 }
 
 .hello,
@@ -85,7 +85,7 @@
 .hello {
   font-size: 20px;
   font-weight: 600;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .hello .hello-name {
@@ -99,7 +99,7 @@
   margin-bottom: 40px;
   border: 1px solid lightgrey;
   border-radius: 16px;
-  min-height: 190px;
+  min-height: 150px;
 }
 
 .user-title {
@@ -141,14 +141,69 @@
 .user-community {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+
+  align-items: center;
+}
+
+.mypage-user-community-item {
+  display: flex;
+  align-items: center;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 16px; /* 다음 항목과 간격 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 약간의 그림자 */
+  height: 55px;
+  width: 500px;
+}
+
+.link-style{
+  text-decoration:none;
+  color: #000; 
+}
+.thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-right: 5px;
+}
+
+.content {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 0.8em;
+}
+
+.subtext {
+  font-size: 0.7em;
+  color: gray;
+}
+
+.date {
+  font-size: 0.8em;
+  color: #999;
+  white-space: nowrap;
+  margin-left: 8px;
+  margin-right: 3px;
+  margin-top: 12px;
 }
 
 .community-list {
   margin-top: 20px;
-  justify-content: center;
+
   display: flex;
   /* margin 이외의 것은 중앙정렬 위해 추가한 것 */
+  flex-direction: column; /* ✅ 세로 방향 정렬 */
+
+  overflow-y: auto;
+  gap: 10px;
 }
 
 #mypage-notice {
@@ -162,6 +217,7 @@
   border-radius: 10px;
   padding: 10px 16px;
   background-color: #fafafa;
+  width: 500px;
 }
 
 .user-community-title {
@@ -181,7 +237,7 @@
 }
 
 .account-right {
-  min-width: 700px;
+  width: 700px;
   border: 1px solid lightgrey;
   border-radius: 16px;
 
@@ -287,4 +343,12 @@
 
 .heart-icon:hover {
   transform: scale(1.2);
+}
+
+.no-favorites-message-mypage {
+  text-align: center;
+  color: #888;
+  margin-bottom: 80px;
+  width: 500px;
+  /* 메시지가 부모 요소 중앙에 오도록 추가 조정 가능 */
 }

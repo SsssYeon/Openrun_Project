@@ -12,6 +12,10 @@ const Home = () => (
     navigation={true} // 네비게이션 추가 (섹션 번호 표시)
     sectionsColor={["#f0f0f0", "#ffffff"]} // 각 섹션 배경색 설정
     anchors={["first", "second"]} // 각 섹션에 대한 앵커 설정
+    
+    normalScrollElements={'.main-search-container'}
+    scrollOverflow={true}
+    
     render={() => (
       <div>
         {/* 첫 번째 섹션 (Main 컴포넌트) */}

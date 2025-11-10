@@ -20,6 +20,7 @@ const reports = {
     { actor_nm: "강홍석", actor_cnt: 2 },
     { actor_nm: "서경수", actor_cnt: 2 },
     { actor_nm: "박은태", actor_cnt: 1 },
+    { actor_nm: "전성우", actor_cnt: 1 },
   ],
 };
 

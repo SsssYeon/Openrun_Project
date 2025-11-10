@@ -1,13 +1,13 @@
 //api 연결 O, 백엔드 없이 화면 보는데 문제 없음
 
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "../css/userjoin.css";
 import Nav from "../components/nav";
+import { NavLink, useNavigate } from "react-router-dom";
 
 
 const Userjoin = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // 로그인 성공 후 페이지 이동용
   const [formData, setFormData] = useState({
     user_id: "",
     user_pw: "",
