@@ -82,7 +82,7 @@ const Community = () => {
         return (
             <div>
                 <Nav />
-                <div className="community-container" style={{textAlign: 'center', marginTop: '50px'}}>
+                <div className="community-container" style={{textAlign: 'center', marginTop: '100px'}}>
                     게시글을 불러오는 중...
                 </div>
             </div>

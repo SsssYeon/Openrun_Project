@@ -139,7 +139,7 @@ const Calendarrecords = () => {
             <div className="mytickets-scroll">
               <div className="mytickets">
                 {searchTerm === "" && events.length === 0 ? (
-                  <p className="no-records-message">관극 기록을 추가해보세요</p>
+                  <p className="calendar-no-records-message">오른쪽 아래 '+'버튼을 눌러 관극 기록을 추가해보세요!</p>
                 ) : 
                 (searchTerm ? filteredEvents : selectedDateEvents).map(
                   (event) => (
@@ -160,14 +160,17 @@ const Calendarrecords = () => {
                           <p>시간: {event.time}</p>
                           <p>장소: {event.location}</p>
                           <p>좌석: {event.seat}</p>
-                          <p>출연진: {event.cast}</p>
+                          <p>출연진: {event.cast.length > 25
+                            ? event.cast.slice(0, 24) + "..."
+                            : event.cast}
+                          </p>
                         </div>
                       </div>
                     </div>
                   )
                 )}
                 {searchTerm && filteredEvents.length === 0 && events.length > 0 && (
-                    <p className="no-records-message">검색 결과가 없습니다.</p>
+                    <p className="calendar-no-records-message">검색 결과가 없습니다.</p>
                 )}
               </div>
             </div>

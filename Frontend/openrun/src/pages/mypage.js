@@ -81,8 +81,6 @@ const fallbackCommunity = [
   },
 ];
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE;
-
 const dateTimeOptions = {
   year: "numeric",
   month: "2-digit",
@@ -95,14 +93,15 @@ const MyPage = () => {
   const [myPosts, setMyPosts] = useState(fallbackCommunity);
   const navigate = useNavigate();
 
-  useEffect(() => {
+ useEffect(() => {
     const fetchUser = async () => {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      if (!token) return navigate("/login", { replace: true });
+
+      // 1. 닉네임 (사용자 정보) API 호출
       try {
-        const token =
-          localStorage.getItem("token") || sessionStorage.getItem("token");
-
-        if (!token) return navigate("/login", { replace: true });
-
         const userResponse = await fetch(`/api/users/me`, {
           method: "GET",
           headers: {
@@ -116,7 +115,16 @@ const MyPage = () => {
 
         const data = await userResponse.json();
         setUser(data);
+      } catch (error) {
+        console.error("사용자 정보 로드 실패. Mock 데이터 사용:", error);
+        // 닉네임 로드 실패 시에만 Mock 데이터 사용
+        setUser(userData); 
+        // 🚨 사용자 정보 없이는 다음 API를 호출할 필요가 없다고 가정하고 리턴할 수도 있지만,
+        // Mock 데이터라도 로드되었으니 진행하는 것으로 유지했습니다.
+      }
 
+      // 2. 관심 공연 API 호출
+      try {
         const interestResponse = await fetch(`/api/calendar/like`, {
           method: "GET",
           headers: {
@@ -132,30 +140,35 @@ const MyPage = () => {
         const interestData = await interestResponse.json();
         const likeList = interestData.userLikeList || [];
         setInterests(likeList.slice(0, 3)); // 상위 3개만 표시
-        
+      } catch (error) {
+        console.warn("관심 공연 API 실패. Mock 데이터 사용:", error);
+        // 관심 공연 로드 실패 시에만 Mock 데이터 사용
+        setInterests(favoritesMock?.slice(0, 3) || []);
+      }
+      
+      // 3. 나의 글 (커뮤니티) API 호출
+      try {
         const postsResponse = await fetch(`/api/users/me/posts`, {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!postsResponse.ok) {
-          // API 실패 시 Mock 데이터 사용 (catch로 넘기지 않고 여기서 처리)
-          console.warn("My posts API failed. Using mock data.");
-          setMyPosts(fallbackCommunity.slice(0, 2));
-        } else {
-          const postsData = await postsResponse.json();
-          setMyPosts(postsData.posts || [].slice(0, 2));
+          throw new Error("나의 글 API 실패");
         }
+
+        const postsData = await postsResponse.json();
+        // API에서 받은 데이터가 배열이 아니거나 비어있으면 빈 배열 사용 후 2개로 자름
+        setMyPosts(postsData.posts?.slice(0, 2) || []);
       } catch (error) {
-        console.error(error);
-        setUser(userData);
-        setInterests(favoritesMock?.slice(0, 3) || []);
+        console.warn("My posts API failed. Using mock data:", error);
+        // 나의 글 로드 실패 시에만 Mock 데이터 사용
         setMyPosts(fallbackCommunity.slice(0, 2));
       }
     };
 
-    fetchUser(); // <-- 함수 호출은 여기
-  }, [navigate]);
+    fetchUser();
+  }, [navigate]); // 의존성 배열 유지
 
   if (!user) return <div>로딩 중...</div>;
 
