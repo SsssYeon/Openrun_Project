@@ -55,3 +55,11 @@
 .heart-button:hover {
   transform: scale(1.2);
 }
+
+.favorite-text {
+    color: grey; /* 텍스트 색상을 흰색으로 */
+    padding: 5px 10px; /* 패딩 추가 */
+    font-size: 0.9rem; /* 글자 크기 조정 */
+    margin-bottom: -5px; /* 하트 버튼과의 간격 */
+    white-space: nowrap; /* 텍스트가 줄바꿈되지 않도록 */
+}

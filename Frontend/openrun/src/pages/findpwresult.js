@@ -47,7 +47,7 @@ const Findpwresult = () => {
   };
 
   return (
-    <div>
+    <div className="findidresult-container">
       <div>
         <Nav />
       </div>
@@ -55,7 +55,7 @@ const Findpwresult = () => {
         <div>
           <h2 id="userjoin_title"> 비밀번호 변경 </h2>
         </div>
-        <div className="userjoin">
+        <div>
           <div>
             {/* 새 비밀번호 */}
             <div>

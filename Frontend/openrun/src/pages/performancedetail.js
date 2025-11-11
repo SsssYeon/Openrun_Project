@@ -141,6 +141,9 @@ const Performancedetail = () => {
       <div className="performance-detail">
         <div className="poster-wrapper">
           <div className="favorite-toggle">
+            <p className="favorite-text">
+                {isFavorite ? "관심 공연 해제" : "관심 공연 등록"}
+            </p>
             <button className="heart-button" onClick={toggleFavorite}>
               {isFavorite ? "❤️" : "🤍"}
             </button>

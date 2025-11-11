@@ -5,7 +5,6 @@ import "../css/userjoin.css";
 import Nav from "../components/nav";
 import { NavLink, useNavigate } from "react-router-dom";
 
-
 const Userjoin = () => {
   const navigate = useNavigate(); // 로그인 성공 후 페이지 이동용
   const [formData, setFormData] = useState({
@@ -192,135 +191,148 @@ const Userjoin = () => {
     <div>
       <Nav />
       <div className="userjoin-container">
-      <form onSubmit={handleSubmit}>
-        <h2 id="userjoin_title">회원가입</h2>
-        <div className="userjoin">
-          {/* 아이디 */}
+        <form onSubmit={handleSubmit}>
+          <h2 id="userjoin_title">회원가입</h2>
+          <div className="userjoin">
+            {/* 아이디 */}
+            <div>
+              <h5>아이디</h5>
+              <input
+                type="text"
+                className="input-field-1"
+                name="user_id"
+                value={formData.user_id}
+                onChange={handleChange}
+                placeholder="7자 이상의 문자"
+                maxLength="20"
+                autoFocus
+              />
+              <button
+                type="button"
+                id="dupIdCheck"
+                onClick={handleCheckDuplicateId}
+                style={{
+                  backgroundColor: "#ffd049", // 완료 시 초록색 (또는 원하는 색상)
+                  color: "black", // 텍스트 색상 변경
+                }}
+                // ✅ 수정된 부분: 아이디가 확인되면 버튼 텍스트 변경
+                disabled={idChecked} // 중복 확인 완료 후 재확인 방지 (선택 사항)
+              >
+                {idChecked ? "확인완료" : "중복확인"}
+              </button>
+            </div>
+
+            {/* 비밀번호 */}
+            <div>
+              <h5>비밀번호</h5>
+              <input
+                type="password"
+                className="input-field-2"
+                name="user_pw"
+                value={formData.user_pw}
+                onChange={handleChange}
+                maxLength="15"
+              />
+              <p
+                className="pw-requirements"
+                style={{ fontSize: "0.85rem", color: "#888", marginTop: "4px" }}
+              >
+                - 영문, 숫자, 특수기호 포함 8자 이상 / 아이디 불가
+              </p>
+            </div>
+
+            {/* 비밀번호 확인 */}
+            <div>
+              <h5>비밀번호 확인</h5>
+              <input
+                type="password"
+                className="input-field-2"
+                name="user_pw_check"
+                value={formData.user_pw_check}
+                onChange={handleChange}
+                maxLength="15"
+              />
+            </div>
+
+            {/* 이름 */}
+            <div>
+              <h5>이름</h5>
+              <input
+                type="text"
+                className="input-field-2"
+                name="user_nm"
+                value={formData.user_nm}
+                onChange={handleChange}
+                maxLength="10"
+              />
+            </div>
+
+            {/* 닉네임 */}
+            <div>
+              <h5>닉네임</h5>
+              <input
+                type="text"
+                className="input-field-2"
+                name="user_nicknm"
+                value={formData.user_nicknm}
+                onChange={handleChange}
+                maxLength="10"
+              />
+            </div>
+
+            {/* 휴대폰 번호 */}
+            <div>
+              <h5>휴대폰 번호</h5>
+              <input
+                type="text"
+                className="input-field-1"
+                name="user_phonenum"
+                value={formData.user_phonenum}
+                onChange={handleChange}
+                maxLength="13"
+              />
+              <button
+                type="button"
+                id="sendPhoneCode"
+                onClick={handleSendPhoneCode}
+              >
+                인증번호 전송
+              </button>{" "}
+            </div>
+
+            <div>
+              <h5>인증번호</h5>
+              <input
+                type="text"
+                className="input-field-1"
+                name="user_phonecode"
+                value={formData.user_phonecode}
+                onChange={handleChange}
+                maxLength="6"
+                disabled={phoneVerified}
+              />
+              <button
+                type="button"
+                id="verifyPhoneCode"
+                onClick={handleVerifyPhoneCode}
+                style={{
+                  backgroundColor: "#ffd049",
+                  color: "black",
+                }}
+                // ✅ 인증 완료 후 비활성화
+                disabled={phoneVerified}
+              >
+                {phoneVerified ? "인증 완료" : "인증 확인"}
+              </button>
+            </div>
+          </div>
           <div>
-            <h5>아이디</h5>
-            <input
-              type="text"
-              className="input-field-1"
-              name="user_id"
-              value={formData.user_id}
-              onChange={handleChange}
-              placeholder="7자 이상의 문자"
-              maxLength="20"
-              autoFocus
-            />
-            <button
-              type="button"
-              id="dupIdCheck"
-              onClick={handleCheckDuplicateId}
-            >
-              중복확인
+            <button type="submit" id="sbtn">
+              가입완료
             </button>
           </div>
-
-          {/* 비밀번호 */}
-          <div>
-            <h5>비밀번호</h5>
-            <input
-              type="password"
-              className="input-field-2"
-              name="user_pw"
-              value={formData.user_pw}
-              onChange={handleChange}
-              maxLength="15"
-            />
-            <p
-              className="pw-requirements"
-              style={{ fontSize: "0.85rem", color: "#888", marginTop: "4px" }}
-            >
-              - 영문, 숫자, 특수기호 포함 8자 이상 / 아이디 불가
-            </p>
-          </div>
-
-          {/* 비밀번호 확인 */}
-          <div>
-            <h5>비밀번호 확인</h5>
-            <input
-              type="password"
-              className="input-field-2"
-              name="user_pw_check"
-              value={formData.user_pw_check}
-              onChange={handleChange}
-              maxLength="15"
-            />
-          </div>
-
-          {/* 이름 */}
-          <div>
-            <h5>이름</h5>
-            <input
-              type="text"
-              className="input-field-2"
-              name="user_nm"
-              value={formData.user_nm}
-              onChange={handleChange}
-              maxLength="10"
-            />
-          </div>
-
-          {/* 닉네임 */}
-          <div>
-            <h5>닉네임</h5>
-            <input
-              type="text"
-              className="input-field-2"
-              name="user_nicknm"
-              value={formData.user_nicknm}
-              onChange={handleChange}
-              maxLength="10"
-            />
-          </div>
-
-          {/* 휴대폰 번호 */}
-          <div>
-            <h5>휴대폰 번호</h5>
-            <input
-              type="text"
-              className="input-field-1"
-              name="user_phonenum"
-              value={formData.user_phonenum}
-              onChange={handleChange}
-              maxLength="13"
-            />
-            <button
-              type="button"
-              id="sendPhoneCode"
-              onClick={handleSendPhoneCode}
-            >
-              인증번호 전송
-            </button>{" "}
-          </div>
-
-          <div>
-            <h5>인증번호</h5>
-            <input
-              type="text"
-              className="input-field-1"
-              name="user_phonecode"
-              value={formData.user_phonecode}
-              onChange={handleChange}
-              maxLength="6"
-            />
-            <button
-              type="button"
-              id="verifyPhoneCode"
-              onClick={handleVerifyPhoneCode}
-            >
-              인증 확인
-            </button>
-          </div>
-        </div>
-        <div>
-          <button type="submit" id="sbtn">
-            가입완료
-          </button>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
     </div>
   );
 };

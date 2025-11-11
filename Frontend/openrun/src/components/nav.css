@@ -39,12 +39,14 @@
 .nav-item-dropdown {
   position: relative;
   display: inline-block;
+  padding: 0 12px; 
+  cursor: pointer;
 }
 
 .dropdown-content {
   display: none;
   position: absolute;
-  top: 120%;
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   min-width: 130px;
@@ -70,4 +72,8 @@
 /* 마우스 오버 시 드롭다운 표시 */
 .nav-item-dropdown:hover .dropdown-content {
   display: block;
+}
+
+.nav-right > a.nav-item:nth-child(2) {
+    margin-right: 12px; /* 커뮤니티 링크에 해당 (nav-item-dropdown이 첫 번째 자식, 커뮤니티가 두 번째 자식) */
 }
