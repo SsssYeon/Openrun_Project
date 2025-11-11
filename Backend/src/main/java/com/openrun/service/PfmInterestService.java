@@ -11,7 +11,6 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class PfmInterestService {
 
-    private static final int MAX_SIZE = 3;
     private static final String COLLECTION_NAME = "UserData";
 
     private final Firestore firestore;
@@ -69,10 +68,6 @@ public class PfmInterestService {
                     list.remove(pfmId); // 공연 ID 제거
                     System.out.println("💔 관심 공연 해제: " + pfmId);
                 } else {
-                    if (list.size() >= MAX_SIZE) {
-                        System.out.println("⚠️ 최대 관심 공연 3개, 추가 불가");
-                        return null;
-                    }
                     list.add(pfmId); // 뒤에 추가 → "먼저 추가한 순서대로 인덱스" 유지
                     System.out.println("❤️ 관심 공연 추가: " + pfmId);
                 }

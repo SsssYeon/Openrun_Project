@@ -37,7 +37,7 @@ const Mylikescalendar = () => {
       }
 
       try {
-        const res = await fetch("/api/calendar/like", {
+        const res = await fetch("/api/user/me/main-favorite", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
