@@ -39,11 +39,16 @@ const Favorites = () => {
 
         const data = await response.json();
         const likeList = data.userLikeList || [];
+        const priorityList = data.userPriorityLikeList || [];
         setFavorites(likeList); // 관심 공연이 없으면 빈 배열로 처리됨
+
+        const mainFavoriteIds = new Set(
+          priorityList.map((item) => item.pfm_doc_id)
+        );
 
         const initialLikedStates = {};
         likeList.forEach((fav) => {
-          initialLikedStates[fav.id] = fav.is_main_favorite || false;
+          initialLikedStates[fav.id] = mainFavoriteIds.has(fav.pfm_doc_id);
         });
         setLikedStates(initialLikedStates);
       } catch (error) {
@@ -239,7 +244,7 @@ const Favorites = () => {
             {favorites.length === 0 ? (
               // 메시지 디자인 바꾸기!!!!!! css 코드 추가
               <div className="no-favorites-message-container">
-                <p className="no-favorites-message-mypage"> 
+                <p className="no-favorites-message-mypage">
                   홈 화면에서 공연을 검색하고 관심공연을 추가해보세요!
                 </p>
               </div>

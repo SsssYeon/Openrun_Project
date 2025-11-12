@@ -9,6 +9,7 @@ import java.util.List;
 public class InterestsResponse {
     /** 프론트가 기대하는 키 이름을 그대로 사용 (userLikeList) */
     private List<Item> userLikeList;
+    private List<Item> userPriorityLikeList;   // 달력에 노출할 우선 관심 공연
 
     @Getter @Setter
     @NoArgsConstructor @AllArgsConstructor @Builder
@@ -19,6 +20,5 @@ public class InterestsResponse {
         private String start;          // yyyy-MM-dd
         private String end;            // yyyy-MM-dd
         private String poster;         // 포스터 URL
-        private boolean is_main_favorite; // 달력 노출 여부(❤️)
     }
 }

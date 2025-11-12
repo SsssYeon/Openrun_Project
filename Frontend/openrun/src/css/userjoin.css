@@ -17,7 +17,7 @@ div > div {
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 60px); /* Nav가 60px이라면 */
-  padding-top: 500px; /* Nav 겹침 방지용 */
+  padding-top: 100px; /* Nav 겹침 방지용 */
 }
 
 .findid-container {
