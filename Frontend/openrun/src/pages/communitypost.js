@@ -236,74 +236,64 @@ function CommunityPost() {
   const currentUserId = getUserIdFromToken(token);
   const isLoggedIn = !!currentUserId;
 
-  useEffect(() => {
-    const fetchPostDetail = async () => {
-      setLoading(true);
-      try {
-        // 1. API 호출 시도
-        const response = await apiService.getPostDetail(id, token);
+   // ⭐ 메인 데이터 패칭 useEffect
+    useEffect(() => {
+        const fetchPostDetail = async () => {
+            setLoading(true); // fetch 시작 시 로딩 상태 설정
 
-        // 2. 성공 시 API 응답 사용 (isAuthor 플래그 포함)
-        setPost(response.post);
-        setCommentList(response.comments);
-        console.log(
-          "[API SUCCESS] Post detail loaded with authorization flag."
-        );
-      } catch (error) {
-        // 3. API 호출 실패 (네트워크 오류, 404, Mock 실패 시뮬레이션 등)
-        console.error("[API FAIL] Falling back to Mock data.", error.message);
+            try {
+                // 1. API 호출 시도
+                const response = await apiService.getPostDetail(id, token);
 
-        // 4. Mock Fallback 로직
-        const foundPost = communitydata.find(
-          (p) => String(p.postDocumentId) === id
-        );
-        if (foundPost) {
-          // Mock 데이터에 isAuthor 플래그 추가 (클라이언트 측에서 계산)
-          const isAuthor = foundPost.userId === currentUserId;
-          const postWithAuth = { ...foundPost, isAuthor };
+                // 2. 성공 시 API 응답 사용 (isAuthor 플래그 포함)
+                const isAuthor = response.post?.userId === currentUserId;
 
-          const commentsWithAuth = commentmocks
-            .filter((c) => String(c.postDocumentId) === id)
-            .map((c) => ({
-              ...c,
-              isAuthor: c.userId === currentUserId,
-            }))
-            .sort(
-              (a, b) =>
-                new Date(b.commentTimeStamp) - new Date(a.commentTimeStamp)
-            );
+                setPost({ ...response.post, isAuthor });
+                
+                // 댓글에도 isAuthor 플래그 추가 (서버가 주지 않을 경우 클라이언트 측 계산)
+                const commentsWithAuth = response.comments
+                    .map(c => ({ ...c, isAuthor: c.userId === currentUserId }))
+                    .sort((a, b) => new Date(b.commentTimeStamp) - new Date(a.commentTimeStamp));
 
-          setPost(postWithAuth);
-          setCommentList(commentsWithAuth);
-        } else {
-          setPost(null); // Mock 데이터도 없는 경우
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
+                setCommentList(commentsWithAuth);
 
-    fetchPostDetail();
-  }, [id, token, currentUserId]); // token과 currentUserId가 변경되면 재호출
+                console.log("[API SUCCESS/MOCK FALLBACK] Post detail loaded.");
+            } catch (error) {
+                // 3. API 호출 실패 (네트워크 오류, 404, Mock 실패 시뮬레이션 등)
+                console.error("[API FAIL] Falling back to Mock data.", error.message);
 
-  useEffect(() => {
-    setLoading(true);
+                // 4. Mock Fallback 로직 (API 서비스 내부에서 처리하지 않았을 경우)
+                const foundPost = communitydata.find(
+                    (p) => String(p.postDocumentId) === id
+                );
+                
+                if (foundPost) {
+                    const isAuthor = foundPost.userId === currentUserId;
+                    const postWithAuth = { ...foundPost, isAuthor };
 
-    const foundPost = communitydata.find(
-      (item) => String(item.postDocumentId) === id
-    );
+                    const commentsWithAuth = commentmocks
+                        .filter((c) => String(c.postDocumentId) === id)
+                        .map((c) => ({
+                            ...c,
+                            isAuthor: c.userId === currentUserId,
+                        }))
+                        .sort(
+                            (a, b) =>
+                                new Date(b.commentTimeStamp) - new Date(a.commentTimeStamp)
+                        );
+                    
+                    setPost(postWithAuth);
+                    setCommentList(commentsWithAuth);
+                } else {
+                    setPost(null); // Mock 데이터도 없는 경우
+                }
+            } finally {
+                setLoading(false); // fetch 완료 시 로딩 상태 해제
+            }
+        };
 
-    if (foundPost) {
-      setPost(foundPost);
-      const filteredComments = commentmocks.filter(
-        (comment) => String(comment.postDocumentId) === id
-      );
-      setCommentList(filteredComments);
-    } else {
-      console.error(`ID ${id}를 가진 커뮤니티 글을 찾을 수 없습니다.`);
-    }
-    setLoading(false);
-  }, [id]); // 의존성 배열에 id만 남깁니다.
+        fetchPostDetail();
+    }, [id, token, currentUserId]); // token과 currentUserId가 변경되면 재호출
 
   // const handleEdit = useCallback(async () => {
   //   if (!post?.isAuthor) {

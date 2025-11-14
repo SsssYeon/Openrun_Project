@@ -129,7 +129,7 @@ const Communityaddpost = () => {
     });
     // 이미지 파일을 FormData에 추가합니다. (postImage라는 키로 여러 파일 추가)
     posterFiles.forEach((file) => {
-      formData.append("postImage", file);
+      formData.append("postImage[]", file);
     });
 
     try {
