@@ -238,4 +238,17 @@ public class AuthService {
 
         return "회원 탈퇴가 완료되었습니다. 모든 로그인 정보가 삭제되었습니다.";
     }
+
+    /* ========== userId 조회 메소드 ========== */
+    public String getUserIdFromToken(String token) throws Exception {
+        if (token == null || token.isEmpty()) return null;
+
+        CollectionReference users = firestore.collection(USER_COLLECTION);
+        List<QueryDocumentSnapshot> documents = users
+                .whereEqualTo("userAutoLoginToken", token)
+                .get().get().getDocuments();
+
+        if (documents.isEmpty()) return null; // 유효하지 않은 토큰
+        return documents.get(0).getString("userId");
+    }
 }

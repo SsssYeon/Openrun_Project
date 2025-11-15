@@ -18,16 +18,20 @@ repositories {
 }
 
 dependencies {
+	// Google Cloud Spring BOM 추가 (버전 관리를 위해)
+	implementation platform('com.google.cloud:spring-cloud-gcp-dependencies:5.3.0') // 또는 최신 버전
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	// Lombok 의존성 추가
+	// 수정된 Google Cloud Storage 라이브러리 이름 사용
+	implementation 'com.google.cloud:spring-cloud-gcp-starter-storage'
+
 	compileOnly 'org.projectlombok:lombok:1.18.32'
 	annotationProcessor 'org.projectlombok:lombok:1.18.32'
 }
 
-//tasks.named('test') {
-//	useJUnitPlatform()
-//}
+tasks.withType(JavaCompile) {
+	options.compilerArgs << "-parameters"
+}
