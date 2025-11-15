@@ -8,8 +8,6 @@ import "../css/communitypost.css";
 import { communitydata } from "../mocks/communitymocks";
 import { commentmocks } from "../mocks/communitycomment";
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE;
-
 // ⭐️ [추가] 이미지 모달 컴포넌트
 const ImageModal = ({
   src,
@@ -221,7 +219,7 @@ function CommunityPost() {
   const token =
     localStorage.getItem("token") || sessionStorage.getItem("token");
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const isLoggedIn = !!token;
 
   // ⭐ 메인 데이터 패칭 useEffect
   useEffect(() => {
@@ -272,17 +270,6 @@ function CommunityPost() {
           const finalIsAuthor = foundPost.isAuthor || false;
           const postWithAuth = { ...foundPost, isAuthor: finalIsAuthor };
 
-          const commentsWithAuth = commentmocks
-            .filter((c) => String(c.postDocumentId) === id)
-            .map((c) => {
-              const finalCommentIsAuthor = c.isAuthor || false;
-              return { ...c, isAuthor: finalCommentIsAuthor };
-            })
-            .sort(
-              (a, b) =>
-                new Date(b.commentTimeStamp) - new Date(a.commentTimeStamp)
-            );
-
           setPost(postWithAuth);
           setCommentList(commentsWithAuth);
         } else {
@@ -295,6 +282,16 @@ function CommunityPost() {
 
     fetchPostDetail();
   }, [id, token]); // token과 currentUserId가 변경되면 재호출
+
+  const commentsWithAuth = commentmocks
+    .filter((c) => String(c.postDocumentId) === id)
+    .map((c) => {
+      const finalCommentIsAuthor = c.isAuthor || false;
+      return { ...c, isAuthor: finalCommentIsAuthor };
+    })
+    .sort(
+      (a, b) => new Date(b.commentTimeStamp) - new Date(a.commentTimeStamp)
+    );
 
   const handleEdit = useCallback(() => {
     // 수정 페이지로 이동 로직 (Mock)
@@ -333,7 +330,7 @@ function CommunityPost() {
 
     if (window.confirm("정말 신고하시겠습니까?")) {
       try {
-        await apiService.reportItem("/community/posts", id, token); // ⭐️ 글 신고 API 호출
+        await apiService.reportItem("community/posts", id, token); // ⭐️ 글 신고 API 호출
         alert("게시글을 신고했습니다.");
       } catch (error) {
         console.error(`[API ERROR] 신고 실패: ${error.message}`);
@@ -449,7 +446,7 @@ function CommunityPost() {
 
       if (window.confirm("정말 신고하시겠습니까?")) {
         try {
-          await apiService.reportItem("/community/comments", commentId, token); // ⭐️ 댓글 신고 API 호출
+          await apiService.reportItem("community/comments", commentId, token); // ⭐️ 댓글 신고 API 호출
           alert("댓글을 신고했습니다.");
         } catch (error) {
           console.error(`[API ERROR] 신고 실패: ${error.message}`);
@@ -460,8 +457,21 @@ function CommunityPost() {
     [isLoggedIn, token]
   );
 
+  const renderWithLineBreaks = (text) => {
+    if (!text) return null;
+    // 텍스트를 줄 바꿈 문자(\n) 기준으로 분리하고, 각 줄 사이에 <br> 태그를 넣어줍니다.
+    return text.split("\n").map((line, index) => (
+      <React.Fragment key={index}>
+        {line}
+        {/* 마지막 줄이 아닐 경우에만 <br>을 추가하여 줄 바꿈을 만듭니다. */}
+        {index !== text.split("\n").length - 1 && <br />}
+      </React.Fragment>
+    ));
+  };
+
   if (loading) return <div>불러오는 중...</div>;
-  if (!post) return <div>해당 커뮤니티 글을 찾을 수 없습니다.</div>;
+  if (!post || post.postState === 1)
+    return <div>숨겨진 글이거나, 해당 커뮤니티 글을 찾을 수 없습니다.</div>;
 
   const dateTimeOptions = {
     year: "numeric",
@@ -491,7 +501,7 @@ function CommunityPost() {
             </>
           ) : (
             // 작성자가 아니지만 로그인한 경우: 신고 버튼 표시
-            !post?.isAuthor && (
+            isLoggedIn && (
               <button className="delete-button" onClick={handleReport}>
                 신고
               </button>
@@ -554,7 +564,7 @@ function CommunityPost() {
                 ))}
               <p className="post-content">
                 {post.postContent?.trim()
-                  ? post.postContent
+                  ? renderWithLineBreaks(post.postContent)
                   : "작성된 내용이 없습니다."}
               </p>
             </div>
@@ -600,19 +610,29 @@ function CommunityPost() {
                             </button>
                           </>
                         ) : (
-                          // 비작성자: 로그인 상태일 때만 신고 버튼 노출
-                          <button
-                            className="comment-action-btn report"
-                            onClick={() =>
-                              handleCommentReport(comment.commentDocumentId)
-                            }
-                          >
-                            신고
-                          </button>
+                          isLoggedIn && (
+                            // 비작성자: 로그인 상태일 때만 신고 버튼 노출
+                            <button
+                              className="comment-action-btn report"
+                              onClick={() =>
+                                handleCommentReport(comment.commentDocumentId)
+                              }
+                            >
+                              신고
+                            </button>
+                          )
                         )}
                       </div>
                     </div>
-                    <p className="comment-content">{comment.commentContent}</p>
+                    <p className="comment-content">
+                      {
+                        comment.isHidden ? (
+                          <em>[숨겨진 댓글입니다.]</em>
+                        ) : (
+                          renderWithLineBreaks(comment.commentContent)
+                        ) // ⭐️ 적용 완료
+                      }
+                    </p>
                   </div>
                 ))
               ) : (

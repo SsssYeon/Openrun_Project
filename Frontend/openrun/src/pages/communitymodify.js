@@ -110,19 +110,16 @@ const Communitymodify = () => {
   }, [id, token]);
 
   useEffect(() => {
-    fetchPostDetail();
+    fetchPostDetail(); // ⭐️ [요청 1] const blobUrls 선언을 return 안으로 이동
 
-    const blobUrls = posterPreviews.filter((url) => url.startsWith("blob:"));
     return () => {
+      // 클린업 함수는 해당 useEffect가 마지막으로 실행될 때의 posterPreviews 값을 참조합니다.
+      const blobUrls = posterPreviews.filter((url) => url.startsWith("blob:"));
       blobUrls.forEach(URL.revokeObjectURL);
     };
-  }, [fetchPostDetail, posterPreviews]);
+  }, [fetchPostDetail]);
 
   const fileInputRef = useRef(null);
-
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
 
   const handleImageClick = () => {
     fileInputRef.current.click(); // 이미지 클릭 시 input 열기
