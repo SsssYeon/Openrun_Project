@@ -10,16 +10,6 @@ import { commentmocks } from "../mocks/communitycomment";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE;
 
-const getUserIdFromToken = (token) => {
-  if (token === "mock_user1_token") {
-    return "user_a123"; // 현재 로그인 사용자 ID (토큰이 유효할 때)
-  }
-  if (token === "mock_user2_token") {
-    return "user_a123";
-  }
-  return null; // 토큰이 없거나 유효하지 않을 때
-};
-
 // ⭐️ [추가] 이미지 모달 컴포넌트
 const ImageModal = ({
   src,
@@ -60,6 +50,34 @@ const ImageModal = ({
       </div>
     </div>
   );
+};
+
+const fetchCurrentUserId = async (token) => {
+  if (!token) return null;
+
+  // Mock 토큰을 위한 임시 처리 (실제 API 호출 시 제거)
+  if (token === "mock_user1_token" || token === "mock_user2_token") {
+    return "user_a123";
+  }
+
+  // 💡 백엔드에 토큰을 보내 현재 사용자의 ID를 요청하는 API 엔드포인트 가정
+  try {
+    const response = await fetch(`/api/user/current-id`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      // 💡 서버 응답 형태: { userId: "..." } 가정
+      return data.userId;
+    }
+    // 토큰이 만료되었거나 유효하지 않은 경우
+    return null;
+  } catch (error) {
+    console.error("Failed to fetch current user ID:", error);
+    return null;
+  }
 };
 
 const apiService = {
@@ -131,17 +149,14 @@ const apiService = {
 
   // ⭐️ POST: 댓글 작성 (/api/community/posts/{postId}/comments)
   createComment: async (postId, token, commentContent) => {
-    const response = await fetch(
-      `/api/community/posts/${postId}/comments`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ commentContent }),
-      }
-    );
+    const response = await fetch(`/api/community/posts/${postId}/comments`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ commentContent }),
+    });
 
     if (!response.ok) {
       if (response.status === 401) throw new Error("401_UNAUTHORIZED_COMMENT");
@@ -159,37 +174,12 @@ const apiService = {
     };
   },
 
-  // ⭐️ PATCH: 댓글 수정 (/api/community/comments/{commentId})
-  // updateComment: async (commentId, token, updateData) => {
-  //   const response = await fetch(
-  //     `${API_BASE_URL}/community/comments/${commentId}`,
-  //     {
-  //       method: "PATCH",
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(updateData),
-  //     }
-  //   );
-
-  //   if (!response.ok) {
-  //     if (response.status === 403)
-  //       throw new Error("403_FORBIDDEN_API_VERIFICATION");
-  //     throw new Error(`HTTP error! status: ${response.status}`);
-  //   }
-  //   return { success: true };
-  // },
-
   // ⭐️ DELETE: 댓글 삭제 (/api/community/comments/{commentId})
   deleteComment: async (commentId, token) => {
-    const response = await fetch(
-      `/api/community/comments/${commentId}`,
-      {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await fetch(`/api/community/comments/${commentId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     if (!response.ok) {
       if (response.status === 403)
@@ -202,13 +192,10 @@ const apiService = {
   // ⭐️ POST: 댓글/글 신고 (/api/community/posts/{postId}/reports 또는 /api/community/comments/{commentId}/reports)
 
   reportItem: async (endpoint, itemId, token) => {
-    const response = await fetch(
-      `/api/${endpoint}/${itemId}/reports`,
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await fetch(`/api/${endpoint}/${itemId}/reports`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     if (!response.ok) {
       if (response.status === 401) throw new Error("401_UNAUTHORIZED_REPORT");
@@ -233,92 +220,82 @@ function CommunityPost() {
 
   const token =
     localStorage.getItem("token") || sessionStorage.getItem("token");
-  const currentUserId = getUserIdFromToken(token);
-  const isLoggedIn = !!currentUserId;
 
-   // ⭐ 메인 데이터 패칭 useEffect
-    useEffect(() => {
-        const fetchPostDetail = async () => {
-            setLoading(true); // fetch 시작 시 로딩 상태 설정
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-            try {
-                // 1. API 호출 시도
-                const response = await apiService.getPostDetail(id, token);
+  // ⭐ 메인 데이터 패칭 useEffect
+  useEffect(() => {
+    const fetchPostDetail = async () => {
+      setLoading(true); // fetch 시작 시 로딩 상태 설정
 
-                // 2. 성공 시 API 응답 사용 (isAuthor 플래그 포함)
-                const isAuthor = response.post?.userId === currentUserId;
+      try {
+        // 1. API 호출 시도
+        const response = await apiService.getPostDetail(id, token);
 
-                setPost({ ...response.post, isAuthor });
-                
-                // 댓글에도 isAuthor 플래그 추가 (서버가 주지 않을 경우 클라이언트 측 계산)
-                const commentsWithAuth = response.comments
-                    .map(c => ({ ...c, isAuthor: c.userId === currentUserId }))
-                    .sort((a, b) => new Date(b.commentTimeStamp) - new Date(a.commentTimeStamp));
+        // 2. 성공 시 API 응답 사용 (isAuthor 플래그 포함)
+        const postData = response.post || response;
 
-                setCommentList(commentsWithAuth);
+        const finalIsAuthor = postData.isAuthor || false;
 
-                console.log("[API SUCCESS/MOCK FALLBACK] Post detail loaded.");
-            } catch (error) {
-                // 3. API 호출 실패 (네트워크 오류, 404, Mock 실패 시뮬레이션 등)
-                console.error("[API FAIL] Falling back to Mock data.", error.message);
+        setPost({
+          ...postData,
+          isAuthor: finalIsAuthor, // 백엔드가 준 isAuthor를 확정하여 상태에 저장
+        });
 
-                // 4. Mock Fallback 로직 (API 서비스 내부에서 처리하지 않았을 경우)
-                const foundPost = communitydata.find(
-                    (p) => String(p.postDocumentId) === id
-                );
-                
-                if (foundPost) {
-                    const isAuthor = foundPost.userId === currentUserId;
-                    const postWithAuth = { ...foundPost, isAuthor };
+        // 🚀 변경 2: 댓글의 isAuthor도 서버 응답만 사용
+        const commentsWithAuth = (response.comments || [])
+          .map((c) => {
+            const finalIsAuthor = c.isAuthor || false; // 서버가 isAuthor를 주지 않으면 false
+            return {
+              ...c,
+              isAuthor: finalIsAuthor,
+            };
+          })
+          .sort(
+            (a, b) =>
+              new Date(b.commentTimeStamp) - new Date(a.commentTimeStamp)
+          );
 
-                    const commentsWithAuth = commentmocks
-                        .filter((c) => String(c.postDocumentId) === id)
-                        .map((c) => ({
-                            ...c,
-                            isAuthor: c.userId === currentUserId,
-                        }))
-                        .sort(
-                            (a, b) =>
-                                new Date(b.commentTimeStamp) - new Date(a.commentTimeStamp)
-                        );
-                    
-                    setPost(postWithAuth);
-                    setCommentList(commentsWithAuth);
-                } else {
-                    setPost(null); // Mock 데이터도 없는 경우
-                }
-            } finally {
-                setLoading(false); // fetch 완료 시 로딩 상태 해제
-            }
-        };
+        setCommentList(commentsWithAuth);
 
-        fetchPostDetail();
-    }, [id, token, currentUserId]); // token과 currentUserId가 변경되면 재호출
+        console.log("[API SUCCESS/MOCK FALLBACK] Post detail loaded.");
+      } catch (error) {
+        // 3. API 호출 실패 (네트워크 오류, 404, Mock 실패 시뮬레이션 등)
+        console.error("[API FAIL] Falling back to Mock data.", error.message);
 
-  // const handleEdit = useCallback(async () => {
-  //   if (!post?.isAuthor) {
-  //     console.error("수정 권한이 없습니다.");
-  //     return;
-  //   }
+        // 4. Mock Fallback 로직 (API 서비스 내부에서 처리하지 않았을 경우)
+        const foundPost = communitydata.find(
+          (p) => String(p.postDocumentId) === id
+        );
 
-  //   try {
-  //     // API 호출 시도 (Mock Service를 통해 서버 검증 시뮬레이션)
-  //     await apiService.updatePost(id, token, {
-  //       title: post.postTitle,
-  //       content: "Updated Content",
-  //     });
-  //     alert("게시글 수정 요청이 성공적으로 서버에 전달되었습니다. (Mock)");
-  //     // 성공 시 수정 페이지로 이동
-  //     navigate(`/modifypost/${id}`);
-  //   } catch (error) {
-  //     console.error(`[API ERROR] 수정 실패: ${error.message}`);
-  //     if (error.message.includes("403_FORBIDDEN")) {
-  //       alert("수정 권한이 없습니다.");
-  //     } else {
-  //       alert("게시글 수정 중 오류가 발생했습니다.");
-  //     }
-  //   }
-  // }, [id, navigate, post, token]);
+        if (foundPost) {
+          const finalIsAuthor = foundPost.isAuthor || false;
+          const postWithAuth = { ...foundPost, isAuthor: finalIsAuthor };
+
+          const commentsWithAuth = commentmocks
+            .filter((c) => String(c.postDocumentId) === id)
+            .map((c) => {
+              const finalCommentIsAuthor = c.isAuthor || false;
+              return { ...c, isAuthor: finalCommentIsAuthor };
+            })
+            .sort(
+              (a, b) =>
+                new Date(b.commentTimeStamp) - new Date(a.commentTimeStamp)
+            );
+
+          setPost(postWithAuth);
+          setCommentList(commentsWithAuth);
+        } else {
+          setPost(null); // Mock 데이터도 없는 경우
+        }
+      } finally {
+        setLoading(false); // fetch 완료 시 로딩 상태 해제
+      }
+    };
+
+    fetchPostDetail();
+  }, [id, token]); // token과 currentUserId가 변경되면 재호출
+
   const handleEdit = useCallback(() => {
     // 수정 페이지로 이동 로직 (Mock)
 
@@ -426,10 +403,9 @@ function CommunityPost() {
         postDocumentId: id,
         commentDocumentId: result.commentDocumentId,
         commentContent: newCommentContent, // 클라이언트 입력 내용
-        userId: currentUserId, // 클라이언트에서 아는 ID (서버가 검증)
         userNickname: result.userNickname,
         commentTimeStamp: result.commentTimeStamp,
-        isAuthor: result.isAuthor, // 서버가 반환한 isAuthor 플래그
+        isAuthor: result.isAuthor || false, // 서버가 반환한 isAuthor 플래그만 사용
       };
 
       setCommentList((prevList) => [newComment, ...prevList]);
@@ -439,11 +415,7 @@ function CommunityPost() {
       console.error(`[API ERROR] 댓글 작성 실패: ${error.message}`);
       alert("댓글 등록 중 오류가 발생했습니다.");
     }
-  }, [id, newCommentContent, isLoggedIn, currentUserId, token]);
-
-  // const handleCommentEdit = useCallback((commentId) => {
-  //   console.log(`[댓글 수정] Comment ID: ${commentId} (수정 모달/인풋 표시)`);
-  // }, []);
+  }, [id, newCommentContent, isLoggedIn, token]);
 
   const handleCommentDelete = useCallback(
     async (commentId) => {

@@ -25,6 +25,8 @@ export const communitydata = [
     commentCount: 15,
 
     postImage: [poster1, poster2],
+
+    isAuthor: true
   },
 
   {

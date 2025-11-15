@@ -8,7 +8,8 @@ const commentmocks = [
         userNickname: "뮤덕_레미",
         dommentState: 0,
         commentTimeStamp: "2025-05-01T12:05:00Z", // 작성일: 2025-05-01 21:05 (KST)
-        commentReportCnt: 0
+        commentReportCnt: 0,
+        isAuthor: true
     },
     {
         postDocumentId: "post_001",
