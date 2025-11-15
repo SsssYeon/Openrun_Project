@@ -18,7 +18,12 @@ public class CommunityPostResponse {
     private List<String> postImage;
     private int postReportCnt;
     private int postState;
+    private int commentCount;
     private List<CommunityCommentResponse> comments;
     @JsonProperty("isAuthor") // JSON 직렬화 시 isAuthor로 내려줌
     private boolean author;
+
+    public void setAuthor(boolean author) {
+        this.author = author;
+    }
 }

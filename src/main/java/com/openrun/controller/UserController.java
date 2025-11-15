@@ -3,6 +3,8 @@ package com.openrun.controller;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
+import com.openrun.dto.MypageMyPostDTO;
+import com.openrun.service.CommunityService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +16,11 @@ import java.util.concurrent.ExecutionException;
 public class UserController {
 
     private final Firestore firestore = FirestoreClient.getFirestore();
+    private final CommunityService communityService;
+
+    public UserController(CommunityService communityService) {
+        this.communityService = communityService;
+    }
 
     // 내 정보 조회
     @GetMapping("/me")
@@ -136,6 +143,47 @@ public class UserController {
             return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
         }
     }
+
+    @GetMapping("/me/posts")
+    public ResponseEntity<Map<String, Object>> getMyPosts(@RequestHeader("Authorization") String authHeader) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer "))
+                return ResponseEntity.status(401).body(Map.of("message", "토큰 없음"));
+
+            String token = authHeader.substring(7).trim(); // Bearer 제거
+
+            // 1. 토큰으로 userId 조회
+            CollectionReference usersRef = firestore.collection("UserData");
+            QuerySnapshot userSnapshot = usersRef.whereEqualTo("userAutoLoginToken", token).get().get();
+
+            if (userSnapshot.getDocuments().isEmpty())
+                return ResponseEntity.status(404).body(Map.of("message", "사용자 없음"));
+
+            String userId = userSnapshot.getDocuments().get(0).getString("userId");
+
+            // 2. CommunityPosts에서 userId로 글 조회
+            CollectionReference postsRef = firestore.collection("PostData");
+            QuerySnapshot postsSnapshot = postsRef.whereEqualTo("userId", userId).get().get();
+
+            List<MypageMyPostDTO> myPosts = new ArrayList<>();
+            for (DocumentSnapshot doc : postsSnapshot.getDocuments()) {
+                myPosts.add(MypageMyPostDTO.fromFirestoreMap(doc.getData(), doc.getId()));
+            }
+
+            // 최신순 정렬 (postTimeStamp 기준)
+            myPosts.sort((a, b) -> b.getPostTimeStamp().compareTo(a.getPostTimeStamp()));
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("posts", myPosts);
+
+            return ResponseEntity.ok(response);
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
+        }
+    }
+
 
     // Authorization 헤더에서 토큰 추출
     private String extractToken(String authHeader) {
