@@ -21,7 +21,7 @@ const Nav = () => {
             <NavLink to="/myreport" className="dropdown-item">나의 통계</NavLink>
           </div>
         </div>
-        <NavLink to="/community" className="nav-item">커뮤니티</NavLink>
+        <NavLink to="/userjoin" className="nav-item">커뮤니티</NavLink>
         <NavLink to="/mypage" className="nav-item">마이페이지</NavLink> {/* 로그인 시 마이페이지로, 로그인하지 않은 상태일 시 로그인 페이지로 */}
       </div>
     </nav>

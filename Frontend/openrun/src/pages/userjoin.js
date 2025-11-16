@@ -1,9 +1,13 @@
 //api 연결 O, 백엔드 없이 화면 보는데 문제 없음
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../css/userjoin.css";
 import Nav from "../components/nav";
 import { NavLink, useNavigate } from "react-router-dom";
+
+// 1. Firebase SDK 가져오기
+import { signInWithPhoneNumber, RecaptchaVerifier } from "firebase/auth";
+import { auth } from "../firebase"; // ⬅️ 설정 파일에서 가져옵니다.
 
 const Userjoin = () => {
   const navigate = useNavigate(); // 로그인 성공 후 페이지 이동용
@@ -20,6 +24,42 @@ const Userjoin = () => {
   const [idChecked, setIdChecked] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
 
+  const [confirmationResult, setConfirmationResult] = useState(null);
+  const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
+
+  // 3. reCAPTCHA 초기화
+  useEffect(() => {
+    // window.recaptchaVerifier가 없으면 초기화합니다.
+    if (
+      typeof window.recaptchaVerifier === "undefined" ||
+      !window.recaptchaVerifier
+    ) {
+      try {
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          auth,
+          "recaptcha-container",
+          {
+            size: "invisible",
+            callback: (response) => {
+              console.log("reCAPTCHA solved.");
+            },
+            "expired-callback": () => {
+              console.log("reCAPTCHA expired. Resetting.");
+              if (window.recaptchaVerifier && window.recaptchaVerifier.reset) {
+                window.recaptchaVerifier.reset();
+              }
+            },
+          }
+        );
+        window.recaptchaVerifier
+          .render()
+          .catch((error) => console.error("reCAPTCHA rendering error:", error));
+      } catch (error) {
+        console.error("Failed to initialize RecaptchaVerifier:", error);
+      }
+    }
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -28,6 +68,13 @@ const Userjoin = () => {
     }));
 
     if (name === "user_id") setIdChecked(false);
+
+    // ✅ 휴대폰 번호 변경 시 인증 상태 초기화 (재인증 강제)
+    if (name === "user_phonenum") {
+      setPhoneVerified(false);
+      setConfirmationResult(null);
+      setFormData((prev) => ({ ...prev, user_phonecode: "" }));
+    }
   };
 
   const handleCheckDuplicateId = async () => {
@@ -67,62 +114,59 @@ const Userjoin = () => {
     }
 
     try {
-      const res = await fetch("/api/auth/verify/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_phonenum: formData.user_phonenum,
-          purpose: "signup",
-        }),
-      });
+      const appVerifier = window.recaptchaVerifier;
 
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("인증번호가 전송되었습니다.");
-      } else {
-        alert(`전송 실패: ${data.message}`);
+      if (!appVerifier) {
+        alert(
+          "인증 시스템 초기화 오류. 페이지를 새로고침하거나 잠시 후 다시 시도해 주세요."
+        );
+        return;
       }
+
+      // 한국은 +82-10-xxxx-xxxx 형식이어야 하므로, 전화번호 형식 보정 필요
+      const phoneNumber =
+        "+82" + formData.user_phonenum.replace(/-/g, "").substring(1);
+
+      const result = await signInWithPhoneNumber(
+        auth,
+        phoneNumber,
+        appVerifier
+      );
+
+      // 확인 결과를 상태에 저장하여 나중에 인증 코드를 확인할 때 사용합니다.
+      setConfirmationResult(result);
+      alert("인증번호가 전송되었습니다.");
     } catch (err) {
-      console.error("전송 오류:", err);
-      alert("인증번호 전송 중 오류가 발생했습니다.");
+      console.error("Firebase 인증번호 전송 오류:", err);
+      // reCAPTCHA 오류, 잘못된 전화번호 등 다양한 오류가 발생할 수 있습니다.
+      alert(`인증번호 전송 중 오류가 발생했습니다. (오류: ${err.code})`);
     }
   };
 
   // ✅ 인증번호 확인
   const handleVerifyPhoneCode = async () => {
+    if (!confirmationResult) {
+      alert("먼저 인증번호 전송을 완료해주세요.");
+      return;
+    }
+
     if (!formData.user_phonecode) {
       alert("인증번호를 입력해주세요.");
       return;
     }
 
     try {
-      const res = await fetch("/api/auth/verify/check", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_phonenum: formData.user_phonenum,
-          code: formData.user_phonecode,
-          purpose: "signup",
-        }),
-      });
+      // 사용자가 입력한 코드로 인증을 시도합니다.
+      await confirmationResult.confirm(formData.user_phonecode);
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        alert("인증 성공!");
-        setPhoneVerified(true);
-      } else {
-        alert(`인증 실패: ${data.message || "잘못된 인증번호입니다."}`);
-        setPhoneVerified(false);
-      }
+      // 인증 성공! (이 시점에 Firebase 사용자 객체는 생성되지만,
+      // 가입은 백엔드 API 호출로 최종 처리해야 함)
+      alert("인증 성공!");
+      setPhoneVerified(true);
     } catch (err) {
-      console.error("인증 확인 오류:", err);
-      alert("인증 확인 중 오류가 발생했습니다.");
+      console.error("Firebase 인증 확인 오류:", err);
+      alert("인증 실패: 잘못된 인증번호이거나 만료되었습니다.");
+      setPhoneVerified(false);
     }
   };
 
@@ -290,13 +334,16 @@ const Userjoin = () => {
                 value={formData.user_phonenum}
                 onChange={handleChange}
                 maxLength="13"
+                placeholder="010-xxxx-xxxx"
+                disabled={phoneVerified}
               />
               <button
                 type="button"
                 id="sendPhoneCode"
                 onClick={handleSendPhoneCode}
+                disabled={phoneVerified}
               >
-                인증번호 전송
+                {phoneVerified ? "전송 완료" : "인증번호 전송"}
               </button>{" "}
             </div>
 
@@ -309,7 +356,7 @@ const Userjoin = () => {
                 value={formData.user_phonecode}
                 onChange={handleChange}
                 maxLength="6"
-                disabled={phoneVerified}
+                disabled={phoneVerified || !confirmationResult}
               />
               <button
                 type="button"
@@ -325,6 +372,12 @@ const Userjoin = () => {
                 {phoneVerified ? "인증 완료" : "인증 확인"}
               </button>
             </div>
+
+            {/* 4. reCAPTCHA 컨테이너 (시각적으로 숨겨져도 무방) */}
+            <div
+              id="recaptcha-container"
+              style={{ visibility: "hidden", height: 0 }}
+            />
           </div>
           <div>
             <button type="submit" id="sbtn">
