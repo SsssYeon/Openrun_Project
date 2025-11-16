@@ -12,6 +12,7 @@ import poster5 from "../components/poster5.jpeg";
 import poster6 from "../components/poster6.jpg";
 
 import logo from "../components/logo2.png";
+import logo3 from "../components/logo3.png";
 
 const fallbackRanking = [
   {
@@ -267,7 +268,7 @@ const Main2 = () => {
 
         <div className="banner">
           <h3 id="title">
-            테스트 배포 중 입니다! 많은 피드백 주시면 감사하겠습니다 :){" "}
+            홍익대학교 25학년도 2학기 졸업프로젝트 연극 뮤지컬 종합 플랫폼 OPEN RUN
           </h3>
         </div>
       </div>
