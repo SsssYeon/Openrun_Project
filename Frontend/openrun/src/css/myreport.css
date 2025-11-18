@@ -11,19 +11,6 @@
   border-bottom: 3px solid #ffd049; /* 노란 밑줄 */
 }
 
-.dropdown-container {
-  text-align: right;
-  margin-bottom: 20px;
-}
-
-.dropdown-container select {
-  padding: 6px 12px;
-  border: 2px solid #ffd049;
-  border-radius: 4px;
-  background-color: white;
-  font-weight: bold;
-}
-
 .stats-boxes {
   display: flex;
   justify-content: space-around;
@@ -59,6 +46,8 @@
   text-align: center;
   width: 400px;
   height: 420px;
+
+  
 }
 
 .frequent-section h3 {
@@ -88,7 +77,8 @@
   list-style: none;
   padding-left: 0;
   line-height: 1.8;
-  width: 70%;
+  width: 65%;
+  margin-top: 10px;
 }
 
 .text-list li {

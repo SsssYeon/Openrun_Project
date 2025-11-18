@@ -152,32 +152,45 @@ public class AuthService {
         return documents.get(0).getString("userId");
     }
 
-    /* =============== 비밀번호 초기화(임시 비번 발급) =============== */
-    public String resetPassword(String userId, String userPhoneNumber) throws Exception {
+    /* =============== 비밀번호 찾기 =============== */
+    public void verifyUserForPasswordReset(String userId, String phone) throws Exception {
         CollectionReference users = firestore.collection(USER_COLLECTION);
 
         List<QueryDocumentSnapshot> documents = users
                 .whereEqualTo("userId", userId)
-                .whereEqualTo("userPhoneNumber", userPhoneNumber)
+                .whereEqualTo("userPhoneNumber", phone)
                 .get().get().getDocuments();
 
-        if (documents.isEmpty()) throw new Exception("입력한 정보와 일치하는 사용자가 없습니다.");
+        if (documents.isEmpty()) {
+            throw new Exception("아이디와 전화번호가 일치하는 사용자가 없습니다.");
+        }
+    }
+
+    /* =============== 비밀번호 재설정 =============== */
+    public void resetPasswordByPhone(String userId, String newPassword) throws Exception {
+        CollectionReference users = firestore.collection(USER_COLLECTION);
+
+        List<QueryDocumentSnapshot> documents = users
+                .whereEqualTo("userId", userId)
+                .get().get().getDocuments();
+
+        if (documents.isEmpty()) {
+            throw new Exception("사용자가 존재하지 않습니다.");
+        }
 
         DocumentSnapshot userDoc = documents.get(0);
         String uid = userDoc.getId();
-        String tempPassword = UUID.randomUUID().toString().substring(0, 8);
 
-        // FirebaseAuth 비밀번호 업데이트
-        firebaseAuth.updateUser(new UserRecord.UpdateRequest(uid).setPassword(tempPassword));
+        // Firebase Auth 비밀번호 업데이트
+        firebaseAuth.updateUser(new UserRecord.UpdateRequest(uid).setPassword(newPassword));
 
         // Firestore 비밀번호 업데이트
-        userDoc.getReference().update("userPw", tempPassword).get();
-
-        return tempPassword;
+        userDoc.getReference().update("userPw", newPassword).get();
     }
 
     /* =============== 비밀번호 변경 =============== */
     public String changePassword(ChangePasswordRequest request) throws Exception {
+
         CollectionReference users = firestore.collection(USER_COLLECTION);
 
         List<QueryDocumentSnapshot> documents = users
@@ -224,5 +237,18 @@ public class AuthService {
         if (session != null) session.invalidate();
 
         return "회원 탈퇴가 완료되었습니다. 모든 로그인 정보가 삭제되었습니다.";
+    }
+
+    /* ========== userId 조회 메소드 ========== */
+    public String getUserIdFromToken(String token) throws Exception {
+        if (token == null || token.isEmpty()) return null;
+
+        CollectionReference users = firestore.collection(USER_COLLECTION);
+        List<QueryDocumentSnapshot> documents = users
+                .whereEqualTo("userAutoLoginToken", token)
+                .get().get().getDocuments();
+
+        if (documents.isEmpty()) return null; // 유효하지 않은 토큰
+        return documents.get(0).getString("userId");
     }
 }

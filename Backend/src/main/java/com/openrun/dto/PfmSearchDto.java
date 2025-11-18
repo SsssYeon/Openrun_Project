@@ -8,4 +8,6 @@ import lombok.Setter;
 public class PfmSearchDto {
     private String pfm_doc_id; // 공연 ID (mt20id)
     private String pfm_nm;     // 공연 이름 (prfnm)
+    private String pfm_start;  // prfpdfrom
+    private String pfm_end;    // prfpdto
 }

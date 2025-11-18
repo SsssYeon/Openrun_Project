@@ -1,4 +1,6 @@
-// api 연결 완료 버전 => 인덱스 0~2까지 노출
+// api 연결 완료 버전 => /api/calendar/like을 통해 달력에 노출되도록 한 공연의 정보만 받아옴(최대 3개)
+// 검색 결과로 공연 기간까지 띄워줘야 공연 찾는데 편할 것 같아서 기간도 결과창에 추가했습니다
+// `/api/performances/search?query=${encodeURIComponent(searchTerm)}` 이 api로 받는 정보에 pfm_start, pfm_end 추가해주세요!
 
 import Nav from "../components/nav.js";
 import "../css/mylikescalendar.css";
@@ -35,7 +37,7 @@ const Mylikescalendar = () => {
       }
 
       try {
-        const res = await fetch("/api/calendar/like", {
+        const res = await fetch("/api/user/me/main-favorite", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -192,7 +194,14 @@ const Mylikescalendar = () => {
                       navigate(`/performance/${performance.pfm_doc_id}`)
                     }
                   >
-                    {performance.pfm_nm}
+                    <span className="result-title">
+                      {performance.pfm_nm.length > 18
+                        ? performance.pfm_nm.slice(0, 17) + "..."
+                        : performance.pfm_nm}
+                    </span>
+                    <span className="result-duration">
+                        {performance.pfm_start} ~ {performance.pfm_end}
+                    </span>
                   </div>
                 ))
               )}
@@ -211,22 +220,27 @@ const Mylikescalendar = () => {
               </button>
             </div>
             <div className="favorite-items-container">
-              {favorites.map((fav, index) => (
-                <div
-                  key={fav.id}
-                  className={`favorite-item favorite-${index + 1}`}
-                  onClick={() => navigate(`/performance/${fav.pfm_doc_id}`)} // ✅ 이동 추가
-                  style={{ cursor: "pointer" }}
-                >
-                  <img src={fav.poster} alt={fav.title} />
-                  <p>
-                    {" "}
-                    {fav.title.length > 9
-                      ? fav.title.slice(0, 9) + "..."
-                      : fav.title}
-                  </p>
-                </div>
-              ))}
+              {favorites.length === 0 ? (
+                <p className="no-favorites-message">
+                  모두 보기를 누른 후 달력에 표시될 공연을 선택해주세요!
+                </p>
+              ) : (
+                favorites.map((fav, index) => (
+                  <div
+                    key={fav.id}
+                    className={`favorite-item favorite-${index + 1}`}
+                    onClick={() => navigate(`/performance/${fav.pfm_doc_id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <img src={fav.poster} alt={fav.title} />
+                    <p>
+                      {fav.title.length > 9
+                        ? fav.title.slice(0, 9) + "..."
+                        : fav.title}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

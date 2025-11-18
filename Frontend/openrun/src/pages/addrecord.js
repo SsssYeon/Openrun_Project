@@ -14,6 +14,7 @@ const Addrecord = () => {
   const [cast, setCast] = useState("");
   const [cost, setCost] = useState("");
   const [memo, setMemo] = useState("");
+  const [bookingsite, setBookingsite] = useState("");
   const [posterFile, setPosterFile] = useState(null);
   const [posterPreview, setPosterPreview] = useState("/default-poster.png");
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ const Addrecord = () => {
     formData.append("pfmcalender_today_cast", cast);
     formData.append("pfmcalender_cost", cost);
     formData.append("pfmcalender_memo", memo);
+    formData.append("pfmcalender_bookingsite", bookingsite)
 
     if (posterFile) {
       formData.append("pfmcalender_poster", posterFile); // 실제 이미지 파일 추가
@@ -155,10 +157,18 @@ const Addrecord = () => {
                 onChange={(e) => setCost(e.target.value)}
               />
             </div>
+
+            <div className="modifyrecord-row">
+              <strong>예매처: </strong>
+              <input
+                value={bookingsite}
+                onChange={(e) => setBookingsite(e.target.value)}
+              />
+            </div>
           </div>
 
           <div className="event-review">
-            <h3 className="title-center">관람 후기</h3>
+            <h3 className="title-center">내용</h3>
             <textarea
               className="review-item"
               value={memo}

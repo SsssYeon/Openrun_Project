@@ -1,9 +1,6 @@
 package com.openrun.controller;
 
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import com.openrun.dto.ChangePasswordRequest;
 import com.openrun.dto.DeleteAccountRequest;
@@ -13,9 +10,7 @@ import com.openrun.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -39,7 +34,7 @@ public class AuthController {
     }
 
     @GetMapping("/check-id")
-    public ResponseEntity<?> checkId(@RequestParam String user_id) {
+    public ResponseEntity<?> checkId(@RequestParam("user_id") String user_id) {
         try {
             boolean exists = authService.isEmailDuplicate(user_id);
             return ResponseEntity.ok(Map.of("exists", exists));
@@ -95,14 +90,27 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/find-password")
+    public ResponseEntity<?> findPassword(@RequestBody Map<String, String> req) {
+        String userId = req.get("user_id");
+        String phone = req.get("user_phonenum");
+        try {
+            authService.verifyUserForPasswordReset(userId, phone);
+            return ResponseEntity.ok(Map.of("user_id", userId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> req) {
+        String userId = req.get("user_id");
+        String phone = req.get("user_phonenum");
+        String newPassword = req.get("new_password");
+
         try {
-            String tempPw = authService.resetPassword(
-                    req.get("user_id"),
-                    req.get("user_phonenum")
-            );
-            return ResponseEntity.ok(Map.of("temp_pw", tempPw, "message", "임시 비밀번호로 재설정되었습니다."));
+            authService.resetPasswordByPhone(userId, newPassword);
+            return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }

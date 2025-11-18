@@ -31,7 +31,7 @@ public class PfmSearchService {
         Set<String> seenIds = new HashSet<>();
         String encodedQuery = URLEncoder.encode(query, "UTF-8");
 
-        // 오늘 기준 ±1년
+        // 오늘 기준 +1년 ~ -5년
         LocalDate today = LocalDate.now();
         String stdate = today.minusYears(5).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String eddate = today.plusYears(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -80,6 +80,9 @@ public class PfmSearchService {
                 String id = getTagValue("mt20id", elem);
                 String name = getTagValue("prfnm", elem);
                 String genre = getTagValue("genrenm", elem);
+                String start = getTagValue("prfpdfrom", elem);
+                String end   = getTagValue("prfpdto", elem);
+
 
                 if (id != null && !id.isBlank()
                         && name != null && !name.isBlank()
@@ -90,6 +93,8 @@ public class PfmSearchService {
                     PfmSearchDto dto = new PfmSearchDto();
                     dto.setPfm_doc_id(id);
                     dto.setPfm_nm(name);
+                    dto.setPfm_start(start == null ? "" : start);
+                    dto.setPfm_end(end == null ? "" : end);
                     results.add(dto);
                 }
             }
@@ -107,51 +112,3 @@ public class PfmSearchService {
         return nodeList.item(0).getTextContent();
     }
 }
-
-
-/*
-package com.openrun.service;
-
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.*;
-import com.openrun.dto.PfmSearchDto;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-@Service
-public class PfmSearchService {
-
-    private final Firestore firestore;
-
-    public PfmSearchService(Firestore firestore) {
-        this.firestore = firestore;
-    }
-
-    public List<PfmSearchDto> searchPerformances(String query) throws ExecutionException, InterruptedException {
-        List<PfmSearchDto> results = new ArrayList<>();
-
-        CollectionReference colRef = firestore.collection("Kopis_performances_detail");
-
-        // Firestore는 대소문자 구분 및 정규식 미지원이므로 유사 검색 시 \uf8ff 활용
-        ApiFuture<QuerySnapshot> future = colRef
-                .whereGreaterThanOrEqualTo("prfnm", query)
-                .whereLessThanOrEqualTo("prfnm", query + "\uf8ff")
-                .get();
-
-        List<QueryDocumentSnapshot> docs = future.get().getDocuments();
-
-        for (DocumentSnapshot doc : docs) {
-            PfmSearchDto dto = doc.toObject(PfmSearchDto.class);
-            if (dto != null) {
-                dto.setPfm_doc_id(doc.getId()); // 문서 ID 삽입
-                results.add(dto);
-            }
-        }
-
-        return results;
-    }
-}
- */

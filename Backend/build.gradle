@@ -18,16 +18,20 @@ repositories {
 }
 
 dependencies {
+
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+	implementation 'io.perfmark:perfmark-api:0.27.0'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	// Lombok 의존성 추가
+
 	compileOnly 'org.projectlombok:lombok:1.18.32'
 	annotationProcessor 'org.projectlombok:lombok:1.18.32'
 }
 
-//tasks.named('test') {
-//	useJUnitPlatform()
-//}
+tasks.withType(JavaCompile) {
+	options.compilerArgs << "-parameters"
+}

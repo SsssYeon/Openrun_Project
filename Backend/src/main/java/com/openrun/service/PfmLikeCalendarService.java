@@ -9,11 +9,14 @@ import com.openrun.dto.PfmLikeCalendarDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.URLEncoder;
@@ -43,7 +46,7 @@ public class PfmLikeCalendarService {
     @Value("${dev.default.userdoc:wkAGLwZbn7M5npJ1fLBq}")
     private String devDefaultUserDocId;
 
-    /* ================= 토큰 해석 (PfmCalendarService 스타일) ================= */
+    /* ================= 공통: 토큰 → 사용자 문서ID 조회 ================= */
 
     private String extractToken(String authHeader) {
         if (authHeader == null || authHeader.isBlank()) return null;
@@ -53,9 +56,9 @@ public class PfmLikeCalendarService {
     }
 
     /**
-     * Authorization 토큰으로 UserData를 검색하여 **문서 ID**를 반환.
+     * Authorization 토큰으로 UserData 문서 ID를 반환.
      * - userAutoLoginToken == token
-     * - 없고 token == "dummy-token"이면 devDefaultUserDocId 사용
+     * - 필요 시 devDefaultUserDocId 사용 가능(주석 해제)
      */
     private String getUserDocIdByToken(String authHeader) throws ExecutionException, InterruptedException {
         String token = extractToken(authHeader);
@@ -70,25 +73,27 @@ public class PfmLikeCalendarService {
             return qs.getDocuments().get(0).getId(); // 문서 ID 반환
         }
 
-        //if ("dummy-token".equals(token)) return devDefaultUserDocId;             // 개발 우회
+        // 개발 편의 우회가 필요하면 주석 해제
+        // if ("dummy-token".equals(token)) return devDefaultUserDocId;
 
         return null;
     }
 
-    /* ================= 메인 API ================= */
+    /* ================= 공개 메서드 1: 전체 관심 공연(userLikeList) ================= */
 
+    /**
+     * 전체 관심 공연(userLikeList)을 KOPIS 상세로 채워 반환
+     */
     public PfmLikeCalendarDTO getMyLikeEvents(String authHeader) throws Exception {
         String userDocId = getUserDocIdByToken(authHeader);
         if (userDocId == null) {
             return PfmLikeCalendarDTO.builder().userLikeList(Collections.emptyList()).build();
         }
 
-        // UserData/{docId}에서 userLikeList 읽기
-        DocumentSnapshot userDoc = firestore.collection(USER_COLLECTION).document(userDocId).get().get();
-        List<String> likeIds = userDoc.exists()
-                ? (List<String>) userDoc.get("userLikeList")
-                : Collections.emptyList();
-        if (likeIds == null) likeIds = Collections.emptyList();
+        DocumentSnapshot userDoc = firestore.collection(USER_COLLECTION)
+                .document(userDocId).get().get();
+
+        List<String> likeIds = readStringList(userDoc, "userLikeList");
 
         List<PfmLikeCalendarDTO.Item> items = new ArrayList<>();
         for (String mt20id : likeIds) {
@@ -104,7 +109,36 @@ public class PfmLikeCalendarService {
         return PfmLikeCalendarDTO.builder().userLikeList(items).build();
     }
 
-    /* ================= KOPIS OpenAPI ================= */
+    /* ============ 공개 메서드 2: 달력 노출 3개(userPriorityLikeList) ============ */
+
+    /**
+     * 달력에 노출하도록 선택된 우선순위 관심 공연(userPriorityLikeList)만 반환
+     */
+    public PfmLikeCalendarDTO getMyPriorityLikeEvents(String authHeader) throws Exception {
+        String userDocId = getUserDocIdByToken(authHeader);
+        if (userDocId == null) {
+            return PfmLikeCalendarDTO.builder().userLikeList(Collections.emptyList()).build();
+        }
+
+        DocumentSnapshot userDoc = firestore.collection(USER_COLLECTION)
+                .document(userDocId).get().get();
+
+        List<String> ids = readStringList(userDoc, "userPriorityLikeList");
+
+        List<PfmLikeCalendarDTO.Item> items = new ArrayList<>();
+        for (String mt20id : ids) {
+            if (mt20id == null || mt20id.isBlank()) continue;
+            try {
+                items.add(fetchDetailFromOpenApiWithRetry(mt20id));
+            } catch (Exception e) {
+                log.warn("KOPIS 조회 실패 mt20id={}: {}", mt20id, e.toString());
+                items.add(minimalItem(mt20id)); // 폴백
+            }
+        }
+        return PfmLikeCalendarDTO.builder().userLikeList(items).build();
+    }
+
+    /* ================= KOPIS OpenAPI 호출/파싱 ================= */
 
     private PfmLikeCalendarDTO.Item fetchDetailFromOpenApiWithRetry(String mt20id) throws Exception {
         // HTTPS 사용, mt20id만 인코딩, 서비스키는 인코딩하지 않음
@@ -119,6 +153,7 @@ public class PfmLikeCalendarService {
                 if (parsed != null) return parsed;
             } catch (Exception e) {
                 if (attempt == maxTry) throw e; // 최종 실패
+                log.debug("KOPIS 재시도 {}/{} - {}: {}", attempt, maxTry, mt20id, e.getMessage());
             }
             // 지수 백오프: 0.3s, 0.6s
             Thread.sleep((long) (300 * Math.pow(2, attempt - 1)));
@@ -140,7 +175,8 @@ public class PfmLikeCalendarService {
         String xml = new String(body, cs);
 
         // XML 파싱
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+        Document doc = DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
                 .parse(new java.io.ByteArrayInputStream(xml.getBytes(cs)));
         doc.getDocumentElement().normalize();
 
@@ -181,11 +217,40 @@ public class PfmLikeCalendarService {
                 .build();
     }
 
-    /* ================= 유틸 ================= */
+    /* ================= Firestore/유틸 ================= */
+
+    /**
+     * Firestore 문서에서 List<String> 형태로 안전하게 읽어오기
+     */
+    @SuppressWarnings("unchecked")
+    private List<String> readStringList(DocumentSnapshot doc, String field) {
+        if (doc == null || !doc.exists()) return Collections.emptyList();
+        Object raw = doc.get(field);
+        if (raw == null) return Collections.emptyList();
+
+        List<String> out = new ArrayList<>();
+        if (raw instanceof List<?> rawList) {
+            for (Object o : rawList) {
+                if (o == null) continue;
+                String s = o.toString();
+                if (s != null && !s.isBlank()) {
+                    out.add(s.trim());
+                }
+            }
+        } else if (raw instanceof String s) {
+            if (!s.isBlank()) out.add(s.trim());
+        }
+        return out;
+    }
 
     private static PfmLikeCalendarDTO.Item minimalItem(String id) {
         return PfmLikeCalendarDTO.Item.builder()
-                .id(id).pfm_doc_id(id).title(id).start("").end("").poster("")
+                .id(nvl(id))
+                .pfm_doc_id(nvl(id))
+                .title(nvl(id))
+                .start("")
+                .end("")
+                .poster("")
                 .build();
     }
 
@@ -193,7 +258,8 @@ public class PfmLikeCalendarService {
         NodeList nl = e.getElementsByTagName(tag);
         if (nl.getLength() == 0) return "";
         Node n = nl.item(0);
-        return n.getTextContent() == null ? "" : n.getTextContent().trim();
+        String content = (n.getTextContent() == null) ? "" : n.getTextContent().trim();
+        return content;
     }
 
     private static String nvl(String s) { return s == null ? "" : s; }
