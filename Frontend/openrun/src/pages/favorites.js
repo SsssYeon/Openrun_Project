@@ -26,6 +26,7 @@ const Favorites = () => {
     }
 
     const fetchFavorites = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch("/api/users/me/interests", {
           method: "GET",
@@ -241,15 +242,21 @@ const Favorites = () => {
           </div>
           <div className="show-grid">
             {/* 조건부 렌더링 시작 */}
-            {favorites.length === 0 ? (
-              // 메시지 디자인 바꾸기!!!!!! css 코드 추가
+            {isLoading ? (
+              <div className="no-favorites-message-container">
+                <p className="no-favorites-message-mypage">
+                  관심 공연 불러오는 중...
+                </p>
+              </div>
+            ) : favorites.length === 0 ? (
+              // ELSE IF: 로딩이 끝나고 목록이 비어있다면 메시지 노출
               <div className="no-favorites-message-container">
                 <p className="no-favorites-message-mypage">
                   홈 화면에서 공연을 검색하고 관심공연을 추가해보세요!
                 </p>
               </div>
             ) : (
-              // ELSE: favorites가 있다면 목록을 렌더링합니다.
+              // ELSE: 로딩이 끝나고 목록이 있다면 렌더링
               favorites.map((show) => (
                 <div key={show.id} className="show-card">
                   <div className="favorite-poster-wrapper">

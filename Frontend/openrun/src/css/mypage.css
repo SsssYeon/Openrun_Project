@@ -62,7 +62,7 @@
 
 .mypage-right {
   min-width: 700px;
-  min-height: 540px;
+  height: 540px;
 }
 
 .mypage-scroll {
@@ -99,7 +99,7 @@
   margin-bottom: 40px;
   border: 1px solid lightgrey;
   border-radius: 16px;
-  min-height: 150px;
+  min-height: 180px;
 }
 
 .user-title {
@@ -135,7 +135,7 @@
   border: 1px solid lightgrey;
   border-radius: 16px;
   padding: 0 30px;
-  min-height: 160px;
+  height: 200px;
 }
 
 .user-community {

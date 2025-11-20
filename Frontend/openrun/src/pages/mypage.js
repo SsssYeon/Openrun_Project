@@ -89,11 +89,15 @@ const dateTimeOptions = {
 
 const MyPage = () => {
   const [user, setUser] = useState(null);
+
+  const [isInterestsLoading, setIsInterestsLoading] = useState(true);
+  const [isPostsLoading, setIsPostsLoading] = useState(true);
+
   const [interests, setInterests] = useState([]); // 관심 공연 상태 추가
   const [myPosts, setMyPosts] = useState(fallbackCommunity);
   const navigate = useNavigate();
 
- useEffect(() => {
+  useEffect(() => {
     const fetchUser = async () => {
       const token =
         localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -118,12 +122,13 @@ const MyPage = () => {
       } catch (error) {
         console.error("사용자 정보 로드 실패. Mock 데이터 사용:", error);
         // 닉네임 로드 실패 시에만 Mock 데이터 사용
-        setUser(userData); 
+        setUser(userData);
         // 🚨 사용자 정보 없이는 다음 API를 호출할 필요가 없다고 가정하고 리턴할 수도 있지만,
         // Mock 데이터라도 로드되었으니 진행하는 것으로 유지했습니다.
       }
 
       // 2. 관심 공연 API 호출
+      setIsInterestsLoading(true);
       try {
         const interestResponse = await fetch(`/api/calendar/like`, {
           method: "GET",
@@ -144,9 +149,12 @@ const MyPage = () => {
         console.warn("관심 공연 API 실패. Mock 데이터 사용:", error);
         // 관심 공연 로드 실패 시에만 Mock 데이터 사용
         setInterests(favoritesMock?.slice(0, 3) || []);
+      } finally {
+        setIsInterestsLoading(false); // 관심 공연 로딩 완료
       }
-      
+
       // 3. 나의 글 (커뮤니티) API 호출
+      setIsPostsLoading(true);
       try {
         const postsResponse = await fetch(`/api/users/me/posts`, {
           method: "GET",
@@ -164,13 +172,14 @@ const MyPage = () => {
         console.warn("My posts API failed. Using mock data:", error);
         // 나의 글 로드 실패 시에만 Mock 데이터 사용
         setMyPosts(fallbackCommunity.slice(0, 2));
+      } finally {
+        setIsPostsLoading(false); // 나의 글 로딩 완료
       }
     };
 
     fetchUser();
   }, [navigate]); // 의존성 배열 유지
 
-  if (!user) return <div>로딩 중...</div>;
 
   const handleLogout = async () => {
     const confirmed = window.confirm("로그아웃 하시겠습니까?");
@@ -236,6 +245,20 @@ const MyPage = () => {
     }
   };
 
+   if (!user) {
+    return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          로딩 중...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <Nav />
@@ -294,21 +317,26 @@ const MyPage = () => {
               <div className="mypage-right-middle">
                 <h3 className="user-title">나의 관심 공연</h3>
                 <div className="user-favorite">
-                  {interests.length === 0 && <p>관심 공연이 없습니다.</p>}
-                  {interests.slice(0, 5).map((show) => (
-                    <div key={show.id} className="user-favorite-content">
-                      <img
-                        src={show.poster}
-                        alt={show.title}
-                        className="user-favorite-poster"
-                      />
-                      <p className="user-favorite-title">
-                        {show.title.length > 7
-                          ? show.title.slice(0, 7) + "..."
-                          : show.title}
-                      </p>
-                    </div>
-                  ))}
+                  {isInterestsLoading ? (
+                    <p>관심 공연 불러오는 중...</p>
+                  ) : interests.length === 0 ? (
+                    <p>관심 공연이 없습니다.</p>
+                  ) : (
+                    interests.slice(0, 5).map((show) => (
+                      <div key={show.id} className="user-favorite-content">
+                        <img
+                          src={show.poster}
+                          alt={show.title}
+                          className="user-favorite-poster"
+                        />
+                        <p className="user-favorite-title">
+                          {show.title.length > 7
+                            ? show.title.slice(0, 7) + "..."
+                            : show.title}
+                        </p>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -316,8 +344,10 @@ const MyPage = () => {
               <div className="mypage-right-bottom">
                 <h3 className="user-title">나의 글</h3>
 
-                <div className="user-community" >
-                  {myPosts.length === 0 ? (
+                <div className="user-community">
+                  {isPostsLoading ? (
+                    <p>나의 글 불러오는 중...</p>
+                  ) : myPosts.length === 0 ? (
                     <p>작성한 글이 없습니다.</p>
                   ) : (
                     myPosts.map((item) => (
@@ -326,7 +356,10 @@ const MyPage = () => {
                         key={item.postDocumentId}
                         className="link-style"
                       >
-                        <div className="mypage-user-community-item" key={item.postDocumentId}>
+                        <div
+                          className="mypage-user-community-item"
+                          key={item.postDocumentId}
+                        >
                           <div className="content">
                             <div className="title">
                               {item.postTitle.length > 30

@@ -109,7 +109,19 @@ const Modifyrecord = () => {
     }
   };
 
-  if (loading) return <div>불러오는 중...</div>;
+  if (loading) {
+    return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          게시글을 불러오는 중...
+        </div>
+      </div>
+    );
+  }
   if (!event) return <div>해당 관극 기록을 찾을 수 없습니다.</div>;
 
   return (

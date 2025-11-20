@@ -37,8 +37,30 @@ const Myreport = () => {
     fetchStatistics();
   }, []);
 
-  if (loading) return <div>통계를 불러오는 중...</div>;
-  if (!stats) return <div>데이터 없음</div>;
+  if (loading) {
+    return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          통계를 불러오는 중...
+        </div>
+      </div>
+    );
+  }
+  if (!stats) return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          관극 기록을 추가하고 통계를 확인해보세요!
+        </div>
+      </div>
+    );;
 
   const {
     total_view: totalView,

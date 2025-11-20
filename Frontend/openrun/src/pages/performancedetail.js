@@ -11,6 +11,7 @@ const Performancedetail = () => {
   const { id } = useParams();
   const [performance, setPerformance] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPerformance = async () => {
@@ -44,6 +45,8 @@ const Performancedetail = () => {
         setPerformance(mappedData);
       } catch (error) {
         console.error("Error fetching performance:", error);
+      }finally {
+        setLoading(false);
       }
     };
 
@@ -94,7 +97,32 @@ const Performancedetail = () => {
     fetchFavoriteStatus();
   }, [id]);
 
-  if (!performance) return <div>해당 공연을 찾을 수 없습니다.</div>;
+  if (loading) {
+    return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          공연을 불러오는 중...
+        </div>
+      </div>
+    );
+  }
+
+  if (!performance)
+    return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          해당 공연을 찾을 수 없습니다.
+        </div>
+      </div>
+    );;
 
   const toggleFavorite = async () => {
     const token = localStorage.getItem("token")|| sessionStorage.getItem("token");

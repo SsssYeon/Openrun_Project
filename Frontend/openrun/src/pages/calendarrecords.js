@@ -12,11 +12,13 @@ const Calendarrecords = () => {
   const [events, setEvents] = useState([]); // 전체 관극 기록
   const [selectedDateEvents, setSelectedDateEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   // 관극 기록 API 호출
   useEffect(() => {
     const fetchCalendarData = async () => {
+      setIsLoading(true);
       const token =
         localStorage.getItem("token") || sessionStorage.getItem("token");
       try {
@@ -39,6 +41,9 @@ const Calendarrecords = () => {
         const formatted = formatCalendarData(eventsData); // ✅ 예시 데이터로 대체
         setEvents(formatted);
         setSelectedDateEvents(formatted);
+      } finally {
+        // ⭐️ 로딩 종료 (성공/실패 무관)
+        setIsLoading(false);
       }
     };
     fetchCalendarData();
@@ -138,40 +143,58 @@ const Calendarrecords = () => {
 
             <div className="mytickets-scroll">
               <div className="mytickets">
-                {searchTerm === "" && events.length === 0 ? (
-                  <p className="calendar-no-records-message">오른쪽 아래 '+'버튼을 눌러 관극 기록을 추가해보세요!</p>
-                ) : 
-                (searchTerm ? filteredEvents : selectedDateEvents).map(
-                  (event) => (
-                    <div
-                      key={event.id}
-                      className="ticket"
-                      onClick={() => navigate(`/detail/${event.id}`)}
-                    >
-                      <div className="ticketscontent">
-                        <img
-                          src={event.poster}
-                          alt={event.title}
-                          className="ticketspicture"
-                        />
-                        <div>
-                          <h3 className="ticketsinfomations">{event.title}</h3>
-                          <p>날짜: {event.start}</p>
-                          <p>시간: {event.time}</p>
-                          <p>장소: {event.location}</p>
-                          <p>좌석: {event.seat}</p>
-                          <p>출연진: {event.cast.length > 25
-                            ? event.cast.slice(0, 24) + "..."
-                            : event.cast}
-                          </p>
+                {isLoading ? (
+                  <p className="calendar-no-records-message">
+                    관극 기록을 불러오는 중입니다...
+                  </p>
+                ) : searchTerm === "" && events.length === 0 ? (
+                  // 로딩 완료 후, 검색어가 없고 전체 이벤트가 0일 경우 (기록 없음)
+                  <p className="calendar-no-records-message">
+                    오른쪽 아래 '+'버튼을 눌러 관극 기록을 추가해보세요!
+                  </p>
+                ) : (
+                  // 목록 렌더링 또는 검색 결과 없음 메시지 렌더링
+                  (searchTerm ? filteredEvents : selectedDateEvents).map(
+                    (event) => (
+                      <div
+                        key={event.id}
+                        className="ticket"
+                        onClick={() => navigate(`/detail/${event.id}`)}
+                      >
+                        <div className="ticketscontent">
+                          <img
+                            src={event.poster}
+                            alt={event.title}
+                            className="ticketspicture"
+                          />
+                          <div>
+                            <h3 className="ticketsinfomations">
+                              {event.title}
+                            </h3>
+                            <p>날짜: {event.start}</p>
+                            <p>시간: {event.time}</p>
+                            <p>장소: {event.location}</p>
+                            <p>좌석: {event.seat}</p>
+                            <p>
+                              출연진:{" "}
+                              {event.cast.length > 25
+                                ? event.cast.slice(0, 24) + "..."
+                                : event.cast}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )
                   )
                 )}
-                {searchTerm && filteredEvents.length === 0 && events.length > 0 && (
-                    <p className="calendar-no-records-message">검색 결과가 없습니다.</p>
-                )}
+                {!isLoading &&
+                  searchTerm &&
+                  filteredEvents.length === 0 &&
+                  events.length > 0 && (
+                    <p className="calendar-no-records-message">
+                      검색 결과가 없습니다.
+                    </p>
+                  )}
               </div>
             </div>
           </div>

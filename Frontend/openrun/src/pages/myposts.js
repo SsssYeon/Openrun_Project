@@ -65,8 +65,6 @@ const Myposts = () => {
     fetchMyPosts();
   }, [navigate]);
 
-  if (loading) return <div>나의 글 목록을 불러오는 중입니다...</div>;
-
   const handleLogout = async () => {
     const confirmed = window.confirm("로그아웃 하시겠습니까?");
     if (!confirmed) return;
@@ -183,7 +181,9 @@ const Myposts = () => {
           </div>
 
           <div class="community-list">
-            {myPosts.length === 0 ? (
+            {loading ? (
+              <p className="no-posts-message">나의 글 목록을 불러오는 중입니다...</p>
+            ) : myPosts.length === 0 ? (
               <p className="no-posts-message">작성한 글이 없습니다.</p>
             ) : (
               myPosts.map((post) => (
@@ -241,6 +241,10 @@ const Myposts = () => {
                         } // postImage가 있으면 사용, 없으면 logo 사용
                         alt={post.postTitle}
                         className="post-thumbnail"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = logo;
+                        }}
                       />
                     </div>
                   </div>

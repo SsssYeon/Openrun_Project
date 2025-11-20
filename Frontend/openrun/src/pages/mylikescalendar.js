@@ -17,6 +17,7 @@ const Mylikescalendar = () => {
   const [favorites, setFavorites] = useState([]); // 우측에 표시할 관심 공연
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredPerformances, setFilteredPerformances] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   const addOneDay = (dateStr) => {
@@ -35,6 +36,8 @@ const Mylikescalendar = () => {
         navigate("/login");
         return;
       }
+
+      setIsLoading(true);
 
       try {
         const res = await fetch("/api/user/me/main-favorite", {
@@ -78,6 +81,9 @@ const Mylikescalendar = () => {
         setEvents(fallbackEvents);
         setSelectedDateEvents(fallbackEvents);
         setFavorites(favoritesMock.slice(0, 3));
+      } finally {
+        // ⭐️ 로딩 종료 (성공/실패 무관)
+        setIsLoading(false);
       }
     };
 
@@ -200,7 +206,7 @@ const Mylikescalendar = () => {
                         : performance.pfm_nm}
                     </span>
                     <span className="result-duration">
-                        {performance.pfm_start} ~ {performance.pfm_end}
+                      {performance.pfm_start} ~ {performance.pfm_end}
                     </span>
                   </div>
                 ))
@@ -220,11 +226,17 @@ const Mylikescalendar = () => {
               </button>
             </div>
             <div className="favorite-items-container">
-              {favorites.length === 0 ? (
+              {isLoading ? (
+                <p className="no-favorites-message">
+                  관심 공연을 불러오는 중...
+                </p>
+              ) : favorites.length === 0 ? (
+                // 로딩 완료 후 데이터가 없을 경우
                 <p className="no-favorites-message">
                   모두 보기를 누른 후 달력에 표시될 공연을 선택해주세요!
                 </p>
               ) : (
+                // 데이터가 있을 경우 목록 렌더링
                 favorites.map((fav, index) => (
                   <div
                     key={fav.id}
