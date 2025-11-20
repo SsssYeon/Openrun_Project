@@ -77,18 +77,20 @@ const Community = () => {
     month: "2-digit",
     day: "2-digit",
   };
-  
+
   if (loading) {
-        return (
-            <div>
-                <Nav />
-                <div className="community-container" style={{textAlign: 'center', marginTop: '100px'}}>
-                    게시글을 불러오는 중...
-                </div>
-            </div>
-        );
-    }
-    
+    return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          게시글을 불러오는 중...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

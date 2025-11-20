@@ -4,8 +4,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import "../css/main2.css"; // CSS 파일 연결
-import poster1 from "../components/poster1.jpg";
-import poster2 from "../components/poster2.jpg";
+import poster7 from "../components/poster7.png";
+import poster8 from "../components/poster8.gif";
 import poster3 from "../components/poster3.jpg";
 import poster4 from "../components/poster4.jpg";
 import poster5 from "../components/poster5.jpeg";
@@ -17,24 +17,24 @@ import logo3 from "../components/logo3.png";
 const fallbackRanking = [
   {
     pfm_doc_id: 1,
-    pfm_nm: "지킬앤하이드",
-    pfm_start: "2024.11.29",
-    pfm_end: "2025.05.18",
-    pfm_poster: poster1,
+    pfm_nm: "물랑루즈",
+    pfm_start: "2025.11.27",
+    pfm_end: "2026.02.22",
+    pfm_poster: poster7,
   },
   {
     pfm_doc_id: 2,
-    pfm_nm: "랭보",
-    pfm_start: "2022.02.19",
-    pfm_end: "2025.05.18",
-    pfm_poster: poster2,
+    pfm_nm: "킹키부츠",
+    pfm_start: "2025.12.17",
+    pfm_end: "2026.03.29",
+    pfm_poster: poster8,
   },
   {
     pfm_doc_id: 3,
-    pfm_nm: "메디슨 카운티의 다리",
-    pfm_start: "2025.05.01",
-    pfm_end: "2025.07.13",
-    pfm_poster: poster3,
+    pfm_nm: "렌트",
+    pfm_start: "2025.11.09",
+    pfm_end: "2026.02.22",
+    pfm_poster: poster6,
   },
 ];
 
@@ -78,7 +78,7 @@ const fallbackCommunity = [
 
     commentCount: 15,
 
-    postImage: [poster1, poster2],
+    postImage: [poster3, poster4],
   },
 
   {
@@ -118,47 +118,71 @@ const Main2 = () => {
   const [latestPosts, setLatestPosts] = useState(fallbackCommunity);
   const navigate = useNavigate();
 
+  const [loadingRanking, setLoadingRanking] = useState(true);
+  const [loadingRecommend, setLoadingRecommend] = useState(true);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+
   useEffect(() => {
     // 랭킹 데이터 요청
+    setLoadingRanking(true);
     fetch(`/api/performances/ranking`)
       .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
+        if (!res.ok) throw new Error("Ranking API failed");
         return res.json();
       })
       .then((data) => {
         if (Array.isArray(data)) setRankingData(data);
+        else throw new Error("Invalid ranking data format");
       })
-      .catch(() => {
-        setRankingData(fallbackRanking);
+      .catch((error) => {
+        console.error("랭킹 데이터 로드 실패:", error);
+        setRankingData(fallbackRanking); // 실패 시 fallback 사용
+      })
+      .finally(() => {
+        setLoadingRanking(false);
       });
 
-    // 추천 공연 요청
+    // === 2. 추천 공연 요청 ===
+    setLoadingRecommend(true);
     fetch(`/api/performances/recommend`)
       .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
+        if (!res.ok) throw new Error("Recommend API failed");
         return res.json();
       })
       .then((data) => {
         if (Array.isArray(data)) setRecommendData(data);
+        else throw new Error("Invalid recommend data format");
       })
-      .catch(() => {
-        setRecommendData(fallbackRecommend);
+      .catch((error) => {
+        console.error("추천 공연 데이터 로드 실패:", error);
+        setRecommendData(fallbackRecommend); // 실패 시 fallback 사용
+      })
+      .finally(() => {
+        setLoadingRecommend(false);
+      });
+
+    // ⭐️ [수정] 3. 최근 커뮤니티 글 요청 (useEffect 안으로 이동) ===
+    setLoadingPosts(true);
+    fetch(`/api/community/latest`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Community API failed");
+        return res.json();
+      })
+      .then((data) => {
+        // 서버 응답이 배열 형태라고 가정합니다.
+        if (Array.isArray(data)) setLatestPosts(data);
+        else throw new Error("Invalid community data format");
+      })
+      .catch((error) => {
+        console.error("커뮤니티 글 로드 실패:", error);
+        setLatestPosts(fallbackCommunity); // 실패 시 fallback 사용
+      })
+      .finally(() => {
+        setLoadingPosts(false);
       });
   }, []);
 
-  // 최근 커뮤니티 글 요청
-  fetch(`/api/community/latest`)
-    .then((res) => {
-      if (!res.ok) throw new Error("Network response was not ok");
-      return res.json();
-    })
-    .then((data) => {
-      // 서버 응답이 배열 형태라고 가정합니다.
-      if (Array.isArray(data)) setLatestPosts(data);
-    })
-    .catch(() => {
-      setLatestPosts(fallbackCommunity);
-    });
+
 
   return (
     <div className="main2-container">
@@ -220,49 +244,55 @@ const Main2 = () => {
         <div className="right-bottom">
           <h3 id="rightbottom-title">최근 커뮤니티 글</h3>
           <div className="main2-community-list">
-            {latestPosts.map((item) => (
-              <Link
-                to={`/community/${item.postDocumentId}`}
-                key={item.postDocumentId}
-                className="post-item-link"
-              >
-                <div className="main2-community-item" key={item.postDocumentId}>
-                  <div className="content">
-                    <div className="title">
-                      {item.postTitle.length > 30
-                        ? item.postTitle.slice(0, 29) + "..."
-                        : item.postTitle}
+            {loadingPosts ? (
+              <p className="calendar-no-records-message">
+                    관극 기록을 불러오는 중입니다...
+                  </p>
+            ) : (
+              latestPosts.map((item) => (
+                <Link
+                  to={`/community/${item.postDocumentId}`}
+                  key={item.postDocumentId}
+                  className="post-item-link"
+                >
+                  <div className="main2-community-item" key={item.postDocumentId}>
+                    <div className="content">
+                      <div className="title">
+                        {item.postTitle.length > 30
+                          ? item.postTitle.slice(0, 29) + "..."
+                          : item.postTitle}
+                      </div>
+
+                      <div className="subtext">
+                        {item.postContent.length > 30
+                          ? item.postContent.slice(0, 29) + "..."
+                          : item.postContent}
+                      </div>
                     </div>
 
-                    <div className="subtext">
-                      {item.postContent.length > 30
-                        ? item.postContent.slice(0, 29) + "..."
-                        : item.postContent}
+                    <div className="date">
+                      {new Date(item.postTimeStamp).toLocaleString(
+                        "ko-KR",
+                        dateTimeOptions
+                      )}
                     </div>
+                    <img
+                      src={
+                        Array.isArray(item.postImage) && item.postImage.length > 0
+                          ? item.postImage[0]
+                          : logo
+                      }
+                      alt={item.postTitle}
+                      className="thumb"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = logo;
+                      }}
+                    />
                   </div>
-
-                  <div className="date">
-                    {new Date(item.postTimeStamp).toLocaleString(
-                      "ko-KR",
-                      dateTimeOptions
-                    )}
-                  </div>
-                  <img
-                    src={
-                      Array.isArray(item.postImage) && item.postImage.length > 0
-                        ? item.postImage[0]
-                        : logo
-                    }
-                    alt={item.postTitle}
-                    className="thumb"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = logo;
-                    }}
-                  />
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))
+            )}
           </div>
         </div>
 
