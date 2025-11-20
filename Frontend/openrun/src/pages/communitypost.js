@@ -307,7 +307,7 @@ function CommunityPost() {
       try {
         // API 호출 시도 (Mock Service를 통해 서버 검증 시뮬레이션)
         await apiService.deletePost(id, token);
-        alert("게시글 삭제 요청이 성공적으로 서버에 전달되었습니다. (Mock)");
+        alert("게시글이 삭제되었습니다.");
 
         // 성공 시 목록으로 이동
         navigate("/community");
@@ -407,7 +407,7 @@ function CommunityPost() {
 
       setCommentList((prevList) => [newComment, ...prevList]);
       setNewCommentContent("");
-      alert("댓글이 성공적으로 등록되었습니다. (Mock)");
+      alert("댓글이 성공적으로 등록되었습니다.");
     } catch (error) {
       console.error(`[API ERROR] 댓글 작성 실패: ${error.message}`);
       alert("댓글 등록 중 오류가 발생했습니다.");
@@ -427,7 +427,7 @@ function CommunityPost() {
           setCommentList((prevList) =>
             prevList.filter((cmt) => cmt.commentDocumentId !== commentId)
           );
-          alert("댓글이 성공적으로 삭제되었습니다. (Mock)");
+          alert("댓글이 성공적으로 삭제되었습니다.");
         } catch (error) {
           console.error(`[API ERROR] 댓글 삭제 실패: ${error.message}`);
           alert("댓글 삭제 중 오류가 발생했습니다.");
@@ -469,7 +469,17 @@ function CommunityPost() {
     ));
   };
 
-  if (loading) return <div>불러오는 중...</div>;
+  if (loading) return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          불러오는 중...
+        </div>
+      </div>
+    );
   if (!post || post.postState === 1)
     return <div>숨겨진 글이거나, 해당 커뮤니티 글을 찾을 수 없습니다.</div>;
 

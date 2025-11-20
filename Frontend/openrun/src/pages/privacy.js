@@ -129,7 +129,7 @@ const Privacy = () => {
           로딩 중...
         </div>
       </div>
-    );;
+    );
 
   const handleLogout = async () => {
     const confirmed = window.confirm("로그아웃 하시겠습니까?");

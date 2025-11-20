@@ -227,7 +227,17 @@ const Communitymodify = () => {
     }
   };
 
-  if (!isLoaded) return <div>로딩 중...</div>;
+  if (!isLoaded) return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          불러오는 중...
+        </div>
+      </div>
+    );
   if (error) return <div>{error}</div>;
 
   const showNavigation = posterPreviews.length > 1;

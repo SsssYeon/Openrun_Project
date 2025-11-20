@@ -119,64 +119,74 @@ const CommunityInfo = () => {
           </div>
 
           <div className="post-list">
-            {posts.map((post) => (
-              <Link
-                to={`/community/${post.postDocumentId}`}
-                key={post.postDocumentId}
-                className="post-item-link"
-              >
-                <div className="post-item">
-                  <div className="post-content-wrap">
-                    <div className="post-item-header">
-                      <h4 className="post-title">
-                        {post.postTitle.length > 22
-                          ? post.postTitle.slice(0, 21) + "..."
-                          : post.postTitle}
-                      </h4>
-                      {post.postTag &&
-                        post.postTag.map((tag, index) => (
-                          <span key={index} className="post-tag">
-                            {tag}
-                          </span>
-                        ))}
+            {loading ? (
+              <p className="loading-message" style={{ textAlign: 'center', padding: '20px' }}>
+                게시글 목록을 불러오는 중...
+              </p>
+            ) : posts.length === 0 ? (
+              <p className="no-posts-message" style={{ textAlign: 'center', padding: '20px' }}>
+                작성된 공연 정보 게시글이 없습니다.
+              </p>
+            ) : (
+              posts.map((post) => (
+                <Link
+                  to={`/community/${post.postDocumentId}`}
+                  key={post.postDocumentId}
+                  className="post-item-link"
+                >
+                  <div className="post-item">
+                    <div className="post-content-wrap">
+                      <div className="post-item-header">
+                        <h4 className="post-title">
+                          {post.postTitle.length > 22
+                            ? post.postTitle.slice(0, 21) + "..."
+                            : post.postTitle}
+                        </h4>
+                        {post.postTag &&
+                          post.postTag.map((tag, index) => (
+                            <span key={index} className="post-tag">
+                              {tag}
+                            </span>
+                          ))}
+                      </div>
+                      <p className="post-summary">
+                        {post.postContent.length > 35
+                          ? post.postContent.slice(0, 34) + "..."
+                          : post.postContent}
+                      </p>
+                      <div className="post-meta">
+                        <span className="post-nickname">{post.userNickname}</span>
+                        <span className="post-date">
+                          {new Date(post.postTimeStamp).toLocaleString(
+                            "ko-KR",
+                            dateTimeOptions
+                          )}
+                        </span>
+                        <span className="post-comments">
+                          💬 {post.commentCount || 0}
+                        </span>
+                      </div>
                     </div>
-                    <p className="post-summary">
-                      {post.postContent.length > 35
-                        ? post.postContent.slice(0, 34) + "..."
-                        : post.postContent}
-                    </p>
-                    <div className="post-meta">
-                      <span className="post-nickname">{post.userNickname}</span>
-                      <span className="post-date">
-                        {new Date(post.postTimeStamp).toLocaleString(
-                          "ko-KR",
-                          dateTimeOptions
-                        )}
-                      </span>
-                      <span className="post-comments">
-                        💬 {post.commentCount || 0}
-                      </span>
+                    <div className="post-image-preview">
+                      <img
+                        src={
+                          Array.isArray(post.postImage) &&
+                          post.postImage.length > 0
+                            ? post.postImage[0]
+                            : logo
+                        }
+                        alt={post.postTitle}
+                        className="post-thumbnail"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = logo;
+                        }}
+                      />
                     </div>
                   </div>
-                  <div className="post-image-preview">
-                    <img
-                      src={
-                        Array.isArray(post.postImage) &&
-                        post.postImage.length > 0
-                          ? post.postImage[0]
-                          : logo
-                      }
-                      alt={post.postTitle}
-                      className="post-thumbnail"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = logo;
-                      }}
-                    />
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))
+            )}
           </div>
 
           <button
