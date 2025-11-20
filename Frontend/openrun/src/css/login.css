@@ -48,10 +48,10 @@ h1#login_title {
   font-size: 13px;           /* 적절한 크기 (필요 시 조정) */
   font-family: "SUIT-Medium"; /* 다른 곳과 동일한 폰트 */
   user-select: none;         /* 클릭 시 텍스트 선택 방지 (선택 사항) */
-  vertical-align: middle; /* ✅ 추가: 체크박스와 글자 수직 정렬 */
-  display: flex;           /* ✅ 추가: 체크박스와 글자를 같은 라인에 정렬 */
-  align-items: center;     /* ✅ 추가: 세로 가운데 정렬 */
-  gap: 5px;                /* ✅ 선택: 체크박스와 글자 사이 간격 */
+  vertical-align: middle; /* 체크박스와 글자 수직 정렬 */
+  display: flex;           /* 체크박스와 글자를 같은 라인에 정렬 */
+  align-items: center;     /* 세로 가운데 정렬 */
+  gap: 5px;                /* 체크박스와 글자 사이 간격 */
 }
 
 #loginBut {
@@ -64,9 +64,6 @@ h1#login_title {
   width: 400px;
   margin: 20px 0 30px 0;
 }
-
-/* #loginBut:hover {
-    background-color: #f8d1dd;} /* 마우스 호버 시 색상 변경 */
 
 .link {
   display: flex;

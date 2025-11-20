@@ -87,7 +87,6 @@
   box-sizing: border-box; /* 패딩 포함 너비 조절 */
 }
 
-/* 포커스 시 밑줄 색깔 변경 (선택 사항) */
 .modifyrecord-row input:focus,
 .modifyrecord-row textarea:focus {
   border-bottom-color: #ffd049;
@@ -110,7 +109,6 @@
   resize: vertical; /* 세로로만 크기 조절 가능 (선택사항) */
 }
 
-/* 포커스 시 밑줄 색상 변경 (선택사항) */
 .review-item:focus {
   border-bottom-color: #ffd049;
 }

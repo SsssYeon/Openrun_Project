@@ -1,4 +1,4 @@
-//api 연결 O
+// 아이디 찾기 결과창, api 연결 O
 
 import React from "react";
 import "../css/findidresult.css";
@@ -8,7 +8,7 @@ import logo from "../components/logo.png";
 const Findidresult = () => {
 
   const location = useLocation();
-  const { userId } = location.state || {}; // 전달받은 값
+  const { userId } = location.state || {}; 
 
   return (
     <div className="findidresult-container">

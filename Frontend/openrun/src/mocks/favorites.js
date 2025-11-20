@@ -27,7 +27,7 @@ const favorites = [
     pfm_doc_id: "1",
     title: "매디슨 카운티의 다리",
     start: "2025-06-04",
-    end: "2025-06-19", // 종료일 다음날로 설정
+    end: "2025-06-22", // 종료일 다음날로 설정
     poster: poster3,
     className: 'favorite-3',
   },

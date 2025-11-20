@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import Nav from "../components/nav";
 
-// import userData from "../mocks/users";
 import "../css/myreport.css";
 
 import fallbackReports from "../mocks/reports";

@@ -1,13 +1,12 @@
-//api 연결 O, 백엔드 없이 화면 보는데 문제 없음
+// 비밀번호 찾기 화면, api 연결 완료
 
 import React, { useState, useEffect } from "react";
 import "../css/userjoin.css";
 import Nav from "../components/nav";
 import { useNavigate } from "react-router-dom";
 
-// 1. Firebase SDK 가져오기
 import { signInWithPhoneNumber, RecaptchaVerifier } from "firebase/auth";
-import { auth } from "../firebase"; // ⬅️ 설정 파일에서 가져옵니다. (Userjoin과 동일 가정)
+import { auth } from "../firebase"; 
 
 const Findpw = () => {
   const [userId, setUserId] = useState("");
@@ -15,11 +14,10 @@ const Findpw = () => {
   const [phoneCode, setPhoneCode] = useState("");
   const [phoneVerified, setPhoneVerified] = useState(false);
 
-  // ⭐️ [추가] Firebase 관련 상태
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
 
-  const [isSendingCode, setIsSendingCode] = useState(false); // 전송 중 상태 추가
+  const [isSendingCode, setIsSendingCode] = useState(false); 
 
   const navigate = useNavigate();
 
@@ -31,7 +29,7 @@ const Findpw = () => {
       try {
         window.recaptchaVerifier = new RecaptchaVerifier(
           auth,
-          "recaptcha-container-findpw", // ID 변경
+          "recaptcha-container-findpw", 
           {
             size: "invisible",
             callback: (response) => {
@@ -60,17 +58,16 @@ const Findpw = () => {
       return;
     }
 
-    if (isSendingCode) return; // 중복 클릭 방지
+    if (isSendingCode) return; 
     setIsSendingCode(true);
-    setConfirmationResult(null); // 전송 전에 기존 결과 초기화
+    setConfirmationResult(null);
 
-    // 전화번호 형식 보정: 010-xxxx-xxxx -> +8210xxxxxxxx
-    const cleanedPhoneNumber = phoneNumber.replace(/[^0-9]/g, ""); // 숫자만 남김
+    const cleanedPhoneNumber = phoneNumber.replace(/[^0-9]/g, "");
     if (cleanedPhoneNumber.length < 10) {
       alert("올바른 휴대폰 번호를 입력해주세요.");
       return;
     }
-    const finalPhoneNumber = "+82" + cleanedPhoneNumber.substring(1); // 010 -> +8210
+    const finalPhoneNumber = "+82" + cleanedPhoneNumber.substring(1); 
 
     
     try {
@@ -104,7 +101,7 @@ const Findpw = () => {
     }
   };
 
-  // ✅ 인증번호 확인
+  // 인증번호 확인
   const handleVerifyPhoneCode = async () => {
     if (!confirmationResult) {
       alert("먼저 인증번호 전송을 완료해주세요.");
@@ -117,10 +114,8 @@ const Findpw = () => {
     }
 
     try {
-      // 사용자가 입력한 코드로 인증을 시도합니다.
       await confirmationResult.confirm(phoneCode);
 
-      // 인증 성공!
       alert("인증 성공!");
       setPhoneVerified(true);
     } catch (err) {
@@ -156,7 +151,6 @@ const Findpw = () => {
 
       const data = await res.json();
 
-      // 성공 시 다음 페이지로 이동 (예: 비밀번호 재설정)
       navigate("/findpwresult", {
         state: { userId: data.user_id },
       });
@@ -188,7 +182,6 @@ const Findpw = () => {
                   name="userjoin_id"
                   value={userId}
                   onChange={(e) => setUserId(e.target.value)}
-                  // placeholder="7자 이상의 문자"
                   autoFocus
                 />
               </div>
@@ -205,7 +198,7 @@ const Findpw = () => {
                   placeholder="010xxxxxxxx"
                   onChange={(e) => {
                     setPhoneNumber(e.target.value);
-                    setPhoneVerified(false); // 번호 바뀌면 재인증
+                    setPhoneVerified(false); 
                   }}
                 />
                 <button
@@ -215,7 +208,6 @@ const Findpw = () => {
                 >
                   인증번호 전송
                 </button>
-                {/*인증번호 전송, 백엔드 개발과 함께 수정 예정*/}
               </div>
 
               {/* 인증번호 */}
@@ -229,7 +221,7 @@ const Findpw = () => {
                   value={phoneCode}
                   onChange={(e) => {
                     setPhoneCode(e.target.value);
-                    setPhoneVerified(false); // 인증번호 바뀌면 재확인
+                    setPhoneVerified(false); 
                   }}
                 />
                 <button

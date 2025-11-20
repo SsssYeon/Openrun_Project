@@ -1,9 +1,8 @@
 // 홈 2번째 화면, 최근 커뮤니티 글 api 연결 완료
-// 오픈런 랭킹, 오픈런 추천 공연 어떻게 할지 결정 필요. 결정 후 수정 필요한 부분 수정 예정
 
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import "../css/main2.css"; // CSS 파일 연결
+import "../css/main2.css";
 import poster7 from "../components/poster7.png";
 import poster8 from "../components/poster8.gif";
 import poster3 from "../components/poster3.jpg";
@@ -161,7 +160,7 @@ const Main2 = () => {
         setLoadingRecommend(false);
       });
 
-    // ⭐️ [수정] 3. 최근 커뮤니티 글 요청 (useEffect 안으로 이동) ===
+    // 3. 최근 커뮤니티 글 요청
     setLoadingPosts(true);
     fetch(`/api/community/latest`)
       .then((res) => {
@@ -169,7 +168,6 @@ const Main2 = () => {
         return res.json();
       })
       .then((data) => {
-        // 서버 응답이 배열 형태라고 가정합니다.
         if (Array.isArray(data)) setLatestPosts(data);
         else throw new Error("Invalid community data format");
       })
@@ -298,7 +296,7 @@ const Main2 = () => {
 
         <div className="banner">
           <h3 id="title">
-            홍익대학교 25학년도 2학기 졸업프로젝트 연극 뮤지컬 종합 플랫폼 OPEN RUN
+            홍익대학교 컴퓨터공학과 25학년도 2학기 졸업프로젝트 연극 뮤지컬 종합 플랫폼 OPEN RUN
           </h3>
         </div>
       </div>

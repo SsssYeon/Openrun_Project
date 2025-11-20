@@ -42,7 +42,6 @@
   text-decoration-color: #ffd049;
 }
 
-/* 로그아웃, 회원탈퇴 버튼도 a 태그처럼 보이게 */
 .menu-item li .text-button {
   background: none;
   border: none;
@@ -68,7 +67,6 @@
 .mypage-scroll {
   overflow-y: auto; /* 세로 스크롤 활성화 */
 }
-/* 오른쪽 상단 인사말 */
 .mypage-right-top {
   border: 1px solid lightgrey;
   border-radius: 16px;
@@ -199,8 +197,7 @@
   margin-top: 20px;
 
   display: flex;
-  /* margin 이외의 것은 중앙정렬 위해 추가한 것 */
-  flex-direction: column; /* ✅ 세로 방향 정렬 */
+  flex-direction: column; /* 세로 방향 정렬 */
 
   overflow-y: auto;
   gap: 10px;
@@ -281,7 +278,6 @@
   width: 500px;
   height: 50px;
   font-size: 18px;
-  /* font-weight: bold; */
   border: none;
   border-radius: 10px;
   margin: 20px 0 50px 0;
@@ -307,16 +303,7 @@
   font-size: 14px;
   color: #333;
 }
-/* 
-.show-card img {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-} */
 
-/* 하트 위치를 위해 감싸는 wrapper 추가 */
 .favorite-poster-wrapper {
   position: relative;
   width: 100%;
@@ -330,7 +317,6 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* 하트 아이콘 오른쪽 위에 고정 */
 .heart-icon {
   position: absolute;
   top: 8px;
@@ -350,5 +336,4 @@
   color: #888;
   margin-bottom: 80px;
   width: 500px;
-  /* 메시지가 부모 요소 중앙에 오도록 추가 조정 가능 */
 }

@@ -1,4 +1,4 @@
-//api 연결 O, 백엔드 없이 화면 보는데 문제 없음
+// 아이디 찾기 화면, api 연결 O
 
 import React, { useState, useEffect } from "react";
 import "../css/userjoin.css";
@@ -15,14 +15,13 @@ const Findid = () => {
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [foundId, setFoundId] = useState(null);
 
-  const [isSendingCode, setIsSendingCode] = useState(false); // 전송 중 상태 추가
+  const [isSendingCode, setIsSendingCode] = useState(false); 
 
   const [confirmationResult, setConfirmationResult] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    // reCAPTCHA가 이미 초기화되었는지 확인
     if (
       typeof window.recaptchaVerifier === "undefined" ||
       !window.recaptchaVerifier
@@ -30,7 +29,7 @@ const Findid = () => {
       try {
         window.recaptchaVerifier = new RecaptchaVerifier(
           auth,
-          "recaptcha-container-findid", // ID 변경 (페이지별 고유하게 설정)
+          "recaptcha-container-findid",
           {
             size: "invisible",
             callback: (response) => {
@@ -59,17 +58,16 @@ const Findid = () => {
       return;
     }
 
-    if (isSendingCode) return; // 중복 클릭 방지
+    if (isSendingCode) return; 
     setIsSendingCode(true);
-    setConfirmationResult(null); // 전송 전에 기존 결과 초기화
+    setConfirmationResult(null); 
 
-    // 전화번호 형식 보정: 010-xxxx-xxxx -> +8210xxxxxxxx
-    const cleanedPhoneNumber = phoneNumber.replace(/[^0-9]/g, ""); // 숫자만 남김
+    const cleanedPhoneNumber = phoneNumber.replace(/[^0-9]/g, ""); 
     if (cleanedPhoneNumber.length < 10) {
       alert("올바른 휴대폰 번호를 입력해주세요.");
       return;
     }
-    const finalPhoneNumber = "+82" + cleanedPhoneNumber.substring(1); // 010 -> +8210
+    const finalPhoneNumber = "+82" + cleanedPhoneNumber.substring(1); 
 
     try {
       const appVerifier = window.recaptchaVerifier;
@@ -81,20 +79,17 @@ const Findid = () => {
         return;
       }
 
-      // Firebase로 인증번호 전송 시도
       const result = await signInWithPhoneNumber(
         auth,
         finalPhoneNumber,
         appVerifier
       );
 
-      // 확인 결과를 상태에 저장
       setConfirmationResult(result);
       alert("인증번호가 전송되었습니다.");
     } catch (err) {
       console.error("Firebase 인증번호 전송 오류:", err);
       alert(`인증번호 전송 중 오류가 발생했습니다. (오류: ${err.code})`);
-      // reCAPTCHA 재설정
       if (window.recaptchaVerifier && window.recaptchaVerifier.reset) {
         window.recaptchaVerifier.reset();
       }
@@ -113,10 +108,8 @@ const Findid = () => {
     }
 
     try {
-      // 사용자가 입력한 코드로 인증을 시도합니다.
       await confirmationResult.confirm(phoneCode);
 
-      // 인증 성공!
       alert("인증 성공!");
       setPhoneVerified(true);
     } catch (err) {
@@ -188,7 +181,6 @@ const Findid = () => {
                   name="userjoin_name"
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
-                  // placeholder="이름"
                 />
               </div>
 
@@ -211,7 +203,6 @@ const Findid = () => {
                 >
                   인증번호 전송
                 </button>
-                {/*인증번호 전송, 백엔드 개발과 함께 수정 예정*/}
               </div>
 
               {/* 인증번호 */}
@@ -225,7 +216,7 @@ const Findid = () => {
                   value={phoneCode}
                   onChange={(e) => {
                     setPhoneCode(e.target.value);
-                    setPhoneVerified(false); // ✅ 인증 다시 필요
+                    setPhoneVerified(false); // 인증 다시 필요
                   }}
                 />
                 <button

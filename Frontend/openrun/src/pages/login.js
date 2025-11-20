@@ -1,4 +1,4 @@
-//api 연결 O
+// 로그인 화면, api 연결 O
 
 import React, { useEffect, useState } from "react";
 import "../css/login.css";
@@ -8,11 +8,11 @@ import Nav from "../components/nav.js";
 const Login = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
-  const [autoLogin, setAutoLogin] = useState(false); // ✅ 자동 로그인 여부
-  const navigate = useNavigate(); // 로그인 성공 후 페이지 이동용
+  const [autoLogin, setAutoLogin] = useState(false); 
+  const navigate = useNavigate(); 
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // 폼 제출 기본 동작 막기
+    e.preventDefault(); 
 
     try {
       const response = await fetch(`/api/auth/login`, {
@@ -31,7 +31,6 @@ const Login = () => {
       }
 
       const data = await response.json();
-      // 예시: 토큰 저장
 
       const storage = autoLogin ? localStorage : sessionStorage;
       storage.setItem("token", data.user_local_token);
@@ -39,24 +38,12 @@ const Login = () => {
       storage.setItem("nickname", data.user_nicknm);
 
       alert(`${data.user_nicknm}님 환영합니다!`);
-      navigate("/"); // 홈 또는 마이페이지 등으로 이동
+      navigate("/"); 
     } catch (err) {
       console.error(err);
       alert("아이디 또는 비밀번호를 확인하세요.");
     }
   };
-
-  // useEffect(() => {
-  //   if (
-  //     process.env.NODE_ENV === "development" &&
-  //     !localStorage.getItem("token") &&
-  //     !sessionStorage.getItem("token")
-  //   ) {
-  //     localStorage.setItem("token", "dummy-token");
-  //     localStorage.setItem("userId", "testuser");
-  //     localStorage.setItem("nickname", "테스트계정");
-  //   }
-  // }, []); // 임시 코드 로그인된 상태로 만들기 위해 토큰 자동 삽입, 추후 주석처리 예정 -> 백 개발 시 주석처리하고 진행해주세요!
 
   return (
     <div>
@@ -92,7 +79,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
               ></input>
 
-              {/* ✅ 자동 로그인 체크박스 추가 */}
+              {/* 자동 로그인 체크박스 추가 */}
               <div style={{ marginTop: "15px", marginBottom: "5px" }}>
                 <label className="auto-login-label">
                   <input

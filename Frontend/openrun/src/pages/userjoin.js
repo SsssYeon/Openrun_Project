@@ -1,16 +1,15 @@
-//api 연결 O, 백엔드 없이 화면 보는데 문제 없음
+// 회원가입 화면
 
 import React, { useState, useEffect } from "react";
 import "../css/userjoin.css";
 import Nav from "../components/nav";
 import { NavLink, useNavigate } from "react-router-dom";
 
-// 1. Firebase SDK 가져오기
 import { signInWithPhoneNumber, RecaptchaVerifier } from "firebase/auth";
-import { auth } from "../firebase"; // ⬅️ 설정 파일에서 가져옵니다.
+import { auth } from "../firebase"; 
 
 const Userjoin = () => {
-  const navigate = useNavigate(); // 로그인 성공 후 페이지 이동용
+  const navigate = useNavigate(); 
   const [formData, setFormData] = useState({
     user_id: "",
     user_pw: "",
@@ -27,9 +26,7 @@ const Userjoin = () => {
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
 
-  // 3. reCAPTCHA 초기화
   useEffect(() => {
-    // window.recaptchaVerifier가 없으면 초기화합니다.
     if (
       typeof window.recaptchaVerifier === "undefined" ||
       !window.recaptchaVerifier
@@ -69,7 +66,6 @@ const Userjoin = () => {
 
     if (name === "user_id") setIdChecked(false);
 
-    // ✅ 휴대폰 번호 변경 시 인증 상태 초기화 (재인증 강제)
     if (name === "user_phonenum") {
       setPhoneVerified(false);
       setConfirmationResult(null);
@@ -106,7 +102,6 @@ const Userjoin = () => {
     }
   };
 
-  // ✅ 인증번호 전송
   const handleSendPhoneCode = async () => {
     if (!formData.user_phonenum) {
       alert("휴대폰 번호를 입력해주세요.");
@@ -123,7 +118,6 @@ const Userjoin = () => {
         return;
       }
 
-      // 한국은 +82-10-xxxx-xxxx 형식이어야 하므로, 전화번호 형식 보정 필요
       const phoneNumber =
         "+82" + formData.user_phonenum.replace(/-/g, "").substring(1);
 
@@ -133,17 +127,14 @@ const Userjoin = () => {
         appVerifier
       );
 
-      // 확인 결과를 상태에 저장하여 나중에 인증 코드를 확인할 때 사용합니다.
       setConfirmationResult(result);
       alert("인증번호가 전송되었습니다.");
     } catch (err) {
       console.error("Firebase 인증번호 전송 오류:", err);
-      // reCAPTCHA 오류, 잘못된 전화번호 등 다양한 오류가 발생할 수 있습니다.
       alert(`인증번호 전송 중 오류가 발생했습니다. (오류: ${err.code})`);
     }
   };
 
-  // ✅ 인증번호 확인
   const handleVerifyPhoneCode = async () => {
     if (!confirmationResult) {
       alert("먼저 인증번호 전송을 완료해주세요.");
@@ -156,11 +147,7 @@ const Userjoin = () => {
     }
 
     try {
-      // 사용자가 입력한 코드로 인증을 시도합니다.
       await confirmationResult.confirm(formData.user_phonecode);
-
-      // 인증 성공! (이 시점에 Firebase 사용자 객체는 생성되지만,
-      // 가입은 백엔드 API 호출로 최종 처리해야 함)
       alert("인증 성공!");
       setPhoneVerified(true);
     } catch (err) {
@@ -213,7 +200,6 @@ const Userjoin = () => {
           user_nm: formData.user_nm,
           user_nicknm: formData.user_nicknm,
           user_phonenum: formData.user_phonenum,
-          // user_doc_no, user_local_token, user_kakao_token, user_timestamp는 가입 시점엔 백엔드에서 자동 생성 가능
         }),
       });
 
@@ -256,11 +242,10 @@ const Userjoin = () => {
                 id="dupIdCheck"
                 onClick={handleCheckDuplicateId}
                 style={{
-                  backgroundColor: "#ffd049", // 완료 시 초록색 (또는 원하는 색상)
-                  color: "black", // 텍스트 색상 변경
+                  backgroundColor: "#ffd049", 
+                  color: "black", 
                 }}
-                // ✅ 수정된 부분: 아이디가 확인되면 버튼 텍스트 변경
-                disabled={idChecked} // 중복 확인 완료 후 재확인 방지 (선택 사항)
+                disabled={idChecked}
               >
                 {idChecked ? "확인완료" : "중복확인"}
               </button>
@@ -366,14 +351,12 @@ const Userjoin = () => {
                   backgroundColor: "#ffd049",
                   color: "black",
                 }}
-                // ✅ 인증 완료 후 비활성화
                 disabled={phoneVerified}
               >
                 {phoneVerified ? "인증 완료" : "인증 확인"}
               </button>
             </div>
 
-            {/* 4. reCAPTCHA 컨테이너 (시각적으로 숨겨져도 무방) */}
             <div
               id="recaptcha-container"
               style={{ visibility: "hidden", height: 0 }}

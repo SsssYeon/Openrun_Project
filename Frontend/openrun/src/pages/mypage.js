@@ -1,10 +1,10 @@
-// 마이페이지, api 연동 완료(커뮤니티까지 완료)
+// 마이페이지, api 연동 완료
 
 import React, { useEffect, useState } from "react";
 import Nav from "../components/nav";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import userData from "../mocks/users";
-import favoritesMock from "../mocks/favorites"; // 예시 관심 공연 데이터 임포트
+import favoritesMock from "../mocks/favorites";
 import "../css/mypage.css";
 import poster1 from "../components/poster1.jpg";
 import poster2 from "../components/poster2.jpg";
@@ -93,7 +93,7 @@ const MyPage = () => {
   const [isInterestsLoading, setIsInterestsLoading] = useState(true);
   const [isPostsLoading, setIsPostsLoading] = useState(true);
 
-  const [interests, setInterests] = useState([]); // 관심 공연 상태 추가
+  const [interests, setInterests] = useState([]); 
   const [myPosts, setMyPosts] = useState(fallbackCommunity);
   const navigate = useNavigate();
 
@@ -104,7 +104,6 @@ const MyPage = () => {
 
       if (!token) return navigate("/login", { replace: true });
 
-      // 1. 닉네임 (사용자 정보) API 호출
       try {
         const userResponse = await fetch(`/api/users/me`, {
           method: "GET",
@@ -121,13 +120,9 @@ const MyPage = () => {
         setUser(data);
       } catch (error) {
         console.error("사용자 정보 로드 실패. Mock 데이터 사용:", error);
-        // 닉네임 로드 실패 시에만 Mock 데이터 사용
         setUser(userData);
-        // 🚨 사용자 정보 없이는 다음 API를 호출할 필요가 없다고 가정하고 리턴할 수도 있지만,
-        // Mock 데이터라도 로드되었으니 진행하는 것으로 유지했습니다.
       }
 
-      // 2. 관심 공연 API 호출
       setIsInterestsLoading(true);
       try {
         const interestResponse = await fetch(`/api/calendar/like`, {
@@ -144,16 +139,14 @@ const MyPage = () => {
 
         const interestData = await interestResponse.json();
         const likeList = interestData.userLikeList || [];
-        setInterests(likeList.slice(0, 3)); // 상위 3개만 표시
+        setInterests(likeList.slice(0, 2)); 
       } catch (error) {
         console.warn("관심 공연 API 실패. Mock 데이터 사용:", error);
-        // 관심 공연 로드 실패 시에만 Mock 데이터 사용
         setInterests(favoritesMock?.slice(0, 3) || []);
       } finally {
-        setIsInterestsLoading(false); // 관심 공연 로딩 완료
+        setIsInterestsLoading(false);
       }
 
-      // 3. 나의 글 (커뮤니티) API 호출
       setIsPostsLoading(true);
       try {
         const postsResponse = await fetch(`/api/users/me/posts`, {
@@ -166,19 +159,17 @@ const MyPage = () => {
         }
 
         const postsData = await postsResponse.json();
-        // API에서 받은 데이터가 배열이 아니거나 비어있으면 빈 배열 사용 후 2개로 자름
         setMyPosts(postsData.posts?.slice(0, 2) || []);
       } catch (error) {
         console.warn("My posts API failed. Using mock data:", error);
-        // 나의 글 로드 실패 시에만 Mock 데이터 사용
         setMyPosts(fallbackCommunity.slice(0, 2));
       } finally {
-        setIsPostsLoading(false); // 나의 글 로딩 완료
+        setIsPostsLoading(false); 
       }
     };
 
     fetchUser();
-  }, [navigate]); // 의존성 배열 유지
+  }, [navigate]); 
 
 
   const handleLogout = async () => {
@@ -209,7 +200,7 @@ const MyPage = () => {
       setUser(null);
 
       alert("정상적으로 로그아웃되었습니다.");
-      navigate("/"); // 로그인 페이지나 홈으로 이동
+      navigate("/"); // 홈으로 이동
     } catch (error) {
       alert(`로그아웃 오류: ${error.message}`);
       console.error("로그아웃 실패:", error);
@@ -229,10 +220,10 @@ const MyPage = () => {
       })
         .then((res) => {
           if (res.ok) {
-            localStorage.clear(); // 모든 사용자 정보 제거
+            localStorage.clear(); 
             sessionStorage.clear();
             alert("회원 탈퇴가 완료되었습니다.");
-            navigate("/"); // 홈 또는 탈퇴 완료 페이지로 이동
+            navigate("/"); // 홈으로 이동
           } else {
             return res.json().then((data) => {
               throw new Error(data.message || "탈퇴 처리에 실패했습니다.");

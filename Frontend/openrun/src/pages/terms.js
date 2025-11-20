@@ -83,7 +83,6 @@ const Terms = () => {
     localStorage.getItem("token") || sessionStorage.getItem("token");
 
   useEffect(() => {
-    // 사용자 정보 가져오기
     const fetchUserInfo = async () => {
       try {
         const response = await fetch("/api/users/me", {
@@ -172,7 +171,7 @@ const Terms = () => {
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
       alert("정상적으로 로그아웃되었습니다.");
-      navigate("/"); // 로그인 페이지나 홈으로 이동
+      navigate("/"); // 홈으로 이동
     } catch (error) {
       alert(`로그아웃 오류: ${error.message}`);
       console.error("로그아웃 실패:", error);
@@ -190,10 +189,10 @@ const Terms = () => {
       })
         .then((res) => {
           if (res.ok) {
-            localStorage.clear(); // 모든 사용자 정보 제거
+            localStorage.clear(); 
             sessionStorage.clear();
             alert("회원 탈퇴가 완료되었습니다.");
-            navigate("/"); // 홈 또는 탈퇴 완료 페이지로 이동
+            navigate("/"); // 홈으로 이동
           } else {
             return res.json().then((data) => {
               throw new Error(data.message || "탈퇴 처리에 실패했습니다.");
@@ -254,14 +253,11 @@ const Terms = () => {
 
         <div className="account-right">
           <div className="terms-content-box" style={{ 
-              maxHeight: '600px', // 스크롤을 위한 최대 높이 설정
-              overflowY: 'auto', // 내용이 길면 스크롤되도록 설정
-             
-              
-              whiteSpace: 'pre-wrap', // 공백 및 줄바꿈 유지
+              maxHeight: '600px', 
+              overflowY: 'auto',
+              whiteSpace: 'pre-wrap', 
               lineHeight: '1.6' 
             }}>
-            {/* 약관 텍스트를 <pre> 태그 대신 일반 div에 넣고 whiteSpace: 'pre-wrap'으로 줄바꿈을 유지 */}
             {TERMS_OF_SERVICE}
           </div>
         </div>

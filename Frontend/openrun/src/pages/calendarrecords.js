@@ -1,4 +1,4 @@
-// api 연결 O, 백엔드와 연결 안됐을 시 예시 데이터 노출 / 사용자 개개인에 맞는 정보 요청
+// 관극 기록 달력 화면 -> api 연결 O, 백엔드와 연결 안됐을 시 예시 데이터 노출
 
 import Nav from "../components/nav.js";
 import "../css/calendarrecords.css";
@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import eventsData from "../mocks/events.js"; // 예시 JSON 데이터
 
 const Calendarrecords = () => {
-  const [events, setEvents] = useState([]); // 전체 관극 기록
+  const [events, setEvents] = useState([]);
   const [selectedDateEvents, setSelectedDateEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +26,7 @@ const Calendarrecords = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // ✅ 토큰 포함
+            Authorization: `Bearer ${token}`, // 토큰 포함
           },
         });
         if (!res.ok) throw new Error("API 응답 오류");
@@ -36,20 +36,19 @@ const Calendarrecords = () => {
         setEvents(formatted);
         setSelectedDateEvents(formatted);
       } catch (error) {
-        console.warn("❌ API 호출 실패, 예시 데이터 사용 중:", error);
+        console.warn("API 호출 실패, 예시 데이터 사용 중:", error);
 
-        const formatted = formatCalendarData(eventsData); // ✅ 예시 데이터로 대체
+        const formatted = formatCalendarData(eventsData); // 예시 데이터로 대체
         setEvents(formatted);
         setSelectedDateEvents(formatted);
       } finally {
-        // ⭐️ 로딩 종료 (성공/실패 무관)
         setIsLoading(false);
       }
     };
     fetchCalendarData();
   }, []);
 
-  // ✅ 공통 데이터 포맷 함수
+  // 공통 데이터 포맷 함수
   const formatCalendarData = (data) =>
     data.map((item) => ({
       id: item.pfmcalender_doc_no,
@@ -125,7 +124,7 @@ const Calendarrecords = () => {
               headerToolbar={{
                 left: "prev",
                 center: "title",
-                right: "next", // 'today' 제거됨
+                right: "next", 
               }}
             />
           </div>
@@ -148,7 +147,7 @@ const Calendarrecords = () => {
                     관극 기록을 불러오는 중입니다...
                   </p>
                 ) : searchTerm === "" && events.length === 0 ? (
-                  // 로딩 완료 후, 검색어가 없고 전체 이벤트가 0일 경우 (기록 없음)
+                  // 로딩 완료 후, 검색어가 없고 기록이 없는 경우
                   <p className="calendar-no-records-message">
                     오른쪽 아래 '+'버튼을 눌러 관극 기록을 추가해보세요!
                   </p>
@@ -201,7 +200,7 @@ const Calendarrecords = () => {
         </div>
         <button
           className="floating-add-button"
-          onClick={() => navigate("/addrecord")} // 원하는 경로로 수정
+          onClick={() => navigate("/addrecord")}
         >
           <span className="plus-symbol">+</span>
         </button>
