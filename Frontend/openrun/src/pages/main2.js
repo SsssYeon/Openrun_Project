@@ -39,17 +39,17 @@ const fallbackRanking = [
 
 const fallbackRecommend = [
   {
-    pfm_doc_id: 1,
+    pfm_doc_id: "PF275043",
     catchphrase: "우린 왜 그냥 스쳐 가지 않고 \n서로를 바라봤을까",
     pfm_poster: poster4,
   },
   {
-    pfm_doc_id: 2,
+    pfm_doc_id: "PF273019",
     catchphrase: "누군가 이 세상을 \n바로잡아야 한다",
     pfm_poster: poster5,
   },
   {
-    pfm_doc_id: 3,
+    pfm_doc_id: "PF274238",
     catchphrase: "No day\nBut today",
     pfm_poster: poster6,
   },
@@ -196,7 +196,7 @@ const Main2 = () => {
                 key={item.pfm_doc_id}
                 className="post-item-link"
               >
-                <div className="ranking-item" key={item.pfm_doc_id ?? index}>
+                <div className="ranking-item">
                   <div className="rank-num">{index + 1}</div>
                   <div className="ranking-info">
                     <div className="title">{item.pfm_nm}</div>
@@ -221,7 +221,7 @@ const Main2 = () => {
                 key={item.pfm_doc_id}
                 className="performance-item-link"
               >
-                <div className="recommend-card" key={item.pfm_id ?? index}>
+                <div className="recommend-card">
                   <img src={item.pfm_poster} alt={`${index}번째 포스터`} />
                   <div className="card-text">
                     <div className="catchphrase">
@@ -244,7 +244,7 @@ const Main2 = () => {
           <div className="main2-community-list">
             {loadingPosts ? (
               <p className="calendar-no-records-message">
-                    관극 기록을 불러오는 중입니다...
+                    커뮤니티 글을 불러오는 중입니다...
                   </p>
             ) : (
               latestPosts.map((item) => (
@@ -253,7 +253,7 @@ const Main2 = () => {
                   key={item.postDocumentId}
                   className="post-item-link"
                 >
-                  <div className="main2-community-item" key={item.postDocumentId}>
+                  <div className="main2-community-item">
                     <div className="content">
                       <div className="title">
                         {item.postTitle.length > 30
