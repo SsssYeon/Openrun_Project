@@ -1,5 +1,4 @@
 // 커뮤니티 글 상세보기 페이지, api 연결 완료
-// 글 상세보기, 삭제, 신고 + 댓글 작성, 삭제, 신고 연결 완료
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -8,7 +7,6 @@ import "../css/communitypost.css";
 import { communitydata } from "../mocks/communitymocks";
 import { commentmocks } from "../mocks/communitycomment";
 
-// ⭐️ [추가] 이미지 모달 컴포넌트
 const ImageModal = ({
   src,
   onClose,
@@ -53,12 +51,10 @@ const ImageModal = ({
 const fetchCurrentUserId = async (token) => {
   if (!token) return null;
 
-  // Mock 토큰을 위한 임시 처리 (실제 API 호출 시 제거)
   if (token === "mock_user1_token" || token === "mock_user2_token") {
     return "user_a123";
   }
 
-  // 💡 백엔드에 토큰을 보내 현재 사용자의 ID를 요청하는 API 엔드포인트 가정
   try {
     const response = await fetch(`/api/user/current-id`, {
       method: "GET",
@@ -67,10 +63,8 @@ const fetchCurrentUserId = async (token) => {
 
     if (response.ok) {
       const data = await response.json();
-      // 💡 서버 응답 형태: { userId: "..." } 가정
       return data.userId;
     }
-    // 토큰이 만료되었거나 유효하지 않은 경우
     return null;
   } catch (error) {
     console.error("Failed to fetch current user ID:", error);
@@ -79,9 +73,7 @@ const fetchCurrentUserId = async (token) => {
 };
 
 const apiService = {
-  // ⭐️ GET: 글 상세 조회 (/api/community/posts/{postId})
   getPostDetail: async (postId, token) => {
-    // 10% 확률로 API 호출 실패 시뮬레이션 (네트워크 오류/CORS 등)
     if (Math.random() < 0.1) {
       throw new Error("API_CALL_FAILED_SIMULATION");
     }
@@ -89,20 +81,17 @@ const apiService = {
     const response = await fetch(`/api/community/posts/${postId}`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`, // 토큰 전송
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
 
-    // HTTP 상태 코드 검증 (200 OK가 아니면 오류 throw)
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
 
-    // ⭐️ 서버 응답 형태 가정 (post와 comments 모두 isAuthor 플래그 포함)
-    // 실제 API 연결 시 commentmocks 부분 제거 필요
     return {
       post: data.post || data,
       comments:
@@ -111,7 +100,6 @@ const apiService = {
     };
   },
 
-  // ⭐️ PATCH: 글 수정 (/api/community/posts/{postId})
   updatePost: async (postId, token, updateData) => {
     const response = await fetch(`/api/community/posts/${postId}`, {
       method: "PATCH",
@@ -130,7 +118,6 @@ const apiService = {
     return { success: true };
   },
 
-  // ⭐️ DELETE: 글 삭제 (/api/community/posts/{postId})
   deletePost: async (postId, token) => {
     const response = await fetch(`/api/community/posts/${postId}`, {
       method: "DELETE",
@@ -145,7 +132,6 @@ const apiService = {
     return { success: true };
   },
 
-  // ⭐️ POST: 댓글 작성 (/api/community/posts/{postId}/comments)
   createComment: async (postId, token, commentContent) => {
     const response = await fetch(`/api/community/posts/${postId}/comments`, {
       method: "POST",
@@ -163,7 +149,6 @@ const apiService = {
 
     const data = await response.json();
 
-    // ⭐️ 서버 응답: isAuthor, ID, nickname, timestamp 포함 가정
     return {
       commentDocumentId: data.commentDocumentId,
       isAuthor: data.isAuthor,
@@ -172,7 +157,6 @@ const apiService = {
     };
   },
 
-  // ⭐️ DELETE: 댓글 삭제 (/api/community/comments/{commentId})
   deleteComment: async (commentId, token) => {
     const response = await fetch(`/api/community/comments/${commentId}`, {
       method: "DELETE",
@@ -186,8 +170,6 @@ const apiService = {
     }
     return { success: true };
   },
-
-  // ⭐️ POST: 댓글/글 신고 (/api/community/posts/{postId}/reports 또는 /api/community/comments/{commentId}/reports)
 
   reportItem: async (endpoint, itemId, token) => {
     const response = await fetch(`/api/${endpoint}/${itemId}/reports`, {
@@ -221,29 +203,25 @@ function CommunityPost() {
 
   const isLoggedIn = !!token;
 
-  // ⭐ 메인 데이터 패칭 useEffect
   useEffect(() => {
     const fetchPostDetail = async () => {
-      setLoading(true); // fetch 시작 시 로딩 상태 설정
+      setLoading(true);
 
       try {
-        // 1. API 호출 시도
         const response = await apiService.getPostDetail(id, token);
 
-        // 2. 성공 시 API 응답 사용 (isAuthor 플래그 포함)
         const postData = response.post || response;
 
         const finalIsAuthor = postData.isAuthor || false;
 
         setPost({
           ...postData,
-          isAuthor: finalIsAuthor, // 백엔드가 준 isAuthor를 확정하여 상태에 저장
+          isAuthor: finalIsAuthor,
         });
 
-        // 🚀 변경 2: 댓글의 isAuthor도 서버 응답만 사용
         const commentsWithAuth = (response.comments || [])
           .map((c) => {
-            const finalIsAuthor = c.isAuthor || false; // 서버가 isAuthor를 주지 않으면 false
+            const finalIsAuthor = c.isAuthor || false;
             return {
               ...c,
               isAuthor: finalIsAuthor,
@@ -258,10 +236,8 @@ function CommunityPost() {
 
         console.log("[API SUCCESS/MOCK FALLBACK] Post detail loaded.");
       } catch (error) {
-        // 3. API 호출 실패 (네트워크 오류, 404, Mock 실패 시뮬레이션 등)
         console.error("[API FAIL] Falling back to Mock data.", error.message);
 
-        // 4. Mock Fallback 로직 (API 서비스 내부에서 처리하지 않았을 경우)
         const foundPost = communitydata.find(
           (p) => String(p.postDocumentId) === id
         );
@@ -273,15 +249,15 @@ function CommunityPost() {
           setPost(postWithAuth);
           setCommentList(commentsWithAuth);
         } else {
-          setPost(null); // Mock 데이터도 없는 경우
+          setPost(null); 
         }
       } finally {
-        setLoading(false); // fetch 완료 시 로딩 상태 해제
+        setLoading(false);
       }
     };
 
     fetchPostDetail();
-  }, [id, token]); // token과 currentUserId가 변경되면 재호출
+  }, [id, token]); 
 
   const commentsWithAuth = commentmocks
     .filter((c) => String(c.postDocumentId) === id)
@@ -294,22 +270,17 @@ function CommunityPost() {
     );
 
   const handleEdit = useCallback(() => {
-    // 수정 페이지로 이동 로직 (Mock)
 
     navigate(`/modifypost/${id}`);
 
-    // console.log(`Editing post ${id}`);
   }, [id, navigate]);
 
-  // ⭐️ 글 삭제: DELETE API 연결
   const handleDelete = useCallback(async () => {
     if (window.confirm("정말 삭제하시겠습니까?")) {
       try {
-        // API 호출 시도 (Mock Service를 통해 서버 검증 시뮬레이션)
         await apiService.deletePost(id, token);
-        alert("게시글 삭제 요청이 성공적으로 서버에 전달되었습니다. (Mock)");
+        alert("게시글이 삭제되었습니다.");
 
-        // 성공 시 목록으로 이동
         navigate("/community");
       } catch (error) {
         console.error(`[API ERROR] 삭제 실패: ${error.message}`);
@@ -330,7 +301,7 @@ function CommunityPost() {
 
     if (window.confirm("정말 신고하시겠습니까?")) {
       try {
-        await apiService.reportItem("community/posts", id, token); // ⭐️ 글 신고 API 호출
+        await apiService.reportItem("community/posts", id, token); 
         alert("게시글을 신고했습니다.");
       } catch (error) {
         console.error(`[API ERROR] 신고 실패: ${error.message}`);
@@ -339,41 +310,32 @@ function CommunityPost() {
     }
   }, [id, isLoggedIn, token]);
 
-  // 🌟 추가할 상태: 현재 표시 중인 이미지의 인덱스
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // 🌟 이전 이미지로 이동하는 함수
   const handlePrevImage = useCallback(() => {
-    // post가 null이거나, post.postImage가 배열이 아니거나, 길이가 1 이하면 return
     if (!post?.postImage || post.postImage.length <= 1) return;
     setCurrentImageIndex((prevIndex) =>
       prevIndex === 0 ? post.postImage.length - 1 : prevIndex - 1
     );
-  }, [post]); // post가 변경될 때마다 함수 재생성
+  }, [post]); 
 
-  // 🌟 다음 이미지로 이동하는 함수
   const handleNextImage = useCallback(() => {
-    // post가 null이거나, post.postImage가 배열이 아니거나, 길이가 1 이하면 return
     if (!post?.postImage || post.postImage.length <= 1) return;
     setCurrentImageIndex((prevIndex) =>
       prevIndex === post.postImage.length - 1 ? 0 : prevIndex + 1
     );
-  }, [post]); // post가 변경될 때마다 함수 재생성
-  // ⭐️ [추가] 이미지 클릭 시 모달 열기
+  }, [post]); 
   const handleImageClick = useCallback(() => {
     setShowImageModal(true);
   }, []);
 
-  // ⭐️ [추가] 모달 닫기
   const handleCloseModal = useCallback(() => {
     setShowImageModal(false);
   }, []);
 
-  // 🌟 현재 표시할 이미지 URL을 결정 (post가 null일 때 안전하게 처리)
   const currentImageUrl =
-    // post가 null이 아닐 때만 post.postImage[index]에 접근합니다.
     (post?.postImage && post.postImage[currentImageIndex]) ||
-    "/default-poster.png"; // fallback (post.postImage가 없거나 유효하지 않을 때)
+    "/default-poster.png";
 
   const showNavigation = post?.postImage?.length > 1;
 
@@ -395,19 +357,18 @@ function CommunityPost() {
         newCommentContent
       );
 
-      // 새 댓글 객체 생성 (API 응답 데이터와 입력 내용 결합)
       const newComment = {
         postDocumentId: id,
         commentDocumentId: result.commentDocumentId,
-        commentContent: newCommentContent, // 클라이언트 입력 내용
+        commentContent: newCommentContent, 
         userNickname: result.userNickname,
         commentTimeStamp: result.commentTimeStamp,
-        isAuthor: result.isAuthor || false, // 서버가 반환한 isAuthor 플래그만 사용
+        isAuthor: result.isAuthor || false, 
       };
 
       setCommentList((prevList) => [newComment, ...prevList]);
       setNewCommentContent("");
-      alert("댓글이 성공적으로 등록되었습니다. (Mock)");
+      alert("댓글이 성공적으로 등록되었습니다.");
     } catch (error) {
       console.error(`[API ERROR] 댓글 작성 실패: ${error.message}`);
       alert("댓글 등록 중 오류가 발생했습니다.");
@@ -427,7 +388,7 @@ function CommunityPost() {
           setCommentList((prevList) =>
             prevList.filter((cmt) => cmt.commentDocumentId !== commentId)
           );
-          alert("댓글이 성공적으로 삭제되었습니다. (Mock)");
+          alert("댓글이 성공적으로 삭제되었습니다.");
         } catch (error) {
           console.error(`[API ERROR] 댓글 삭제 실패: ${error.message}`);
           alert("댓글 삭제 중 오류가 발생했습니다.");
@@ -446,7 +407,7 @@ function CommunityPost() {
 
       if (window.confirm("정말 신고하시겠습니까?")) {
         try {
-          await apiService.reportItem("community/comments", commentId, token); // ⭐️ 댓글 신고 API 호출
+          await apiService.reportItem("community/comments", commentId, token); 
           alert("댓글을 신고했습니다.");
         } catch (error) {
           console.error(`[API ERROR] 신고 실패: ${error.message}`);
@@ -459,17 +420,26 @@ function CommunityPost() {
 
   const renderWithLineBreaks = (text) => {
     if (!text) return null;
-    // 텍스트를 줄 바꿈 문자(\n) 기준으로 분리하고, 각 줄 사이에 <br> 태그를 넣어줍니다.
     return text.split("\n").map((line, index) => (
       <React.Fragment key={index}>
         {line}
-        {/* 마지막 줄이 아닐 경우에만 <br>을 추가하여 줄 바꿈을 만듭니다. */}
         {index !== text.split("\n").length - 1 && <br />}
       </React.Fragment>
     ));
   };
 
-  if (loading) return <div>불러오는 중...</div>;
+  if (loading)
+    return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          불러오는 중...
+        </div>
+      </div>
+    );
   if (!post || post.postState === 1)
     return <div>숨겨진 글이거나, 해당 커뮤니티 글을 찾을 수 없습니다.</div>;
 
@@ -479,7 +449,7 @@ function CommunityPost() {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false, // 24시간 형식
+    hour12: false, 
   };
 
   return (
@@ -490,7 +460,6 @@ function CommunityPost() {
       <div className="community-post">
         <div className="event-buttons">
           {post?.isAuthor ? (
-            // 작성자인 경우: 수정 및 삭제 버튼 표시
             <>
               <button className="edit-button" onClick={handleEdit}>
                 수정
@@ -500,7 +469,6 @@ function CommunityPost() {
               </button>
             </>
           ) : (
-            // 작성자가 아니지만 로그인한 경우: 신고 버튼 표시
             isLoggedIn && (
               <button className="delete-button" onClick={handleReport}>
                 신고
@@ -523,7 +491,6 @@ function CommunityPost() {
             alt={`${post.postTitle} 이미지 ${currentImageIndex + 1}`}
             onClick={handleImageClick}
             className="post-poster"
-            // 이미지 로드 실패 시 대체 이미지 표시
           />
           {/* 다음 버튼 */}
           {showNavigation && (
@@ -556,7 +523,7 @@ function CommunityPost() {
               {post.postTag &&
                 post.postTag.map((tag, index) => (
                   <span
-                    key={index} // 배열을 순회할 때는 고유한 key를 지정해야 합니다.
+                    key={index}
                     className="community-post-tag"
                   >
                     {tag}
@@ -587,19 +554,9 @@ function CommunityPost() {
                           )}
                         </span>
                       </div>
-                      {/* ⭐️ 댓글 인라인 액션 버튼 */}
                       <div className="comment-actions">
                         {comment.isAuthor ? (
-                          // 작성자: 수정 및 삭제
                           <>
-                            {/* <button
-                              className="comment-action-btn edit"
-                              onClick={() =>
-                                handleCommentEdit(comment.commentDocumentId)
-                              }
-                            >
-                              수정
-                            </button> */}
                             <button
                               className="comment-action-btn delete"
                               onClick={() =>
@@ -611,7 +568,6 @@ function CommunityPost() {
                           </>
                         ) : (
                           isLoggedIn && (
-                            // 비작성자: 로그인 상태일 때만 신고 버튼 노출
                             <button
                               className="comment-action-btn report"
                               onClick={() =>
@@ -630,7 +586,7 @@ function CommunityPost() {
                           <em>[숨겨진 댓글입니다.]</em>
                         ) : (
                           renderWithLineBreaks(comment.commentContent)
-                        ) // ⭐️ 적용 완료
+                        ) 
                       }
                     </p>
                   </div>

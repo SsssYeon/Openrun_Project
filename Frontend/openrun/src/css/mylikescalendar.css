@@ -37,7 +37,7 @@
   background-color: #ffd049; /* 기간 표시 막대 색상 */
   border: none !important;
   width: auto !important;
-  height: 6px !important; /* 막대 높이 */
+  height: 7px !important; /* 막대 높이 */
   box-sizing: border-box;
   position: relative;
   padding: 0 !important;
@@ -74,6 +74,9 @@
 
 .mylikescalendar .fc-daygrid-event {
   margin-bottom: 6px !important; /* 이벤트끼리 간격 추가 */
+  margin-left: -5px !important; /* 👈 이벤트 시작점을 왼쪽으로 5px 이동 (값 조정 필요) */
+  margin-right: -5px !important;/* 👈 이벤트 끝점도 오른쪽으로 확장 (선택 사항) */
+  padding-left: 0 !important; /* 혹시 모를 내부 패딩 제거 */
 }
 
 .mylikescalendar .fc-event.favorite-1 {
@@ -144,15 +147,12 @@
   border-bottom: 1px solid #f0f0f0;
   transition: background-color 0.2s ease;
   
-  /* ⚠️ 추가/수정: 제목과 기간을 한 줄에 배치하고 공간을 분배합니다. */
   display: flex;
   justify-content: space-between; /* 양 끝 정렬 */
   align-items: center;
 }
 
-/* 2. 제목 스타일 */
 .result-title {
-    /* 제목이 기간보다 많은 공간을 차지하도록 설정 */
     flex-grow: 1; 
     white-space: nowrap;
     overflow: hidden;
@@ -161,9 +161,8 @@
     padding-right: 10px; /* 제목과 기간 사이 간격 */
 }
 
-/* 3. 기간 스타일 (오른쪽 정렬) */
 .result-duration {
-    flex-shrink: 0; /* 기간은 줄어들지 않음 */
+    flex-shrink: 0; 
     color: #666;
     font-size: 12px;
     text-align: right; /* ⬅️ 기간은 오른쪽 정렬 */
@@ -271,5 +270,4 @@
   color: #888;
   margin-bottom: 80px;
   width: 100%;
-  /* 메시지가 부모 요소 중앙에 오도록 추가 조정 가능 */
 }

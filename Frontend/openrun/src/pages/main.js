@@ -1,8 +1,8 @@
-// api를 통해 못 찾을 시 mocks 데이터에서 찾도록 설정
+// 첫번째 홈 화면
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
-import "../css/main.css"; // CSS 파일 연결
+import "../css/main.css"; 
 import logo from "../components/logo.png";
 import Nav from "../components/nav.js";
 import performancesData from "../mocks/performances"; 
@@ -27,7 +27,7 @@ const Main = () => {
           throw new Error("검색 실패");
         }
         const data = await response.json();
-        setResults(data); // 백엔드에서 공연 배열을 반환해야 함
+        setResults(data); 
       } catch (error) {
       console.warn("🔁 API 실패 → mocks 데이터로 대체 중:", error);
 
@@ -37,7 +37,7 @@ const Main = () => {
           item.pfm_nm.toLowerCase().includes(query.toLowerCase())
       );
 
-      setResults(filtered); // ✅ 예시 데이터 필터링
+      setResults(filtered); 
     }
     };
 
@@ -92,7 +92,7 @@ const Main = () => {
               {results.length > 0 ? (
                 results.map((item) => (
                   <li
-                    key={item.pfm_doc_id} // 백엔드 필드명 기준
+                    key={item.pfm_doc_id} 
                     className="main-dropdown-item"
                     onClick={() => {
                       navigate(`/performance/${item.pfm_doc_id}`);

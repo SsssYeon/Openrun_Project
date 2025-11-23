@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Nav from "../components/nav";
 import { Link, useNavigate } from "react-router-dom";
-// import userData from "../mocks/users";
 import "../css/mypage.css";
 
 const Passwordchange = () => {
@@ -16,13 +15,11 @@ const Passwordchange = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. 빈칸 여부 확인
     if (!currentPassword || !newPassword || !confirmPassword) {
       alert("모든 항목을 입력해주세요.");
       return;
     }
 
-    // 2. 새 비밀번호 유효성 검사 (영문, 숫자, 특수문자 포함 8자 이상)
     const pwRegex =
       /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?]).{8,}$/;
     if (!pwRegex.test(newPassword)) {
@@ -32,13 +29,11 @@ const Passwordchange = () => {
       return;
     }
 
-    // 3. 새 비밀번호와 확인 일치 여부
     if (newPassword !== confirmPassword) {
       alert("새 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
       return;
     }
 
-    // 4. PATCH 요청 (토큰 필요)
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const response = await fetch("/api/users/me/password", {
@@ -95,7 +90,7 @@ const Passwordchange = () => {
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
       alert("정상적으로 로그아웃되었습니다.");
-      navigate("/"); // 로그인 페이지나 홈으로 이동
+      navigate("/"); // 홈으로 이동
     } catch (error) {
       alert(`로그아웃 오류: ${error.message}`);
       console.error("로그아웃 실패:", error);
@@ -115,10 +110,10 @@ const Passwordchange = () => {
       })
         .then((res) => {
           if (res.ok) {
-            localStorage.clear(); // 모든 사용자 정보 제거
+            localStorage.clear(); 
             sessionStorage.clear();
             alert("회원 탈퇴가 완료되었습니다.");
-            navigate("/"); // 홈 또는 탈퇴 완료 페이지로 이동
+            navigate("/"); // 홈으로 이동
           } else {
             return res.json().then((data) => {
               throw new Error(data.message || "탈퇴 처리에 실패했습니다.");

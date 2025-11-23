@@ -11,14 +11,14 @@ const eventsData = [
     pfmcalender_doc_no: 1,
     pfmcalender_nm: "매디슨 카운티의 다리",
     pfmcalender_date: "2025-04-10",
-    pfmcalender_time: "19:30", // 시간이 별도 필드로 있으면 유지하거나 pfmcalender_date에 합쳐도 됩니다
+    pfmcalender_time: "19:30", 
     pfmcalender_today_cast: "차지연, 박은태",
     pfmcalender_seat: "2층 3열 6번",
     pfmcalender_cost: 80000,
-    pfmcalender_bookingsite: "인터파크", // 예시
+    pfmcalender_bookingsite: "인터파크", 
     pfmcalender_memo: "감동적이었어요",
-    pfmcalender_share: 0, // 0=나만보기, 1=공유하기 예시
-    pfmcalender_timestamp: "2025-04-01T12:00:00", // 예시, ISO 8601 형식
+    pfmcalender_share: 0, 
+    pfmcalender_timestamp: "2025-04-01T12:00:00", 
     pfmcalender_location: "광림아트센터 BBCH홀",
     pfmcalender_poster: poster3,
   },

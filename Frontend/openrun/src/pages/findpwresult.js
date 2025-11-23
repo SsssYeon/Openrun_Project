@@ -1,4 +1,4 @@
-//api 연결 O
+// 비밀번호 찾기 결과 화면, api 연결 O
 
 import React, { useState } from "react";
 import "../css/userjoin.css";
@@ -67,7 +67,6 @@ const Findpwresult = () => {
                 name="userjoin_password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                // placeholder="비밀번호"
               />
             </div>
 
@@ -81,7 +80,6 @@ const Findpwresult = () => {
                 name="userjoin_pswCheck"
                 value={passwordCheck}
                 onChange={(e) => setPasswordCheck(e.target.value)}
-                // placeholder="비밀번호 확인"
               />
             </div>
           </div>

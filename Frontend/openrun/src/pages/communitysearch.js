@@ -10,28 +10,22 @@ import logo from "../components/logo2.png";
 const API_BASE_URL = process.env.REACT_APP_API_BASE;
 
 const apiService = {
-  // ⭐️ GET: 글 목록 조회 (검색 및 태그 필터링 포함)
   getSearchResults: async (token, tag, keyword) => {
-    // 1. 기본 URL 설정
     let url = `/api/community/posts?`;
 
-    // 2. 태그 파라미터 추가 (선택된 태그가 '전체'가 아닐 경우만)
     if (tag && tag !== "전체") {
       url += `tag=${encodeURIComponent(tag)}&`;
     }
 
-    // 3. 검색어 파라미터 추가 (검색어가 있을 경우만)
     if (keyword) {
       url += `q=${encodeURIComponent(keyword)}&`;
     }
 
-    // 마지막 '&' 또는 '?' 제거 (선택 사항)
     url =
       url.slice(-1) === "&" || url.slice(-1) === "?" ? url.slice(0, -1) : url;
 
-    console.log(`[API URL] ${url}`); // 확인용
+    console.log(`[API URL] ${url}`); 
 
-    // ⭐️ 실제 API fetch 요청 구조 (이전 컴포넌트들과 동일)
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -60,11 +54,9 @@ const CommunitySearch = () => {
   const token =
     localStorage.getItem("token") || sessionStorage.getItem("token");
 
-  // [수정] 기간 대신 태그를 선택하는 상태
   const [selectedTag, setSelectedTag] = useState("전체");
 
   const uniqueTags = useMemo(() => {
-    // "전체", "시야", "공연 후기", "공연 정보", "사담" 5가지 태그로 고정
     return ["전체", "시야", "공연 후기", "공연 정보", "사담"];
   }, []);
 
@@ -73,8 +65,6 @@ const CommunitySearch = () => {
   }, []);
 
   const handleSearch = () => {
-    // 이미 searchTerm 상태가 변경될 때마다 useMemo로 필터링되지만,
-    // 여기서는 명시적으로 검색을 시작하는 용도로 사용할 수 있습니다. (예: API 호출)
     console.log("검색 실행:", searchTerm, "태그:", selectedTag);
   };
 
@@ -90,22 +80,18 @@ const CommunitySearch = () => {
       setError(null);
 
       try {
-        // 1. API 호출
         const responsePosts = await apiService.getSearchResults(
           token,
           tag,
           keyword
         );
 
-        // 2. 성공 시 API 응답 사용
         setPosts(responsePosts);
         console.log(`[API SUCCESS] Search results loaded successfully.`);
       } catch (error) {
-        // 3. API 호출 실패 시 Mock Fallback 로직 유지
         console.error(`[API FAIL] Falling back to Mock data.`, error.message);
         setError(error.message);
 
-        // 4. Mock 데이터로 필터링 (프론트엔드 자체 검색 로직)
         let mockFiltered = communitydata;
 
         if (tag !== "전체") {
@@ -131,13 +117,11 @@ const CommunitySearch = () => {
       }
     },
     [token]
-  ); // token이 변경될 때만 재생성
+  ); 
 
   useEffect(() => {
-    // 컴포넌트 마운트 시 (초기 상태: selectedTag="전체", searchTerm="") 전체 글 목록을 가져오며,
-    // 이후 사용자가 검색 조건을 바꿀 때마다 새로운 검색 결과를 가져옵니다.
     fetchSearchResults(selectedTag, searchTerm);
-  }, [fetchSearchResults, selectedTag, searchTerm]); // 의존성 배열에 검색 조건 포함
+  }, [fetchSearchResults, selectedTag, searchTerm]); 
   
   const dateTimeOptions = {
     year: "numeric",
@@ -209,7 +193,6 @@ const CommunitySearch = () => {
                   className="post-item-link"
                 >
                   <div className="post-item">
-                    {/* ... (게시글 항목 UI는 동일) ... */}
                     <div className="post-content-wrap">
                       <div className="post-item-header">
                         <h4 className="post-title">
@@ -265,7 +248,7 @@ const CommunitySearch = () => {
 
           <button
             className="floating-add-button"
-            onClick={() => navigate("/communityaddpost")} // 커뮤니티 글 작성 페이지 구현 후 수정 예정
+            onClick={() => navigate("/communityaddpost")}
           >
             <span className="plus-symbol">+</span>
           </button>

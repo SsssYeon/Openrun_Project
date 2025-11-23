@@ -3,7 +3,7 @@ package com.openrun.dto;
 import java.util.List;
 import java.util.Map;
 
-public class MypageMyPostDTO {
+public class MyPostDTO {
     private String postDocumentId;
     private String postTitle;
     private String postContent;
@@ -14,9 +14,9 @@ public class MypageMyPostDTO {
     private int commentCount;
 
     // 생성자
-    public MypageMyPostDTO(String postDocumentId, String postTitle, String postContent,
-                           String postTimeStamp, List<String> postImage, List<String> postTag,
-                           String userNickname, int commentCount) {
+    public MyPostDTO(String postDocumentId, String postTitle, String postContent,
+                     String postTimeStamp, List<String> postImage, List<String> postTag,
+                     String userNickname, int commentCount) {
         this.postDocumentId = postDocumentId;
         this.postTitle = postTitle;
         this.postContent = postContent;
@@ -28,8 +28,8 @@ public class MypageMyPostDTO {
     }
 
     // Firestore Map에서 DTO 생성
-    public static MypageMyPostDTO fromFirestoreMap(Map<String, Object> data, String documentId) {
-        return new MypageMyPostDTO(
+    public static MyPostDTO fromFirestoreMap(Map<String, Object> data, String documentId) {
+        return new MyPostDTO(
                 documentId, // 여기서 문서 ID 사용
                 (String) data.get("postTitle"),
                 (String) data.get("postContent"),

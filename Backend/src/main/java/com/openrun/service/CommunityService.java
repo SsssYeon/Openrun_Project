@@ -41,7 +41,7 @@ public class CommunityService {
     }
 
     /**마이페이지 내가 쓴 글*/
-    public List<MypageMyPostDTO> getUserPosts(String userId, int limit) {
+    public List<MyPostDTO> getUserPosts(String userId, int limit) {
         try {
             ApiFuture<QuerySnapshot> query = firestore.collection("CommunityPosts")
                     .whereEqualTo("userId", userId)
@@ -50,8 +50,8 @@ public class CommunityService {
             List<QueryDocumentSnapshot> documents = query.get().getDocuments();
 
             return documents.stream()
-                    .map(doc -> MypageMyPostDTO.fromFirestoreMap(doc.getData(), doc.getId()))
-                    .sorted(Comparator.comparing(MypageMyPostDTO::getPostTimeStamp).reversed())
+                    .map(doc -> MyPostDTO.fromFirestoreMap(doc.getData(), doc.getId()))
+                    .sorted(Comparator.comparing(MyPostDTO::getPostTimeStamp).reversed())
                     .limit(limit)
                     .collect(Collectors.toList());
 
@@ -62,8 +62,8 @@ public class CommunityService {
     }
 
     /** 전체 커뮤니티 글 조회 + 태그 필터 + 검색 */
-    public List<CommunityPostResponse> getAllPosts(String tag, String keyword) {
-        List<CommunityPostResponse> postList = new ArrayList<>();
+    public List<CommunityPostResponseDTO> getAllPosts(String tag, String keyword) {
+        List<CommunityPostResponseDTO> postList = new ArrayList<>();
 
         try {
             ApiFuture<QuerySnapshot> future = firestore.collection(POST_COLLECTION)
@@ -75,7 +75,7 @@ public class CommunityService {
             for (QueryDocumentSnapshot doc : documents) {
                 Map<String, Object> data = doc.getData();
 
-                CommunityPostResponse post = new CommunityPostResponse();
+                CommunityPostResponseDTO post = new CommunityPostResponseDTO();
                 post.setPostDocumentId(doc.getId());
                 post.setPostTitle((String) data.getOrDefault("postTitle", ""));
                 post.setPostContent((String) data.getOrDefault("postContent", ""));
@@ -116,7 +116,7 @@ public class CommunityService {
     }
 
     /** 커뮤니티 글 작성 */
-    public void createPost(CommunityPostRequest request, String token) throws Exception {
+    public void createPost(CommunityPostRequestDTO request, String token) throws Exception {
         // 1) 사용자 정보 조회
         List<QueryDocumentSnapshot> userDocs = firestore.collection("UserData")
                 .whereEqualTo("userAutoLoginToken", token)
@@ -256,7 +256,7 @@ public class CommunityService {
     }
 
     /** 게시글 상세 조회 + 댓글 목록 포함 */
-    public CommunityPostResponse getPostDetail(String postId, String currentUserId)
+    public CommunityPostResponseDTO getPostDetail(String postId, String currentUserId)
             throws ExecutionException, InterruptedException {
 
         DocumentSnapshot doc = firestore.collection(POST_COLLECTION)
@@ -268,10 +268,10 @@ public class CommunityService {
             return null;
         }
 
-        CommunityPostResponse response = mapDocToResponse(doc, currentUserId);
+        CommunityPostResponseDTO response = mapDocToResponse(doc, currentUserId);
 
         List<String> commentIds = (List<String>) doc.get("commentList");
-        List<CommunityCommentResponse> comments = new ArrayList<>();
+        List<CommunityCommentResponseDTO> comments = new ArrayList<>();
 
         if (commentIds != null && !commentIds.isEmpty()) {
             for (String commentId : commentIds) {
@@ -280,7 +280,7 @@ public class CommunityService {
                         .get()
                         .get();
                 if (commentDoc.exists()) {
-                    CommunityCommentResponse comment = new CommunityCommentResponse();
+                    CommunityCommentResponseDTO comment = new CommunityCommentResponseDTO();
                     comment.setCommentDocumentId(commentDoc.getId());
                     comment.setPostDocumentId(postId);
                     comment.setCommentContent(commentDoc.getString("commentContent"));
@@ -304,9 +304,9 @@ public class CommunityService {
     }
 
     /** 문서 → DTO 변환 */
-    private CommunityPostResponse mapDocToResponse(DocumentSnapshot doc, String currentUserId) {
+    private CommunityPostResponseDTO mapDocToResponse(DocumentSnapshot doc, String currentUserId) {
 
-        CommunityPostResponse response = new CommunityPostResponse();
+        CommunityPostResponseDTO response = new CommunityPostResponseDTO();
 
         response.setPostDocumentId(doc.getId());
         response.setPostTitle(doc.getString("postTitle"));
@@ -326,9 +326,9 @@ public class CommunityService {
     }
 
     /** 댓글 목록 조회 */
-    private List<CommunityCommentResponse> getCommentsForPost(String postId, String currentUserId)
+    private List<CommunityCommentResponseDTO> getCommentsForPost(String postId, String currentUserId)
             throws ExecutionException, InterruptedException {
-        List<CommunityCommentResponse> commentList = new ArrayList<>();
+        List<CommunityCommentResponseDTO> commentList = new ArrayList<>();
 
         QuerySnapshot commentDocs = firestore.collection(POST_COLLECTION)
                 .document(postId)
@@ -338,7 +338,7 @@ public class CommunityService {
 
         for (QueryDocumentSnapshot doc : commentDocs) {
 
-            CommunityCommentResponse comment = new CommunityCommentResponse();
+            CommunityCommentResponseDTO comment = new CommunityCommentResponseDTO();
             comment.setCommentDocumentId(doc.getId());
             comment.setPostDocumentId(postId);
             comment.setCommentContent(doc.getString("commentContent"));
@@ -359,7 +359,7 @@ public class CommunityService {
     }
 
     /** 댓글 작성 */
-    public CommunityCommentResponse createComment(String postId, String userId, CommunityCommentRequest request)
+    public CommunityCommentResponseDTO createComment(String postId, String userId, CommunityCommentRequestDTO request)
             throws ExecutionException, InterruptedException {
 
         // 1) 사용자 정보 조회
@@ -394,7 +394,7 @@ public class CommunityService {
         postRef.update("commentList", FieldValue.arrayUnion(commentId)).get();
 
         // 6) 반환 DTO 구성 (프론트용)
-        CommunityCommentResponse response = new CommunityCommentResponse();
+        CommunityCommentResponseDTO response = new CommunityCommentResponseDTO();
         response.setCommentDocumentId(commentId);
         response.setPostDocumentId(postId);
         response.setCommentContent(request.getCommentContent());
@@ -439,7 +439,7 @@ public class CommunityService {
         return true;
     }
 
-    /** 게시글 삭제 + 게시글의 모든 댓글 삭제 */
+    /** 게시글 삭제 (+게시글의 모든 댓글) */
     public boolean deletePost(String postId, String userId) throws ExecutionException, InterruptedException {
 
         // 1. 게시글 문서 조회
@@ -539,4 +539,27 @@ public class CommunityService {
         return true;
     }
 
+    /** 최근 커뮤니티 글 **/
+    public List<CommunityPostResponseDTO> getLatestPosts() {
+        try {
+            // Firestore 컬렉션 이름 확인 필요
+            var querySnapshot = firestore.collection("PostData")
+                    .whereEqualTo("postState", 0)
+                    .orderBy("postTimeStamp", com.google.cloud.firestore.Query.Direction.DESCENDING)
+                    .limit(2)
+                    .get()
+                    .get();
+
+            List<CommunityPostResponseDTO> list = new ArrayList<>();
+            for (QueryDocumentSnapshot doc : querySnapshot.getDocuments()) {
+                CommunityPostResponseDTO post = doc.toObject(CommunityPostResponseDTO.class);
+                post.setPostDocumentId(doc.getId());
+                list.add(post);
+            }
+
+            return list;
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException("최근 커뮤니티 글 조회 실패", e);
+        }
+    }
 }

@@ -14,7 +14,7 @@ const Communityaddpost = () => {
   const [posterPreviews, setPosterPreviews] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedTags, setSelectedTags] = useState([]);
-  const [isSubmitting, setIsSubmitting] = useState(false); // 중복 제출 방지 상태 추가
+  const [isSubmitting, setIsSubmitting] = useState(false); 
 
   const navigate = useNavigate();
 
@@ -22,10 +22,10 @@ const Communityaddpost = () => {
     setTitle(e.target.value);
   };
 
-  const fileInputRef = useRef(null); // input 참조
+  const fileInputRef = useRef(null); 
 
   const handleImageClick = () => {
-    fileInputRef.current.click(); // 이미지 클릭 시 input 열기
+    fileInputRef.current.click();
   };
 
   const handleFileChange = (e) => {
@@ -38,33 +38,27 @@ const Communityaddpost = () => {
       );
       setPosterPreviews((prevPreviews) => [...prevPreviews, ...newPreviews]);
 
-      // 새 이미지를 추가했으므로, 인덱스를 0으로 리셋 (새로 추가한 이미지를 바로 보여줄 필요는 없으므로 현 인덱스 유지도 가능)
-      // 여기서는 일반적으로 슬라이드를 첫 이미지로 리셋합니다.
       setCurrentImageIndex(0);
     }
     e.target.value = null;
   };
 
   const handleImageRemove = (e, indexToRemove) => {
-    e.stopPropagation(); // 버튼 클릭이 파일 입력창을 열지 않도록 방지
+    e.stopPropagation(); 
 
-    // 새 배열 생성
     const newFiles = posterFiles.filter((_, i) => i !== indexToRemove);
     const newPreviews = posterPreviews.filter((_, i) => i !== indexToRemove);
 
     setPosterFiles(newFiles);
     setPosterPreviews(newPreviews);
 
-    // 인덱스 조정
     setCurrentImageIndex((prevIndex) => {
       const newLength = newPreviews.length;
-      if (newLength === 0) return 0; // 남은 이미지가 없으면 0
+      if (newLength === 0) return 0; 
 
-      // 현재 인덱스가 삭제된 인덱스보다 크거나 같다면 (배열이 당겨졌으므로) 인덱스를 하나 줄임
       if (prevIndex > indexToRemove) {
         return prevIndex - 1;
       }
-      // 현재 인덱스가 유효한 범위를 벗어난 경우 (e.g. 마지막 이미지 삭제 시)
       if (prevIndex >= newLength) {
         return newLength - 1;
       }
@@ -88,16 +82,13 @@ const Communityaddpost = () => {
     );
   };
 
-  const TAGS = ["시야", "공연 후기", "공연 정보", "사담"]; // ⭐️ 태그 목록 정의
+  const TAGS = ["시야", "공연 후기", "공연 정보", "사담"]; // 태그 목록 정의
 
-  // ⭐️ [추가] 태그 선택 핸들러
   const handleTagSelect = (tag) => {
     setSelectedTags((prevTags) => {
       if (prevTags.includes(tag)) {
-        // 이미 선택된 태그면 배열에서 제거
         return prevTags.filter((t) => t !== tag);
       } else {
-        // 선택되지 않은 태그면 배열에 추가
         return [...prevTags, tag];
       }
     });
@@ -106,7 +97,6 @@ const Communityaddpost = () => {
   const handleSave = async () => {
     if (!title.trim() || !content.trim()) {
       console.error("제목 또는 내용이 비어 있습니다.");
-      // alert() 대신 사용자 정의 모달 UI를 사용해야 하지만, 현재는 console.error로 대체합니다.
       alert("제목, 내용은 필수 입력입니다.");
       return;
     }
@@ -122,12 +112,9 @@ const Communityaddpost = () => {
     formData.append("postTitle", title);
     formData.append("postContent", content);
 
-    // 선택된 태그를 FormData에 추가합니다. (백엔드에서 배열로 처리하도록 요청)
     selectedTags.forEach((tag) => {
-      // 일반적으로 백엔드에서 postTag를 배열로 받으려면 이렇게 키를 여러 번 사용합니다.
       formData.append("postTag", tag);
     });
-    // 이미지 파일을 FormData에 추가합니다. (postImage라는 키로 여러 파일 추가)
     posterFiles.forEach((file) => {
       formData.append("postImage[]", file);
     });
@@ -136,22 +123,18 @@ const Communityaddpost = () => {
       const token =
         localStorage.getItem("token") || sessionStorage.getItem("token");
 
-      // ⚠️ API_BASE_URL과 커뮤니티 POST 엔드포인트 사용
       const res = await fetch(`/api/community/posts`, {
         method: "POST",
         headers: {
-          // FormData를 사용할 때는 Content-Type을 명시하지 않습니다.
-          ...(token && { Authorization: `Bearer ${token}` }), // 토큰은 선택 사항이 아닐 확률이 높습니다.
+          ...(token && { Authorization: `Bearer ${token}` }), 
         },
         body: formData,
       });
 
       if (res.ok) {
         alert("글이 성공적으로 작성되었습니다.");
-        // 성공 후 커뮤니티 메인 페이지 또는 해당 글 상세 페이지로 이동
         navigate("/community");
       } else {
-        // 서버 응답 본문을 읽어 에러 메시지를 콘솔에 출력 (디버깅 용)
         const errorText = await res.text();
         console.error("서버 응답 오류:", res.status, errorText);
         alert(`글 작성에 실패했습니다. 상태: ${res.status}`);
@@ -171,7 +154,6 @@ const Communityaddpost = () => {
       <Nav />
       <div className="event-detail">
         <div className="poster-upload-area">
-          {/* ⭐️ [변경 5] 파일 입력 필드 (multiple 속성 유지) */}
           <input
             type="file"
             accept="image/*"
@@ -180,7 +162,6 @@ const Communityaddpost = () => {
             onChange={handleFileChange}
             multiple
           />
-          {/* 1. 이미지가 없을 때: 기본 이미지 및 클릭 유도 */}
           {posterPreviews.length === 0 && (
             <img
               src="/default-poster.png"
@@ -189,9 +170,7 @@ const Communityaddpost = () => {
               onClick={handleImageClick}
             />
           )}
-          {/* 2. 이미지가 1개 이상일 때: 슬라이더/단일 뷰 */}
           {posterPreviews.length > 0 && (
-            // Slider Container (relative position for absolute buttons)
             <div
               className="slider-container"
               style={{
@@ -205,7 +184,7 @@ const Communityaddpost = () => {
             >
               <div
                 style={{
-                  position: "relative", // 내부 버튼 절대 위치 기준
+                  position: "relative", 
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -276,7 +255,7 @@ const Communityaddpost = () => {
                   </button>
                 )}
               </div>
-              {/* ❌ 삭제 버튼 (현재 이미지 위에 오버레이) */}
+              {/* 삭제 버튼 (현재 이미지 위에 오버레이) */}
               <button
                 className="remove-button"
                 onClick={(e) => handleImageRemove(e, currentImageIndex)}
@@ -293,10 +272,10 @@ const Communityaddpost = () => {
               >
                 삭제
               </button>
-            </div> // ⭐️ slider-container 닫는 태그
+            </div> 
           )}
         </div>
-        {/* poster-upload-area 닫는 태그 */}
+
         <div className="event-info-container">
           <div className="event-content">
             <h3 className="title-center">커뮤니티 글 작성</h3>
@@ -316,7 +295,6 @@ const Communityaddpost = () => {
                     <button
                       key={tag}
                       onClick={() => handleTagSelect(tag)}
-                      // ⭐️ 선택 상태에 따른 스타일 변경
                       style={{
                         padding: "8px 12px",
                         borderRadius: "20px",

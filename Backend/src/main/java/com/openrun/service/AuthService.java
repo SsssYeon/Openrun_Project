@@ -4,10 +4,10 @@ import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.*;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
-import com.openrun.dto.ChangePasswordRequest;
-import com.openrun.dto.DeleteAccountRequest;
-import com.openrun.dto.LoginRequest;
-import com.openrun.dto.SignupRequest;
+import com.openrun.dto.ChangePasswordRequestDTO;
+import com.openrun.dto.DeleteAccountRequestDTO;
+import com.openrun.dto.LoginRequestDTO;
+import com.openrun.dto.SignupRequestDTO;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +27,8 @@ public class AuthService {
 
     private final HttpSession session;       // 필요 없으면 제거 가능
 
-    /* =============== 회원가입 =============== */
-    public void signup(SignupRequest request) throws Exception {
+    /** 회원가입 **/
+    public void signup(SignupRequestDTO request) throws Exception {
         try {
             // 1) Firebase Authentication 계정 생성 (email은 내부용 가짜 도메인)
             UserRecord.CreateRequest createRequest = new UserRecord.CreateRequest()
@@ -59,15 +59,15 @@ public class AuthService {
         }
     }
 
-    /* =============== ID(=userId) 중복 확인 =============== */
+    /** userId 중복 확인 **/
     public boolean isEmailDuplicate(String userId) throws ExecutionException, InterruptedException {
         CollectionReference users = firestore.collection(USER_COLLECTION);
         QuerySnapshot snapshot = users.whereEqualTo("userId", userId).get().get();
         return !snapshot.isEmpty();
     }
 
-    /* =============== 로그인 (로컬 토큰 발급) =============== */
-    public Map<String, Object> login(LoginRequest request) throws Exception {
+    /** 로그인 (로컬 토큰 발급) **/
+    public Map<String, Object> login(LoginRequestDTO request) throws Exception {
         CollectionReference users = firestore.collection(USER_COLLECTION);
 
         List<QueryDocumentSnapshot> documents = users
@@ -98,7 +98,7 @@ public class AuthService {
         return result;
     }
 
-    /* =============== 자동 로그인 =============== */
+    /** 자동 로그인 **/
     public Map<String, Object> autoLogin(String token) throws Exception {
         CollectionReference users = firestore.collection(USER_COLLECTION);
 
@@ -120,7 +120,7 @@ public class AuthService {
         return result;
     }
 
-    /* =============== 로그아웃(토큰 무효화) =============== */
+    /** 로그아웃(토큰 무효화) **/
     public ResponseEntity<String> logout(String userId) throws Exception {
         CollectionReference users = firestore.collection(USER_COLLECTION);
 
@@ -138,7 +138,7 @@ public class AuthService {
         return ResponseEntity.ok("로그아웃이 완료되었습니다.");
     }
 
-    /* =============== 아이디 찾기 =============== */
+    /** 아이디 찾기 **/
     public String findUserId(String userName, String userPhoneNumber) throws Exception {
         CollectionReference users = firestore.collection(USER_COLLECTION);
 
@@ -152,7 +152,7 @@ public class AuthService {
         return documents.get(0).getString("userId");
     }
 
-    /* =============== 비밀번호 찾기 =============== */
+    /** 비밀번호 찾기 **/
     public void verifyUserForPasswordReset(String userId, String phone) throws Exception {
         CollectionReference users = firestore.collection(USER_COLLECTION);
 
@@ -166,7 +166,7 @@ public class AuthService {
         }
     }
 
-    /* =============== 비밀번호 재설정 =============== */
+    /** 비밀번호 재설정 **/
     public void resetPasswordByPhone(String userId, String newPassword) throws Exception {
         CollectionReference users = firestore.collection(USER_COLLECTION);
 
@@ -188,8 +188,8 @@ public class AuthService {
         userDoc.getReference().update("userPw", newPassword).get();
     }
 
-    /* =============== 비밀번호 변경 =============== */
-    public String changePassword(ChangePasswordRequest request) throws Exception {
+    /** 비밀번호 변경 **/
+    public String changePassword(ChangePasswordRequestDTO request) throws Exception {
 
         CollectionReference users = firestore.collection(USER_COLLECTION);
 
@@ -212,8 +212,8 @@ public class AuthService {
         return "비밀번호가 성공적으로 변경되었습니다.";
     }
 
-    /* =============== 회원 탈퇴 =============== */
-    public String deleteAccount(DeleteAccountRequest request) throws Exception {
+    /** 회원 탈퇴 **/
+    public String deleteAccount(DeleteAccountRequestDTO request) throws Exception {
         CollectionReference users = firestore.collection(USER_COLLECTION);
 
         List<QueryDocumentSnapshot> documents = users
@@ -239,7 +239,7 @@ public class AuthService {
         return "회원 탈퇴가 완료되었습니다. 모든 로그인 정보가 삭제되었습니다.";
     }
 
-    /* ========== userId 조회 메소드 ========== */
+    /** userId 조회 메소드(Community) **/
     public String getUserIdFromToken(String token) throws Exception {
         if (token == null || token.isEmpty()) return null;
 

@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import Nav from "../components/nav";
 import { Link, useNavigate } from "react-router-dom";
-// import userData from "../mocks/users";
 import "../css/mypage.css";
 import poster1 from "../components/poster1.jpg";
 import logo from "../components/logo2.png";
@@ -14,7 +13,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE;
 const Myposts = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [myPosts, setMyPosts] = useState( communitydata);
+  const [myPosts, setMyPosts] = useState(communitydata);
   const [loading, setLoading] = useState(true);
 
   const dateTimeOptions = {
@@ -35,17 +34,13 @@ const Myposts = () => {
       }
 
       try {
-        // ⭐️ [수정] API_BASE_URL을 사용하여 나의 글 리스트 API 호출
-        const postsResponse = await fetch(
-          `/api/users/me/posts`,
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const postsResponse = await fetch(`/api/users/me/posts`, {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         if (!postsResponse.ok) {
-          throw new Error("API_FAIL"); // 실패 시 Mock Fallback으로 이동
+          throw new Error("API_FAIL");
         }
 
         const postsData = await postsResponse.json();
@@ -55,8 +50,7 @@ const Myposts = () => {
           `[API FAIL] My posts API failed. Falling back to Mock data.`,
           error.message
         );
-        // API 호출 실패 시 Mock 데이터 사용
-        setMyPosts( communitydata);
+        setMyPosts(communitydata);
       } finally {
         setLoading(false);
       }
@@ -64,8 +58,6 @@ const Myposts = () => {
 
     fetchMyPosts();
   }, [navigate]);
-
-  if (loading) return <div>나의 글 목록을 불러오는 중입니다...</div>;
 
   const handleLogout = async () => {
     const confirmed = window.confirm("로그아웃 하시겠습니까?");
@@ -95,7 +87,7 @@ const Myposts = () => {
       setUser(null);
 
       alert("정상적으로 로그아웃되었습니다.");
-      navigate("/"); // 로그인 페이지나 홈으로 이동
+      navigate("/"); // 홈으로 이동
     } catch (error) {
       alert(`로그아웃 오류: ${error.message}`);
       console.error("로그아웃 실패:", error);
@@ -115,10 +107,10 @@ const Myposts = () => {
       })
         .then((res) => {
           if (res.ok) {
-            localStorage.clear(); // 모든 사용자 정보 제거
+            localStorage.clear();
             sessionStorage.clear();
             alert("회원 탈퇴가 완료되었습니다.");
-            navigate("/"); // 홈 또는 탈퇴 완료 페이지로 이동
+            navigate("/"); // 홈으로 이동
           } else {
             return res.json().then((data) => {
               throw new Error(data.message || "탈퇴 처리에 실패했습니다.");
@@ -183,7 +175,11 @@ const Myposts = () => {
           </div>
 
           <div class="community-list">
-            {myPosts.length === 0 ? (
+            {loading ? (
+              <p className="no-posts-message">
+                나의 글 목록을 불러오는 중입니다...
+              </p>
+            ) : myPosts.length === 0 ? (
               <p className="no-posts-message">작성한 글이 없습니다.</p>
             ) : (
               myPosts.map((post) => (
@@ -202,10 +198,7 @@ const Myposts = () => {
                         </h4>
                         {post.postTag &&
                           post.postTag.map((tag, index) => (
-                            <span
-                              key={index} // 배열을 순회할 때는 고유한 key를 지정해야 합니다.
-                              className="post-tag"
-                            >
+                            <span key={index} className="post-tag">
                               {tag}
                             </span>
                           ))}
@@ -236,11 +229,14 @@ const Myposts = () => {
                           Array.isArray(post.postImage) &&
                           post.postImage.length > 0
                             ? post.postImage[0]
-                            : // 그렇지 않으면 (postImage가 배열이 아니거나 비어있으면) logo를 사용
-                              logo
-                        } // postImage가 있으면 사용, 없으면 logo 사용
+                            : logo
+                        } 
                         alt={post.postTitle}
                         className="post-thumbnail"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = logo;
+                        }}
                       />
                     </div>
                   </div>

@@ -11,28 +11,24 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE;
 const TARGET_TAG = "공연 정보";
 
 const apiService = {
-  // ⭐️ GET: 글 목록 조회 (/api/community/posts)
   getPosts: async (token) => {
     const url = `/api/community/posts?tag=${encodeURIComponent(
       TARGET_TAG
     )}`;
-    // ⭐️ 실제 API fetch 요청 구조
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`, // 토큰은 선택 사항
+        Authorization: `Bearer ${token}`, 
         "Content-Type": "application/json",
       },
     });
 
     if (!response.ok) {
-      // HTTP 오류 시 Mock Fallback을 위해 Error throw
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
 
-    // ⭐️ 서버 응답 형태 가정: 글 목록 배열
     return data.posts || data;
   },
 };
@@ -52,18 +48,14 @@ const CommunityInfo = () => {
     setError(null);
 
     try {
-      // 1. API 호출 시도 (tag 파라미터 없이 '전체' 글 요청)
       const responsePosts = await apiService.getPosts(token);
 
-      // 2. 성공 시 API 응답 사용
       setPosts(responsePosts);
       console.log(`[API SUCCESS] All posts loaded successfully.`);
     } catch (error) {
-      // 3. API 호출 실패 시 Mock Fallback 로직
       console.error(`[API FAIL] Falling back to Mock data.`, error.message);
       setError(error.message);
 
-      // 4. Mock 데이터 전체 사용 (이 컴포넌트는 '전체'만 담당)
       const mockFiltered = communitydata.filter(
         (post) => post.postTag && post.postTag.includes(TARGET_TAG)
       );
@@ -71,10 +63,9 @@ const CommunityInfo = () => {
     } finally {
       setLoading(false);
     }
-  }, [token]); // token이 변경될 때만 fetchPosts 재생성
+  }, [token]); 
 
   useEffect(() => {
-    // 컴포넌트 마운트 시 한 번만 전체 글을 불러옴
     fetchPosts();
   }, [fetchPosts]);
 
@@ -119,69 +110,79 @@ const CommunityInfo = () => {
           </div>
 
           <div className="post-list">
-            {posts.map((post) => (
-              <Link
-                to={`/community/${post.postDocumentId}`}
-                key={post.postDocumentId}
-                className="post-item-link"
-              >
-                <div className="post-item">
-                  <div className="post-content-wrap">
-                    <div className="post-item-header">
-                      <h4 className="post-title">
-                        {post.postTitle.length > 22
-                          ? post.postTitle.slice(0, 21) + "..."
-                          : post.postTitle}
-                      </h4>
-                      {post.postTag &&
-                        post.postTag.map((tag, index) => (
-                          <span key={index} className="post-tag">
-                            {tag}
-                          </span>
-                        ))}
+            {loading ? (
+              <p className="loading-message" style={{ textAlign: 'center', padding: '20px' }}>
+                게시글 목록을 불러오는 중...
+              </p>
+            ) : posts.length === 0 ? (
+              <p className="no-posts-message" style={{ textAlign: 'center', padding: '20px' }}>
+                작성된 공연 정보 게시글이 없습니다.
+              </p>
+            ) : (
+              posts.map((post) => (
+                <Link
+                  to={`/community/${post.postDocumentId}`}
+                  key={post.postDocumentId}
+                  className="post-item-link"
+                >
+                  <div className="post-item">
+                    <div className="post-content-wrap">
+                      <div className="post-item-header">
+                        <h4 className="post-title">
+                          {post.postTitle.length > 22
+                            ? post.postTitle.slice(0, 21) + "..."
+                            : post.postTitle}
+                        </h4>
+                        {post.postTag &&
+                          post.postTag.map((tag, index) => (
+                            <span key={index} className="post-tag">
+                              {tag}
+                            </span>
+                          ))}
+                      </div>
+                      <p className="post-summary">
+                        {post.postContent.length > 35
+                          ? post.postContent.slice(0, 34) + "..."
+                          : post.postContent}
+                      </p>
+                      <div className="post-meta">
+                        <span className="post-nickname">{post.userNickname}</span>
+                        <span className="post-date">
+                          {new Date(post.postTimeStamp).toLocaleString(
+                            "ko-KR",
+                            dateTimeOptions
+                          )}
+                        </span>
+                        <span className="post-comments">
+                          💬 {post.commentCount || 0}
+                        </span>
+                      </div>
                     </div>
-                    <p className="post-summary">
-                      {post.postContent.length > 35
-                        ? post.postContent.slice(0, 34) + "..."
-                        : post.postContent}
-                    </p>
-                    <div className="post-meta">
-                      <span className="post-nickname">{post.userNickname}</span>
-                      <span className="post-date">
-                        {new Date(post.postTimeStamp).toLocaleString(
-                          "ko-KR",
-                          dateTimeOptions
-                        )}
-                      </span>
-                      <span className="post-comments">
-                        💬 {post.commentCount || 0}
-                      </span>
+                    <div className="post-image-preview">
+                      <img
+                        src={
+                          Array.isArray(post.postImage) &&
+                          post.postImage.length > 0
+                            ? post.postImage[0]
+                            : logo
+                        }
+                        alt={post.postTitle}
+                        className="post-thumbnail"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = logo;
+                        }}
+                      />
                     </div>
                   </div>
-                  <div className="post-image-preview">
-                    <img
-                      src={
-                        Array.isArray(post.postImage) &&
-                        post.postImage.length > 0
-                          ? post.postImage[0]
-                          : logo
-                      }
-                      alt={post.postTitle}
-                      className="post-thumbnail"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = logo;
-                      }}
-                    />
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))
+            )}
           </div>
 
           <button
             className="floating-add-button"
-            onClick={() => navigate("/communityaddpost")} // 커뮤니티 글 작성 페이지 구현 후 수정 예정
+            onClick={() => navigate("/communityaddpost")} 
           >
             <span className="plus-symbol">+</span>
           </button>

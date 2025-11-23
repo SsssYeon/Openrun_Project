@@ -2,10 +2,10 @@ package com.openrun.controller;
 
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
-import com.openrun.dto.ChangePasswordRequest;
-import com.openrun.dto.DeleteAccountRequest;
-import com.openrun.dto.LoginRequest;
-import com.openrun.dto.SignupRequest;
+import com.openrun.dto.ChangePasswordRequestDTO;
+import com.openrun.dto.DeleteAccountRequestDTO;
+import com.openrun.dto.LoginRequestDTO;
+import com.openrun.dto.SignupRequestDTO;
 import com.openrun.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +23,9 @@ public class AuthController {
         this.authService = authService;
     }
 
+    /** 회원가입 **/
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
+    public ResponseEntity<?> signup(@RequestBody SignupRequestDTO request) {
         try {
             authService.signup(request);
             return ResponseEntity.ok(Map.of("message", "회원가입 성공!"));
@@ -33,6 +34,7 @@ public class AuthController {
         }
     }
 
+    /** userId 중복 확인 **/
     @GetMapping("/check-id")
     public ResponseEntity<?> checkId(@RequestParam("user_id") String user_id) {
         try {
@@ -44,8 +46,9 @@ public class AuthController {
         }
     }
 
+    /** 로그인 **/
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
         try {
             Map<String, Object> result = authService.login(request);
             return ResponseEntity.ok(result);
@@ -54,6 +57,7 @@ public class AuthController {
         }
     }
 
+    /** 자동 로그인 **/
     @GetMapping("/autologin")
     public ResponseEntity<?> autoLogin(@RequestParam("token") String token) {
         try {
@@ -64,7 +68,7 @@ public class AuthController {
         }
     }
 
-    // 로그아웃
+    /** 로그아웃(토큰 무효화) **/
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
         String token = extractToken(authHeader);
@@ -74,12 +78,12 @@ public class AuthController {
         // 프론트에서는 토큰 삭제만 하면 충분, 백에서는 선택적으로 토큰 만료 처리
         return ResponseEntity.ok(Map.of("message", "로그아웃 성공"));
     }
-
     private String extractToken(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
         return authHeader.substring(7).trim();
     }
 
+    /** 아이디 찾기 **/
     @PostMapping("/find-id")
     public ResponseEntity<?> findId(@RequestBody Map<String, String> req) {
         try {
@@ -90,6 +94,7 @@ public class AuthController {
         }
     }
 
+    /** 비밀번호 찾기 **/
     @PostMapping("/find-password")
     public ResponseEntity<?> findPassword(@RequestBody Map<String, String> req) {
         String userId = req.get("user_id");
@@ -102,6 +107,7 @@ public class AuthController {
         }
     }
 
+    /** 비밀번호 재설정 **/
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> req) {
         String userId = req.get("user_id");
@@ -116,8 +122,9 @@ public class AuthController {
         }
     }
 
+    /** 비밀번호 변경 **/
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequestDTO request) {
         try {
             String message = authService.changePassword(request);
             return ResponseEntity.ok(Map.of("message", message));
@@ -126,8 +133,9 @@ public class AuthController {
         }
     }
 
+    /** 회원 탈퇴 **/
     @DeleteMapping("/delete-account")
-    public ResponseEntity<?> deleteAccount(@RequestBody DeleteAccountRequest request) {
+    public ResponseEntity<?> deleteAccount(@RequestBody DeleteAccountRequestDTO request) {
         try {
             String message = authService.deleteAccount(request);
             return ResponseEntity.ok(Map.of("message", message));

@@ -1,4 +1,4 @@
-//api 연결 O, 백엔드 없이 화면 보는데 문제 없음
+// 관극기록 추가 화면 -> api 연결 O
 
 import React, { useRef, useState } from "react";
 import Nav from "../components/nav";
@@ -23,10 +23,10 @@ const Addrecord = () => {
     setName(e.target.value);
   };
 
-  const fileInputRef = useRef(null); // input 참조
+  const fileInputRef = useRef(null); 
 
   const handleImageClick = () => {
-    fileInputRef.current.click(); // 이미지 클릭 시 input 열기
+    fileInputRef.current.click(); 
   };
 
   const handleFileChange = (e) => {
@@ -55,7 +55,7 @@ const Addrecord = () => {
     formData.append("pfmcalender_bookingsite", bookingsite)
 
     if (posterFile) {
-      formData.append("pfmcalender_poster", posterFile); // 실제 이미지 파일 추가
+      formData.append("pfmcalender_poster", posterFile); 
     }
 
     try {
@@ -65,7 +65,7 @@ const Addrecord = () => {
       const res = await fetch("/api/calendar/me", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // 👈 토큰 포함
+          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });

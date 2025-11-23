@@ -56,7 +56,7 @@ const commentmocks = [
         commentReportCnt: 0
     },
 
-    // --- post_005 댓글 (신고 예시) ---
+
     {
         postDocumentId: "post_005",
         commentDocumentId: "cmt_5001",
@@ -65,7 +65,7 @@ const commentmocks = [
         userNickname: "관리자신고",
         dommentState: 0,
         commentTimeStamp: "2025-07-20T11:00:00Z",
-        commentReportCnt: 5 // 신고 5회
+        commentReportCnt: 0
     },
     {
         postDocumentId: "post_005",
@@ -78,7 +78,7 @@ const commentmocks = [
         commentReportCnt: 0
     },
     
-    // --- post_010 댓글 (숨김/삭제 예시) ---
+
     {
         postDocumentId: "post_010",
         commentDocumentId: "cmt_10001",
@@ -100,12 +100,8 @@ const commentmocks = [
         commentReportCnt: 0
     },
 
-    // 나머지 게시글 (post_004, post_006 ~ post_009, post_011 ~ post_024)에 대한 일반 댓글
-    // 코드 길이를 줄이기 위해 반복문을 사용하여 생성 (실제 파일에는 풀어서 작성 권장)
-    // 여기서는 몇 개의 대표 예시만 남기고 나머지 ID는 생략하겠습니다.
 ];
 
-// post_024에 대한 최신 댓글
 commentmocks.push({
     postDocumentId: "post_024",
     commentDocumentId: "cmt_24001",

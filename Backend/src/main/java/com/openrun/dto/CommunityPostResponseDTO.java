@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CommunityPostResponse {
+public class CommunityPostResponseDTO {
     private String postDocumentId;
     private String postTitle;
     private String postContent;
@@ -19,10 +19,9 @@ public class CommunityPostResponse {
     private int postReportCnt;
     private int postState;
     private int commentCount;
-    private List<CommunityCommentResponse> comments;
+    private List<CommunityCommentResponseDTO> comments;
     @JsonProperty("isAuthor") // JSON 직렬화 시 isAuthor로 내려줌
     private boolean author;
-
     public void setAuthor(boolean author) {
         this.author = author;
     }

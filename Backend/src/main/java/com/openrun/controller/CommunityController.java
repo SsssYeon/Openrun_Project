@@ -1,9 +1,9 @@
 package com.openrun.controller;
 
-import com.openrun.dto.CommunityCommentRequest;
-import com.openrun.dto.CommunityCommentResponse;
-import com.openrun.dto.CommunityPostRequest;
-import com.openrun.dto.CommunityPostResponse;
+import com.openrun.dto.CommunityCommentRequestDTO;
+import com.openrun.dto.CommunityCommentResponseDTO;
+import com.openrun.dto.CommunityPostRequestDTO;
+import com.openrun.dto.CommunityPostResponseDTO;
 import com.openrun.service.AuthService;
 import com.openrun.service.CommunityService;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +27,12 @@ public class CommunityController {
 
     /** 전체 커뮤니티 글 조회 + 태그 필터 + 검색 */
     @GetMapping("/posts")
-    public ResponseEntity<List<CommunityPostResponse>> getAllPosts(
+    public ResponseEntity<List<CommunityPostResponseDTO>> getAllPosts(
             @RequestParam(value = "tag", required = false) String tag,
             @RequestParam(value = "q", required = false) String keyword
     ) {
         try {
-            List<CommunityPostResponse> posts = communityService.getAllPosts(tag, keyword);
+            List<CommunityPostResponseDTO> posts = communityService.getAllPosts(tag, keyword);
             return ResponseEntity.ok(posts);
         } catch (Exception e) {
             e.printStackTrace();
@@ -43,7 +43,7 @@ public class CommunityController {
     /** 커뮤니티 글 작성 */
     @PostMapping("/posts")
     public ResponseEntity<?> createPost(
-            @ModelAttribute CommunityPostRequest request,
+            @ModelAttribute CommunityPostRequestDTO request,
             @RequestHeader(value = "Authorization", required = false) String authorization
     ) {
         try {
@@ -109,7 +109,7 @@ public class CommunityController {
 
     /**글 상세 조회*/
     @GetMapping("/posts/{postId}")
-    public CommunityPostResponse getPostDetail(
+    public CommunityPostResponseDTO getPostDetail(
             @PathVariable("postId") String postId,
             @RequestHeader(value = "Authorization", required = false) String token
     ) throws ExecutionException, InterruptedException {
@@ -125,7 +125,7 @@ public class CommunityController {
             System.out.println("토큰에서 userId 조회 실패: " + e.getMessage());
         }
 
-        CommunityPostResponse response = communityService.getPostDetail(postId, currentUserId);
+        CommunityPostResponseDTO response = communityService.getPostDetail(postId, currentUserId);
 
         if (response == null) {
             throw new RuntimeException("해당 커뮤니티 글을 찾을 수 없습니다.");
@@ -140,7 +140,7 @@ public class CommunityController {
     public ResponseEntity<?> createComment(
             @PathVariable("postId") String postId,
             @RequestHeader(value = "Authorization", required = false) String authorization,
-            @RequestBody CommunityCommentRequest request
+            @RequestBody CommunityCommentRequestDTO request
     ) {
         try {
             if (authorization == null || !authorization.startsWith("Bearer ")) {
@@ -156,7 +156,7 @@ public class CommunityController {
                         .body(Map.of("success", false, "message", "유효하지 않은 사용자입니다."));
             }
 
-            CommunityCommentResponse commentResponse = communityService.createComment(postId, userId, request);
+            CommunityCommentResponseDTO commentResponse = communityService.createComment(postId, userId, request);
 
             return ResponseEntity.ok(commentResponse);
 
@@ -264,7 +264,7 @@ public class CommunityController {
         }
     }
 
-    /** 댓글 신고 */
+    /** 댓글 신고 **/
     @PostMapping("/comments/{commentId}/reports")
     public ResponseEntity<?> reportComment(
             @PathVariable("commentId") String commentId,
@@ -289,4 +289,9 @@ public class CommunityController {
         }
     }
 
+    /** 최근 커뮤니티 글 **/
+    @GetMapping("/latest")
+    public List<CommunityPostResponseDTO> getLatestPosts() {
+        return communityService.getLatestPosts();
+    }
 }

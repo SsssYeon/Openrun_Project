@@ -2,7 +2,7 @@ package com.openrun.controller;
 
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
-import com.openrun.dto.MypageMyPostDTO;
+import com.openrun.dto.MyPostDTO;
 import com.openrun.service.CommunityService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -164,9 +164,9 @@ public class UserController {
             CollectionReference postsRef = firestore.collection("PostData");
             QuerySnapshot postsSnapshot = postsRef.whereEqualTo("userId", userId).get().get();
 
-            List<MypageMyPostDTO> myPosts = new ArrayList<>();
+            List<MyPostDTO> myPosts = new ArrayList<>();
             for (DocumentSnapshot doc : postsSnapshot.getDocuments()) {
-                myPosts.add(MypageMyPostDTO.fromFirestoreMap(doc.getData(), doc.getId()));
+                myPosts.add(MyPostDTO.fromFirestoreMap(doc.getData(), doc.getId()));
             }
 
             // 최신순 정렬 (postTimeStamp 기준)

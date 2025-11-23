@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CommunityCommentResponse {
+public class CommunityCommentResponseDTO {
     private String commentDocumentId;
     private String postDocumentId;
     private String commentContent;
@@ -17,7 +17,6 @@ public class CommunityCommentResponse {
     private int commentState;
     @JsonProperty("isAuthor") // JSON 직렬화 시 isAuthor로 내려줌
     private boolean author;
-
     public void setAuthor(boolean author) {
         this.author = author;
     }

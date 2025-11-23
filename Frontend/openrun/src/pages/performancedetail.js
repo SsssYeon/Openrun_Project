@@ -1,9 +1,8 @@
-// api를 통해 찾지 못했을 시 mocks 데이터에서 찾도록 
-// 공연 상세정보 - 관심공연 추가 / 삭제 및 관심공연 등록되어 있을 시 채워진 하트 노출되게 수정 완료
+// 공연 상세정보 - 관심공연 추가 
 
 import { useParams } from "react-router-dom";
 import Nav from "../components/nav";
-import performances from "../mocks/performances"; // 경로는 실제 파일 위치에 맞게 조정
+import performances from "../mocks/performances"; 
 import "../css/performancedetail.css";
 import React, { useState, useEffect } from "react";
 
@@ -11,6 +10,7 @@ const Performancedetail = () => {
   const { id } = useParams();
   const [performance, setPerformance] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPerformance = async () => {
@@ -21,7 +21,6 @@ const Performancedetail = () => {
         }
         const data = await response.json();
 
-        // 백엔드 필드를 프론트에 맞게 변환 (선택)
         const mappedData = {
           api_mt20id: data.mt20id,
           api_prfnm: data.prfnm,
@@ -44,10 +43,11 @@ const Performancedetail = () => {
         setPerformance(mappedData);
       } catch (error) {
         console.error("Error fetching performance:", error);
+      }finally {
+        setLoading(false);
       }
     };
 
-         // API 실패 시 mock 데이터에서 찾아서 세팅
       const found = performances.find((p) => p.pfm_doc_id === id);
       if (found) {
         setPerformance({
@@ -84,7 +84,7 @@ const Performancedetail = () => {
        if (!response.ok) throw new Error("관심 여부 조회 실패");
 
         const data = await response.json();
-        setIsFavorite(data.isLiked); // 또는 true/false 반환 구조에 따라 수정
+        setIsFavorite(data.isLiked); 
       } catch (error) {
         console.error("관심공연 상태 확인 실패:", error);
       }
@@ -94,7 +94,32 @@ const Performancedetail = () => {
     fetchFavoriteStatus();
   }, [id]);
 
-  if (!performance) return <div>해당 공연을 찾을 수 없습니다.</div>;
+  if (loading) {
+    return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          공연을 불러오는 중...
+        </div>
+      </div>
+    );
+  }
+
+  if (!performance)
+    return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          해당 공연을 찾을 수 없습니다.
+        </div>
+      </div>
+    );;
 
   const toggleFavorite = async () => {
     const token = localStorage.getItem("token")|| sessionStorage.getItem("token");
@@ -129,7 +154,7 @@ const Performancedetail = () => {
       }
     } catch (error) {
       console.error("관심공연 처리 중 오류 발생:", error);
-      setIsFavorite(!newFavoriteStatus); // 실패 시 롤백
+      setIsFavorite(!newFavoriteStatus); 
     }
   };
 

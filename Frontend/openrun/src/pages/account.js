@@ -94,7 +94,7 @@ const Account = () => {
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
       alert("정상적으로 로그아웃되었습니다.");
-      navigate("/"); // 로그인 페이지나 홈으로 이동
+      navigate("/"); // 홈으로 이동
     } catch (error) {
       alert(`로그아웃 오류: ${error.message}`);
       console.error("로그아웃 실패:", error);
@@ -115,7 +115,7 @@ const Account = () => {
             localStorage.clear(); // 모든 사용자 정보 제거
             sessionStorage.clear();
             alert("회원 탈퇴가 완료되었습니다.");
-            navigate("/"); // 홈 또는 탈퇴 완료 페이지로 이동
+            navigate("/"); // 홈으로 이동
           } else {
             return res.json().then((data) => {
               throw new Error(data.message || "탈퇴 처리에 실패했습니다.");

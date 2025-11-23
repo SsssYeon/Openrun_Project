@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CommunityPostRequest {
+public class CommunityPostRequestDTO {
     private String postTitle;             // 글 제목
     private String postContent;           // 글 내용
     private List<String> postTag;         // 글 태그

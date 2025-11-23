@@ -1,8 +1,8 @@
-// 오픈런 랭킹, 오픈런 추천 공연 api 연결 완료 / 추후 커뮤니티 및 배너 수정 예정
+// 관극기록 수정 화면
 
 import { useParams, useNavigate } from "react-router-dom";
 import Nav from "../components/nav";
-import events from "../mocks/events"; // 경로는 실제 파일 위치에 맞게 조정
+import events from "../mocks/events"; 
 import "../css/eventdetail.css";
 import React, { useState, useEffect } from "react";
 
@@ -90,10 +90,10 @@ const Modifyrecord = () => {
 
     try {
       const res = await fetch(`/api/calendar/me/${id}`, {
-        method: "PUT", // 또는 PATCH
+        method: "PUT", 
         headers: {
           "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }), // 토큰이 있을 때만 헤더에 추가
+          ...(token && { Authorization: `Bearer ${token}` }), 
         },
         body: JSON.stringify(updatedRecord),
       });
@@ -109,7 +109,19 @@ const Modifyrecord = () => {
     }
   };
 
-  if (loading) return <div>불러오는 중...</div>;
+  if (loading) {
+    return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          게시글을 불러오는 중...
+        </div>
+      </div>
+    );
+  }
   if (!event) return <div>해당 관극 기록을 찾을 수 없습니다.</div>;
 
   return (
@@ -118,11 +130,6 @@ const Modifyrecord = () => {
         <Nav />
       </div>
       <div className="event-detail">
-        {/* <img
-          src={"/default-poster.png"} // 포스터 정보가 없다면 기본 이미지 사용
-          alt={`${event.pfmcalender_nm} 포스터`}
-          className="poster"
-        /> */}
         <img
           src={event.pfmcalender_poster || "/default-poster.png"}
           alt={`${event.pfmcalender_nm} 포스터`}

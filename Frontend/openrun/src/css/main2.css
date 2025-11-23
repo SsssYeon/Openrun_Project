@@ -103,7 +103,6 @@ body {
   margin: 0;
 }
 
-/*left 내용, 순위*/
 .ranking-section {
   width: 300px;
   padding: 20px;
@@ -156,7 +155,6 @@ body {
   object-fit: cover;
 }
 
-/*right-top 내용, 추천작*/
 .recommend-section {
   width: 100%;
   padding: 20px;
@@ -195,8 +193,6 @@ body {
   font-size: 0.95em;
   color: #333;
 }
-
-/*right bottom 내용, 최근 커뮤니티 글*/
 
 .main2-community-list {
   width: 90%;

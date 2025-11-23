@@ -4,8 +4,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import "../css/main2.css"; // CSS 파일 연결
-import poster1 from "../components/poster1.jpg";
-import poster2 from "../components/poster2.jpg";
+import poster7 from "../components/poster7.png";
+import poster8 from "../components/poster8.gif";
 import poster3 from "../components/poster3.jpg";
 import poster4 from "../components/poster4.jpg";
 import poster5 from "../components/poster5.jpeg";
@@ -16,41 +16,45 @@ import logo3 from "../components/logo3.png";
 
 const fallbackRanking = [
   {
-    pfm_doc_id: 1,
-    pfm_nm: "지킬앤하이드",
-    pfm_start: "2024.11.29",
-    pfm_end: "2025.05.18",
-    pfm_poster: poster1,
+    pfm_doc_id: "PF274266",
+    pfm_nm: "물랑루즈",
+    pfm_start: "2025.11.27",
+    pfm_end: "2026.02.22",
+    pfm_poster: poster7,
   },
+
   {
-    pfm_doc_id: 2,
-    pfm_nm: "랭보",
-    pfm_start: "2022.02.19",
-    pfm_end: "2025.05.18",
-    pfm_poster: poster2,
+    pfm_doc_id: "PF276569",
+    pfm_nm: "킹키부츠",
+    pfm_start: "2025.12.17",
+    pfm_end: "2026.03.29",
+    pfm_poster: poster8,
   },
+
   {
-    pfm_doc_id: 3,
-    pfm_nm: "메디슨 카운티의 다리",
-    pfm_start: "2025.05.01",
-    pfm_end: "2025.07.13",
-    pfm_poster: poster3,
+    pfm_doc_id: "PF274238",
+    pfm_nm: "렌트",
+    pfm_start: "2025.11.09",
+    pfm_end: "2026.02.22",
+    pfm_poster: poster6,
   },
 ];
 
 const fallbackRecommend = [
   {
-    pfm_doc_id: 1,
+    pfm_doc_id: "PF275043",
     catchphrase: "우린 왜 그냥 스쳐 가지 않고 \n서로를 바라봤을까",
     pfm_poster: poster4,
   },
+
   {
-    pfm_doc_id: 2,
+    pfm_doc_id: "PF273019",
     catchphrase: "누군가 이 세상을 \n바로잡아야 한다",
     pfm_poster: poster5,
   },
+
   {
-    pfm_doc_id: 3,
+    pfm_doc_id: "PF274238",
     catchphrase: "No day\nBut today",
     pfm_poster: poster6,
   },
@@ -78,7 +82,7 @@ const fallbackCommunity = [
 
     commentCount: 15,
 
-    postImage: [poster1, poster2],
+    postImage: [poster3, poster4],
   },
 
   {
@@ -106,6 +110,7 @@ const fallbackCommunity = [
   },
 ];
 
+
 const dateTimeOptions = {
   year: "numeric",
   month: "2-digit",
@@ -116,49 +121,39 @@ const Main2 = () => {
   const [rankingData, setRankingData] = useState(fallbackRanking);
   const [recommendData, setRecommendData] = useState(fallbackRecommend);
   const [latestPosts, setLatestPosts] = useState(fallbackCommunity);
+  const [loadingRanking, setLoadingRanking] = useState(true);
+  const [loadingRecommend, setLoadingRecommend] = useState(true);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     // 랭킹 데이터 요청
     fetch(`/api/performances/ranking`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data)) setRankingData(data);
-      })
-      .catch(() => {
-        setRankingData(fallbackRanking);
-      });
+      .then((res) =>
+        res.ok ? res.json() : Promise.reject("Ranking API failed")
+      )
+      .then((data) =>
+        setRankingData(Array.isArray(data) ? data : fallbackRanking)
+      )
+      .catch(() => setRankingData(fallbackRanking))
+      .finally(() => setLoadingRanking(false));
 
     // 추천 공연 요청
-    fetch(`/api/performances/recommend`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data)) setRecommendData(data);
-      })
-      .catch(() => {
-        setRecommendData(fallbackRecommend);
-      });
-  }, []);
+    setRecommendData(fallbackRecommend);
+    setLoadingRecommend(false);
 
-  // 최근 커뮤니티 글 요청
-  fetch(`/api/community/latest`)
-    .then((res) => {
-      if (!res.ok) throw new Error("Network response was not ok");
-      return res.json();
-    })
-    .then((data) => {
-      // 서버 응답이 배열 형태라고 가정합니다.
-      if (Array.isArray(data)) setLatestPosts(data);
-    })
-    .catch(() => {
-      setLatestPosts(fallbackCommunity);
-    });
+    // 최근 커뮤니티 글 요청
+    fetch("/api/community/latest")
+      .then((res) =>
+        res.ok ? res.json() : Promise.reject("Community API failed")
+      )
+      .then((data) =>
+        setLatestPosts(Array.isArray(data) ? data : fallbackCommunity)
+      )
+      .catch(() => setLatestPosts(fallbackCommunity))
+      .finally(() => setLoadingPosts(false));
+  }, []);
 
   return (
     <div className="main2-container">
@@ -171,10 +166,10 @@ const Main2 = () => {
             {rankingData.map((item, index) => (
               <Link
                 to={`/performance/${item.pfm_doc_id}`}
-                key={item.pfm_doc_id}
+                key={String(item.pfm_doc_id)}
                 className="post-item-link"
               >
-                <div className="ranking-item" key={item.pfm_doc_id ?? index}>
+                <div className="ranking-item">
                   <div className="rank-num">{index + 1}</div>
                   <div className="ranking-info">
                     <div className="title">{item.pfm_nm}</div>
@@ -199,7 +194,7 @@ const Main2 = () => {
                 key={item.pfm_doc_id}
                 className="performance-item-link"
               >
-                <div className="recommend-card" key={item.pfm_id ?? index}>
+                <div className="recommend-card">
                   <img src={item.pfm_poster} alt={`${index}번째 포스터`} />
                   <div className="card-text">
                     <div className="catchphrase">
@@ -220,13 +215,17 @@ const Main2 = () => {
         <div className="right-bottom">
           <h3 id="rightbottom-title">최근 커뮤니티 글</h3>
           <div className="main2-community-list">
-            {latestPosts.map((item) => (
+            {loadingPosts ? (
+              <p className="calendar-no-records-message">
+                관극 기록을 불러오는 중입니다...
+              </p>
+            ) : (latestPosts.map((item) => (
               <Link
                 to={`/community/${item.postDocumentId}`}
-                key={item.postDocumentId}
+                key={String(item.postDocumentId)}
                 className="post-item-link"
               >
-                <div className="main2-community-item" key={item.postDocumentId}>
+                <div className="main2-community-item">
                   <div className="content">
                     <div className="title">
                       {item.postTitle.length > 30
@@ -262,13 +261,14 @@ const Main2 = () => {
                   />
                 </div>
               </Link>
-            ))}
+            ))
+          )}
           </div>
         </div>
 
         <div className="banner">
           <h3 id="title">
-            홍익대학교 25학년도 2학기 졸업프로젝트 연극 뮤지컬 종합 플랫폼 OPEN RUN
+            홍익대학교 컴퓨터공학과 25학년도 2학기 졸업프로젝트 연극 뮤지컬 종합 플랫폼 OPENRUN
           </h3>
         </div>
       </div>

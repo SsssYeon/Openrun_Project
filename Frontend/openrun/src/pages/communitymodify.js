@@ -9,7 +9,6 @@ import { communitydata } from "../mocks/communitymocks";
 const API_BASE_URL = process.env.REACT_APP_API_BASE;
 
 const apiService = {
-  // ⭐️ GET: 게시글 상세 조회
   getPostDetail: async (token, postId) => {
     const url = `/api/community/posts/${postId}`;
     const response = await fetch(url, {
@@ -27,13 +26,11 @@ const apiService = {
     return data;
   },
 
-  // ⭐️ PATCH: 게시글 수정
   modifyPost: async (token, postId, formData) => {
     const url = `/api/community/posts/${postId}`;
     const response = await fetch(url, {
       method: "PATCH",
       headers: {
-        // FormData를 사용하므로 Content-Type 명시하지 않음
         ...(token && { Authorization: `Bearer ${token}` }),
       },
       body: formData,
@@ -42,7 +39,6 @@ const apiService = {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    // 서버가 수정 성공 시 응답 본문이 없을 수 있으므로 텍스트로 처리
     return response.text().catch(() => ({}));
   },
 };
@@ -62,32 +58,28 @@ const Communitymodify = () => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false); // ⭐️ 중복 제출 방지 추가
+  const [isSubmitting, setIsSubmitting] = useState(false); // 중복 제출 방지 추가
 
   const navigate = useNavigate();
 
-  // ⭐️ API를 통해 게시글 상세 정보를 불러오는 함수
   const fetchPostDetail = useCallback(async () => {
     if (!id) return;
     setIsLoaded(false);
     setError(null);
 
     try {
-      // ⚠️ 실제 API 호출
       const postDetail = await apiService.getPostDetail(token, id);
 
-      // 상태 설정 (API 응답 데이터 사용)
       setTitle(postDetail.postTitle || "");
       setContent(postDetail.postContent || "");
       setSelectedTags(postDetail.postTag || []);
-      setPosterPreviews(postDetail.postImage || []); // 이미지 URL 배열
+      setPosterPreviews(postDetail.postImage || []);
 
       console.log("[API SUCCESS] Post detail loaded:", postDetail);
     } catch (apiError) {
       console.error(`[API FAIL] Falling back to Mock data.`, apiError.message);
       setError(apiError.message);
 
-      // Mock 데이터 Fallback 로직 유지
       const postToModify = communitydata.find(
         (post) =>
           post.postDocumentId === id ||
@@ -110,10 +102,9 @@ const Communitymodify = () => {
   }, [id, token]);
 
   useEffect(() => {
-    fetchPostDetail(); // ⭐️ [요청 1] const blobUrls 선언을 return 안으로 이동
+    fetchPostDetail(); 
 
     return () => {
-      // 클린업 함수는 해당 useEffect가 마지막으로 실행될 때의 posterPreviews 값을 참조합니다.
       const blobUrls = posterPreviews.filter((url) => url.startsWith("blob:"));
       blobUrls.forEach(URL.revokeObjectURL);
     };
@@ -122,7 +113,7 @@ const Communitymodify = () => {
   const fileInputRef = useRef(null);
 
   const handleImageClick = () => {
-    fileInputRef.current.click(); // 이미지 클릭 시 input 열기
+    fileInputRef.current.click(); 
   };
 
   const handleFileChange = (e) => {
@@ -143,9 +134,6 @@ const Communitymodify = () => {
 
     const removedUrl = posterPreviews[index];
     if (removedUrl.startsWith("blob:")) {
-      // Blob URL과 일치하는 File 객체를 newPosterFiles에서 정확히 제거하는 로직은 복잡합니다.
-      // 여기서는 간단히 console.warn만 남기고, 서버 전송 시 Blob URL이 아닌 것(기존 이미지)만
-      // existingImages로 보내는 로직에 의존합니다.
       console.warn(
         "Blob URL을 삭제했습니다. 실제 파일 객체 관리에 주의하세요."
       );
@@ -168,7 +156,7 @@ const Communitymodify = () => {
     setCurrentImageIndex((prev) => (prev + 1) % posterPreviews.length);
   };
 
-  const TAGS = ["시야", "공연 후기", "공연 정보", "사담"]; // ⭐️ 태그 목록 정의
+  const TAGS = ["시야", "공연 후기", "공연 정보", "사담"]; 
 
   const handleTagSelect = (tag) => {
     setSelectedTags((prev) =>
@@ -193,24 +181,18 @@ const Communitymodify = () => {
     formData.append("postTitle", title);
     formData.append("postContent", content);
 
-    // 1. 태그 추가 (글 작성과 동일)
     selectedTags.forEach((tag) => {
       formData.append("postTag", tag);
     });
 
-    // 2. 이미지 처리
-    // 2a. 기존 이미지 URL 추가 (Blob URL이 아닌 것들만)
     const existingImageUrls = posterPreviews.filter(
       (url) => !url.startsWith("blob:")
     );
     existingImageUrls.forEach((url) => {
-      // 서버에서 'existingImages'라는 키로 기존 URL을 받도록 가정
       formData.append("existingImages", url);
     });
 
-    // 2b. 새로 업로드된 파일 추가
     newPosterFiles.forEach((file) => {
-      // 서버에서 'newImages'라는 키로 새 파일을 받도록 가정
       formData.append("newImages", file);
     });
 
@@ -227,7 +209,17 @@ const Communitymodify = () => {
     }
   };
 
-  if (!isLoaded) return <div>로딩 중...</div>;
+  if (!isLoaded) return (
+      <div>
+        <Nav />
+        <div
+          className="community-container"
+          style={{ textAlign: "center", marginTop: "100px" }}
+        >
+          불러오는 중...
+        </div>
+      </div>
+    );
   if (error) return <div>{error}</div>;
 
   const showNavigation = posterPreviews.length > 1;
@@ -237,7 +229,6 @@ const Communitymodify = () => {
       <Nav />
       <div className="event-detail">
         <div className="poster-upload-area">
-          {/* ⭐️ [변경 5] 파일 입력 필드 (multiple 속성 유지) */}
           <input
             type="file"
             accept="image/*"
@@ -246,7 +237,6 @@ const Communitymodify = () => {
             onChange={handleFileChange}
             multiple
           />
-          {/* 1. 이미지가 없을 때: 기본 이미지 및 클릭 유도 */}
           {posterPreviews.length === 0 && (
             <img
               src="/default-poster.png"
@@ -255,13 +245,11 @@ const Communitymodify = () => {
               onClick={handleImageClick}
             />
           )}
-          {/* 2. 이미지가 1개 이상일 때: 슬라이더/단일 뷰 */}
           {posterPreviews.length > 0 && (
-            // Slider Container (relative position for absolute buttons)
             <div
               className="slider-container"
               style={{
-                flexDirection: "column", // ⭐️ 세로 정
+                flexDirection: "column",
                 display: "flex",
                 alignItems: "center",
 
@@ -271,7 +259,7 @@ const Communitymodify = () => {
             >
               <div
                 style={{
-                  position: "relative", // 내부 버튼 절대 위치 기준
+                  position: "relative", 
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -342,7 +330,7 @@ const Communitymodify = () => {
                   </button>
                 )}
               </div>
-              {/* ❌ 삭제 버튼 (현재 이미지 위에 오버레이) */}
+              {/* 삭제 버튼 (현재 이미지 위에 오버레이) */}
               <button
                 className="remove-button"
                 onClick={(e) => handleImageRemove(e, currentImageIndex)}
@@ -359,10 +347,10 @@ const Communitymodify = () => {
               >
                 삭제
               </button>
-            </div> // ⭐️ slider-container 닫는 태그
+            </div> 
           )}
         </div>
-        {/* poster-upload-area 닫는 태그 */}
+
         <div className="event-info-container">
           <div className="event-content">
             <h3 className="title-center">커뮤니티 글 수정</h3>
@@ -382,7 +370,6 @@ const Communitymodify = () => {
                     <button
                       key={tag}
                       onClick={() => handleTagSelect(tag)}
-                      // ⭐️ 선택 상태에 따른 스타일 변경
                       style={{
                         padding: "8px 12px",
                         borderRadius: "20px",

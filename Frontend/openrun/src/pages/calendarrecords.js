@@ -1,4 +1,4 @@
-// api 연결 O, 백엔드와 연결 안됐을 시 예시 데이터 노출 / 사용자 개개인에 맞는 정보 요청
+// 관극 기록 달력 화면 -> api 연결 O, 백엔드와 연결 안됐을 시 예시 데이터 노출
 
 import Nav from "../components/nav.js";
 import "../css/calendarrecords.css";
@@ -9,14 +9,16 @@ import { useNavigate } from "react-router-dom";
 import eventsData from "../mocks/events.js"; // 예시 JSON 데이터
 
 const Calendarrecords = () => {
-  const [events, setEvents] = useState([]); // 전체 관극 기록
+  const [events, setEvents] = useState([]);
   const [selectedDateEvents, setSelectedDateEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   // 관극 기록 API 호출
   useEffect(() => {
     const fetchCalendarData = async () => {
+      setIsLoading(true);
       const token =
         localStorage.getItem("token") || sessionStorage.getItem("token");
       try {
@@ -24,7 +26,7 @@ const Calendarrecords = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // ✅ 토큰 포함
+            Authorization: `Bearer ${token}`, // 토큰 포함
           },
         });
         if (!res.ok) throw new Error("API 응답 오류");
@@ -34,17 +36,19 @@ const Calendarrecords = () => {
         setEvents(formatted);
         setSelectedDateEvents(formatted);
       } catch (error) {
-        console.warn("❌ API 호출 실패, 예시 데이터 사용 중:", error);
+        console.warn("API 호출 실패, 예시 데이터 사용 중:", error);
 
-        const formatted = formatCalendarData(eventsData); // ✅ 예시 데이터로 대체
+        const formatted = formatCalendarData(eventsData); // 예시 데이터로 대체
         setEvents(formatted);
         setSelectedDateEvents(formatted);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchCalendarData();
   }, []);
 
-  // ✅ 공통 데이터 포맷 함수
+  // 공통 데이터 포맷 함수
   const formatCalendarData = (data) =>
     data.map((item) => ({
       id: item.pfmcalender_doc_no,
@@ -120,7 +124,7 @@ const Calendarrecords = () => {
               headerToolbar={{
                 left: "prev",
                 center: "title",
-                right: "next", // 'today' 제거됨
+                right: "next", 
               }}
             />
           </div>
@@ -138,47 +142,65 @@ const Calendarrecords = () => {
 
             <div className="mytickets-scroll">
               <div className="mytickets">
-                {searchTerm === "" && events.length === 0 ? (
-                  <p className="calendar-no-records-message">오른쪽 아래 '+'버튼을 눌러 관극 기록을 추가해보세요!</p>
-                ) : 
-                (searchTerm ? filteredEvents : selectedDateEvents).map(
-                  (event) => (
-                    <div
-                      key={event.id}
-                      className="ticket"
-                      onClick={() => navigate(`/detail/${event.id}`)}
-                    >
-                      <div className="ticketscontent">
-                        <img
-                          src={event.poster}
-                          alt={event.title}
-                          className="ticketspicture"
-                        />
-                        <div>
-                          <h3 className="ticketsinfomations">{event.title}</h3>
-                          <p>날짜: {event.start}</p>
-                          <p>시간: {event.time}</p>
-                          <p>장소: {event.location}</p>
-                          <p>좌석: {event.seat}</p>
-                          <p>출연진: {event.cast.length > 25
-                            ? event.cast.slice(0, 24) + "..."
-                            : event.cast}
-                          </p>
+                {isLoading ? (
+                  <p className="calendar-no-records-message">
+                    관극 기록을 불러오는 중입니다...
+                  </p>
+                ) : searchTerm === "" && events.length === 0 ? (
+                  // 로딩 완료 후, 검색어가 없고 기록이 없는 경우
+                  <p className="calendar-no-records-message">
+                    오른쪽 아래 '+'버튼을 눌러 관극 기록을 추가해보세요!
+                  </p>
+                ) : (
+                  // 목록 렌더링 또는 검색 결과 없음 메시지 렌더링
+                  (searchTerm ? filteredEvents : selectedDateEvents).map(
+                    (event) => (
+                      <div
+                        key={event.id}
+                        className="ticket"
+                        onClick={() => navigate(`/detail/${event.id}`)}
+                      >
+                        <div className="ticketscontent">
+                          <img
+                            src={event.poster}
+                            alt={event.title}
+                            className="ticketspicture"
+                          />
+                          <div>
+                            <h3 className="ticketsinfomations">
+                              {event.title}
+                            </h3>
+                            <p>날짜: {event.start}</p>
+                            <p>시간: {event.time}</p>
+                            <p>장소: {event.location}</p>
+                            <p>좌석: {event.seat}</p>
+                            <p>
+                              출연진:{" "}
+                              {event.cast.length > 25
+                                ? event.cast.slice(0, 24) + "..."
+                                : event.cast}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )
                   )
                 )}
-                {searchTerm && filteredEvents.length === 0 && events.length > 0 && (
-                    <p className="calendar-no-records-message">검색 결과가 없습니다.</p>
-                )}
+                {!isLoading &&
+                  searchTerm &&
+                  filteredEvents.length === 0 &&
+                  events.length > 0 && (
+                    <p className="calendar-no-records-message">
+                      검색 결과가 없습니다.
+                    </p>
+                  )}
               </div>
             </div>
           </div>
         </div>
         <button
           className="floating-add-button"
-          onClick={() => navigate("/addrecord")} // 원하는 경로로 수정
+          onClick={() => navigate("/addrecord")}
         >
           <span className="plus-symbol">+</span>
         </button>
