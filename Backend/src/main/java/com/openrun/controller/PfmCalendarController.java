@@ -21,7 +21,7 @@ public class PfmCalendarController {
 
     private final PfmCalendarService service;
 
-    /** 내 관극 기록 전체 조회함 */
+    /* 내 관극 기록 전체 조회 */
     @GetMapping("/me")
     public ResponseEntity<List<PfmCalendarDTO>> getMyCalendar(
             @RequestHeader(value = "Authorization", required = false) String authorization
@@ -29,7 +29,7 @@ public class PfmCalendarController {
         return ResponseEntity.ok(service.getAllEventsForMe(authorization));
     }
 
-    /** 단건 조회함 */
+    /* 상세 조회 */
     @GetMapping("/me/{id}")
     public ResponseEntity<PfmCalendarDTO> getMyCalendarItem(
             @RequestHeader(value = "Authorization", required = false) String authorization,
@@ -39,7 +39,7 @@ public class PfmCalendarController {
         return dto == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(dto);
     }
 
-    /** 생성: multipart/form-data 업로드함 (포스터 포함) */
+    /* 관극 기록 추가(multipart/form-data) */
     @PostMapping(value = "/me", consumes = "multipart/form-data")
     public ResponseEntity<?> createMyCalendarItemMultipart(
             @RequestHeader(value = "Authorization", required = false) String authorization,
@@ -62,7 +62,7 @@ public class PfmCalendarController {
         }
     }
 
-    /** 생성: JSON으로 업로드함 */
+    /* 관극 기록 추가(JSON) */
     @PostMapping(value = "/me", consumes = "application/json")
     public ResponseEntity<?> createMyCalendarItemJson(
             @RequestHeader(value = "Authorization", required = false) String authorization,
@@ -75,7 +75,7 @@ public class PfmCalendarController {
         }
     }
 
-    /** 수정함 */
+    /* 관극 기록 수정 */
     @PutMapping(value = "/me/{id}", consumes = "application/json")
     public ResponseEntity<String> updateMyCalendarItem(
             @RequestHeader(value = "Authorization", required = false) String authorization,
@@ -85,7 +85,7 @@ public class PfmCalendarController {
         return service.updateMyEventJsonResponse(authorization, id, req);
     }
 
-    /** 삭제함 */
+    /* 관극 기록 삭제 */
     @DeleteMapping("/me/{id}")
     public ResponseEntity<String> deleteMyCalendarItem(
             @RequestHeader(value = "Authorization", required = false) String authorization,

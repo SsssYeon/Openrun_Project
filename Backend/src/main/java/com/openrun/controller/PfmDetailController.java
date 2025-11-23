@@ -16,6 +16,7 @@ public class PfmDetailController {
         this.pfmDetailService = pfmDetailService;
     }
 
+    /* 공연 정보 상세 보기 */
     @GetMapping("/{id}")
     public PfmDetailDto getPerformanceDetail(@PathVariable String id) throws Exception {
         return pfmDetailService.getPerformanceDetail(id);

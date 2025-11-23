@@ -18,10 +18,10 @@ public class PfmInterestController {
         this.pfmInterestService = pfmInterestService;
     }
 
+    /* 관심 공연 정보 가져오기 */
     @GetMapping("/{id}/interest")
     public Map<String, Boolean> isInterest(@PathVariable String id, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-        System.out.println("🔑 Authorization Header: " + authHeader);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Map.of("isLiked", false);
@@ -32,6 +32,7 @@ public class PfmInterestController {
         return Map.of("isLiked", isLiked);
     }
 
+    /* 관심 공연 등록 */
     @PostMapping("/{id}/interest")
     public void addInterest(@PathVariable String id, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
@@ -41,6 +42,7 @@ public class PfmInterestController {
         pfmInterestService.toggleInterest(token, id);
     }
 
+    /* 관심 공연 삭제 */
     @DeleteMapping("/{id}/interest")
     public void removeInterest(@PathVariable String id, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");

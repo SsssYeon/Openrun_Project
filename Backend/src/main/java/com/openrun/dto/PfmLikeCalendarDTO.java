@@ -6,7 +6,7 @@ import java.util.List;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class PfmLikeCalendarDTO {
-    private List<Item> userLikeList; // 프론트가 그대로 기대하는 키
+    private List<Item> userLikeList;
 
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
     public static class Item {

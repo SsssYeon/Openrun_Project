@@ -23,7 +23,7 @@ public class FirebaseConfig {
 
     private static final ObjectMapper OM = new ObjectMapper();
 
-    /** 오직 환경변수만 사용 (파일/베이스64/ADC 미사용) */
+    /* 환경변수만 사용 (파일/베이스64/ADC 미사용) */
     private static GoogleCredentials loadCredentialsFromEnvOnly() throws IOException {
         String rawJson = System.getenv("FIREBASE_CREDENTIALS_JSON");
         if (rawJson == null || rawJson.isBlank()) {
@@ -59,7 +59,7 @@ public class FirebaseConfig {
             String bucket = System.getenv("FIREBASE_STORAGE_BUCKET");
             if (bucket == null || bucket.isBlank()) {
                 throw new IllegalStateException(
-                        "FIREBASE_STORAGE_BUCKET 환경변수가 비어 있습니다. 예: openrun-8e238.firebasestorage.app"
+                        "FIREBASE_STORAGE_BUCKET 환경변수가 비어 있습니다"
                 );
             }
 

@@ -14,6 +14,7 @@ public class PfmLikeCalendarController {
 
     private final PfmLikeCalendarService service;
 
+    /* 관극 공연 달력 */
     @GetMapping("/like")
     public ResponseEntity<PfmLikeCalendarDTO> getMyLikeCalendar(
             @RequestHeader(value = "Authorization", required = false) String authorization

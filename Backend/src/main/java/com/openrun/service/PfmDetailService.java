@@ -21,7 +21,6 @@ public class PfmDetailService {
 
     public PfmDetailDto getPerformanceDetail(String id) throws Exception {
         String urlStr = DETAIL_URL + id + "?service=" + API_KEY;
-        System.out.println("📄 공연 상세 요청 URL: " + urlStr);
 
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -36,7 +35,6 @@ public class PfmDetailService {
         reader.close();
 
         String xml = responseBuilder.toString();
-        System.out.println("📦 API 원본 응답:\n" + xml);
 
         InputStream xmlStream = new java.io.ByteArrayInputStream(xml.getBytes("UTF-8"));
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlStream);

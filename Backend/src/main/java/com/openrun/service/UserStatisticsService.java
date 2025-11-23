@@ -22,7 +22,7 @@ public class UserStatisticsService {
 
     private final Firestore firestore;
 
-    /** userId 기준으로 통계 전량 재계산하고 StatsData/{userId}에 저장 */
+    /* userId 기준으로 통계 전량 재계산하고 StatsData/{userId}에 저장 */
     public void recomputeForUser(String userId) {
         try {
             if (userId == null || userId.isBlank()) return;
@@ -84,7 +84,7 @@ public class UserStatisticsService {
         }
     }
 
-    /** 저장된 통계를 그대로 반환 (없으면 null) */
+    /* 저장된 통계를 그대로 반환 (없으면 null) */
     public Map<String, Object> readStatsDoc(String userId) throws ExecutionException, InterruptedException {
         if (userId == null || userId.isBlank()) return null;
         DocumentSnapshot snap = firestore.collection(STATS_COLLECTION).document(userId).get().get();

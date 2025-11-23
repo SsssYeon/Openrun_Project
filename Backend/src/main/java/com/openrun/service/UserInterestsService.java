@@ -87,7 +87,7 @@ public class UserInterestsService {
                 .build();
     }
 
-    /** 캐시 computeIfAbsent용 안전 래퍼 */
+    /* 캐시 computeIfAbsent용 안전 래퍼 */
     private InterestsResponse.Item safeFetch(String id) {
         try { return fetchDetail(id); }
         catch (Exception e) {
@@ -96,7 +96,7 @@ public class UserInterestsService {
         }
     }
 
-    /** 상세 채워 반환 */
+    /* 상세 채워 반환 */
     private InterestsResponse.Item fetchDetail(String id) throws Exception {
         String url="https://www.kopis.or.kr/openApi/restful/pblprfr/"
                 + URLEncoder.encode(id, StandardCharsets.UTF_8)

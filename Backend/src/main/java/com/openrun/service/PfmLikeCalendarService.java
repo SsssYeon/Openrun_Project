@@ -38,13 +38,8 @@ public class PfmLikeCalendarService {
     private final Firestore firestore;
     private final RestTemplate restTemplate;
 
-    /** application.properties: kopis.api.key=YOUR_KEY */
     @Value("${kopis.api.key}")
     private String kopisApiKey;
-
-    /** (선택) dummy-token 수신 시 사용할 기본 UserData 문서ID */
-    @Value("${dev.default.userdoc:wkAGLwZbn7M5npJ1fLBq}")
-    private String devDefaultUserDocId;
 
     /* ================= 공통: 토큰 → 사용자 문서ID 조회 ================= */
 
@@ -55,10 +50,9 @@ public class PfmLikeCalendarService {
                 : authHeader.trim();
     }
 
-    /**
+    /*
      * Authorization 토큰으로 UserData 문서 ID를 반환.
      * - userAutoLoginToken == token
-     * - 필요 시 devDefaultUserDocId 사용 가능(주석 해제)
      */
     private String getUserDocIdByToken(String authHeader) throws ExecutionException, InterruptedException {
         String token = extractToken(authHeader);
@@ -73,15 +67,12 @@ public class PfmLikeCalendarService {
             return qs.getDocuments().get(0).getId(); // 문서 ID 반환
         }
 
-        // 개발 편의 우회가 필요하면 주석 해제
-        // if ("dummy-token".equals(token)) return devDefaultUserDocId;
-
         return null;
     }
 
     /* ================= 공개 메서드 1: 전체 관심 공연(userLikeList) ================= */
 
-    /**
+    /*
      * 전체 관심 공연(userLikeList)을 KOPIS 상세로 채워 반환
      */
     public PfmLikeCalendarDTO getMyLikeEvents(String authHeader) throws Exception {
@@ -111,7 +102,7 @@ public class PfmLikeCalendarService {
 
     /* ============ 공개 메서드 2: 달력 노출 3개(userPriorityLikeList) ============ */
 
-    /**
+    /*
      * 달력에 노출하도록 선택된 우선순위 관심 공연(userPriorityLikeList)만 반환
      */
     public PfmLikeCalendarDTO getMyPriorityLikeEvents(String authHeader) throws Exception {
@@ -141,7 +132,6 @@ public class PfmLikeCalendarService {
     /* ================= KOPIS OpenAPI 호출/파싱 ================= */
 
     private PfmLikeCalendarDTO.Item fetchDetailFromOpenApiWithRetry(String mt20id) throws Exception {
-        // HTTPS 사용, mt20id만 인코딩, 서비스키는 인코딩하지 않음
         String url = "https://www.kopis.or.kr/openApi/restful/pblprfr/"
                 + URLEncoder.encode(mt20id, StandardCharsets.UTF_8)
                 + "?service=" + kopisApiKey;
@@ -219,7 +209,7 @@ public class PfmLikeCalendarService {
 
     /* ================= Firestore/유틸 ================= */
 
-    /**
+    /*
      * Firestore 문서에서 List<String> 형태로 안전하게 읽어오기
      */
     @SuppressWarnings("unchecked")
@@ -274,7 +264,7 @@ public class PfmLikeCalendarService {
                 return d.format(DateTimeFormatter.ISO_LOCAL_DATE);
             } catch (DateTimeParseException ignore) {}
         }
-        // 점 제거 후 재시도
+
         String compact = raw.replaceAll("\\.", "");
         if (compact.matches("\\d{8}")) {
             try {

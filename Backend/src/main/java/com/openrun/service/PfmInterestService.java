@@ -47,7 +47,7 @@ public class PfmInterestService {
         }
     }
 
-    // null/빈값 제거 + 최대 크기 유지용(우선순위 리스트가 3개 제한이라면)
+    // null/빈값 제거 + 최대 크기 유지용(우선순위 리스트 3개 제한)
     private List<String> compactAndLimit(List<String> list, int maxSize) {
         if (list == null) return new ArrayList<>();
         List<String> compacted = new ArrayList<>();
@@ -80,7 +80,7 @@ public class PfmInterestService {
                 boolean isCurrentlyLiked = likeList.contains(pfmId);
 
                 if (isCurrentlyLiked) {
-                    // 관심 해제: 두 리스트 모두에서 제거
+                    // 관심 해제: userLikeList, userPriorityLikeList 모두에서 제거
                     likeList.removeIf(id -> Objects.equals(id, pfmId));
                     priorityList.removeIf(id -> Objects.equals(id, pfmId));
                     priorityList = compactAndLimit(priorityList, 3);
@@ -92,7 +92,7 @@ public class PfmInterestService {
 
                     System.out.println("관심 공연 해제: " + pfmId);
                 } else {
-                    // 관심 추가: likeList에만 추가(우선순위는 별도 로직에서 관리)
+                    // 관심 추가: userLikeList에만 추가(우선순위는 별도 로직에서 관리)
                     likeList.add(pfmId);
                     transaction.update(userDoc, "userLikeList", likeList);
 

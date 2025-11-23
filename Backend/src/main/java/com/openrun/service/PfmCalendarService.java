@@ -32,35 +32,16 @@ public class PfmCalendarService {
     private final StorageClient storageClient;
     private final UserStatisticsService userStatisticsService;
 
-    /** 개발용 더미 토큰/유저 (필요 없으면 비워두세요) */
-    @Value("${dev.default.token:}")
-    private String devDefaultToken;      // 예: dummy-token
-    @Value("${dev.default.userId:}")
-    private String devDefaultUserId;     // 예: testuser0815
-
-    /* ================= 공통 유틸 ================= */
 
     private String extractToken(String authHeader) {
         if (authHeader == null || authHeader.isBlank()) return null;
         return authHeader.startsWith("Bearer ") ? authHeader.substring(7).trim() : authHeader.trim();
     }
 
-    /** ✅ 외부에서도 사용 가능하도록 공개: Authorization 헤더 → userId */
+    /* Authorization 헤더 → userId */
     public String resolveUserId(String authHeader) throws ExecutionException, InterruptedException {
         String token = extractToken(authHeader);
 
-        // 개발 편의: 비어있으면 기본값 사용
-        if ((token == null || token.isBlank()) && !devDefaultToken.isBlank() && !devDefaultUserId.isBlank()) {
-            log.warn("[auth] empty token -> use dev default userId={}", devDefaultUserId);
-            return devDefaultUserId;
-        }
-        // 더미 토큰 매칭
-        if (token != null && !devDefaultToken.isBlank() && token.equals(devDefaultToken)) {
-            log.warn("[auth] dummy token matched -> userId={}", devDefaultUserId);
-            return devDefaultUserId.isBlank() ? null : devDefaultUserId;
-        }
-
-        // 정상 토큰 조회
         QuerySnapshot qs = firestore.collection(USER_COLLECTION)
                 .whereEqualTo("userAutoLoginToken", token)
                 .limit(1)
@@ -103,7 +84,7 @@ public class PfmCalendarService {
         return dto;
     }
 
-    /** Firebase Storage 업로드 (실패해도 저장은 계속 진행) */
+    /* Firebase Storage 업로드 */
     private String uploadPosterImage(MultipartFile file) {
         if (file == null || file.isEmpty()) return null;
         try {
@@ -184,7 +165,7 @@ public class PfmCalendarService {
 
         if (location != null) {
             data.put("pfmcalender_place", location);
-            data.put("pfmcalender_location", location); // 하위 호환
+            data.put("pfmcalender_location", location);
         }
         putIfNotNull(data, "pfmcalender_seat", seat);
         putIfNotNull(data, "pfmcalender_today_cast", cast);

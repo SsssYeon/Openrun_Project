@@ -18,13 +18,14 @@ public class PfmSearchController {
         this.pfmSearchService = pfmSearchService;
     }
 
+    /* 공연 정보 검색 */
     @GetMapping("/search")
     public List<PfmSearchDto> searchPerformances(@RequestParam("query") String query) {
         try {
             return pfmSearchService.searchPerformancesFromApi(query);
         } catch (Exception e) {
             System.err.println("API 요청 실패: " + e.getMessage());
-            return List.of(); // 실패 시 빈 배열 반환 → 프론트 fallback
+            return List.of(); // 실패 시 빈 배열 반환
         }
     }
 }

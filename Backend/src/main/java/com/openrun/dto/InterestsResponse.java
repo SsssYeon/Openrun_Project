@@ -7,8 +7,8 @@ import java.util.List;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class InterestsResponse {
-    /** 프론트가 기대하는 키 이름을 그대로 사용 (userLikeList) */
-    private List<Item> userLikeList;
+
+    private List<Item> userLikeList;           // 관심 공연 리스트
     private List<Item> userPriorityLikeList;   // 달력에 노출할 우선 관심 공연
 
     @Getter @Setter

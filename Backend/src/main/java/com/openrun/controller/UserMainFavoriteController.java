@@ -23,6 +23,7 @@ public class UserMainFavoriteController {
     private final UserMainFavoriteService userMainFavoriteService;
     private final PfmLikeCalendarService likeCalendarService;
 
+    /* 우선 순위 (3개) 관심 공연 정보 가져오기 */
     @GetMapping
     public ResponseEntity<PfmLikeCalendarDTO> list(
             @RequestHeader(value = "Authorization", required = false) String authorization
@@ -30,6 +31,7 @@ public class UserMainFavoriteController {
         return ResponseEntity.ok(likeCalendarService.getMyPriorityLikeEvents(authorization));
     }
 
+    /* 우선 순위 (3개) 관심 공연 등록하기 */
     @PostMapping
     public ResponseEntity<ApiResponse<List<String>>> add(
             @RequestHeader(value = "Authorization", required = false) String authorization,
@@ -52,6 +54,7 @@ public class UserMainFavoriteController {
         }
     }
 
+    /* 우선 순위 (3개) 관심 공연 해제하기 */
     @DeleteMapping("/{pfm_doc_id}")
     public ResponseEntity<ApiResponse<List<String>>> delete(
             @RequestHeader(value = "Authorization", required = false) String authorization,

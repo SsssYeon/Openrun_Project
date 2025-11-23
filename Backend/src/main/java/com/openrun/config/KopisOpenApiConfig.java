@@ -13,7 +13,7 @@ public class KopisOpenApiConfig {
         return new RestTemplate();
     }
 
-    // 프로퍼티에서 주입 받아 사용할 수 있도록 빈 노출 (선택)
+    // 프로퍼티에서 주입 받아 사용할 수 있도록 빈 노출
     @Bean
     public String kopisApiKey(@Value("${kopis.api.key}") String key) {
         return key;

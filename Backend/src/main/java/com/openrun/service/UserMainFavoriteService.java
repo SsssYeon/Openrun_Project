@@ -64,7 +64,6 @@ public class UserMainFavoriteService {
         DocumentReference ref = firestore.collection(USER_COLLECTION).document(userDocId);
 
         List<String> updated = firestore.runTransaction(tx -> {
-            // ★ 여기도 동일!
             ApiFuture<DocumentSnapshot> future = tx.get(ref);
             DocumentSnapshot snap = future.get();
 
