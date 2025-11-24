@@ -13,6 +13,8 @@ const Calendarrecords = () => {
   const [selectedDateEvents, setSelectedDateEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
+  const [renderedEvents, setRenderedEvents] = useState([]);
   const navigate = useNavigate();
 
   // 관극 기록 API 호출
@@ -21,6 +23,8 @@ const Calendarrecords = () => {
       setIsLoading(true);
       const token =
         localStorage.getItem("token") || sessionStorage.getItem("token");
+      let fetchedEvents = [];
+
       try {
         const res = await fetch("/api/calendar/me", {
           method: "GET",
@@ -31,17 +35,15 @@ const Calendarrecords = () => {
         });
         if (!res.ok) throw new Error("API 응답 오류");
         const data = await res.json();
-
-        const formatted = formatCalendarData(data);
-        setEvents(formatted);
-        setSelectedDateEvents(formatted);
+        fetchedEvents = formatCalendarData(data);
       } catch (error) {
         console.warn("API 호출 실패, 예시 데이터 사용 중:", error);
 
-        const formatted = formatCalendarData(eventsData); // 예시 데이터로 대체
-        setEvents(formatted);
-        setSelectedDateEvents(formatted);
+        fetchedEvents = formatCalendarData(eventsData);
       } finally {
+        setEvents(fetchedEvents);
+        setSelectedDateEvents(fetchedEvents);
+        setRenderedEvents(fetchedEvents);
         setIsLoading(false);
       }
     };
@@ -66,8 +68,24 @@ const Calendarrecords = () => {
 
   // 날짜 클릭 시 해당 날짜의 이벤트만 추출
   const handleDateClick = (arg) => {
-    const filtered = events.filter((event) => event.start === arg.dateStr);
-    setSelectedDateEvents(filtered);
+    const filteredByDate = events.filter(
+      (event) => event.start === arg.dateStr
+    );
+    setSelectedDateEvents(filteredByDate);
+
+    // 날짜 클릭 시 검색어는 초기화하지 않고, 검색어가 없으면 날짜 필터링 결과를, 있으면 검색 결과에 날짜를 반영합니다.
+    if (searchTerm.trim() === "") {
+      setRenderedEvents(filteredByDate);
+    } else {
+      // 검색어가 있는 상태에서 날짜를 클릭하면, 그 날짜에 해당하는 항목들만 검색 필터링을 다시 적용
+      const filteredBySearch = filteredByDate.filter(
+        (event) =>
+          event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          event.cast.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setRenderedEvents(filteredBySearch);
+    }
   };
 
   // 이벤트(포스터) 클릭 시 상세 페이지로 이동
@@ -87,6 +105,34 @@ const Calendarrecords = () => {
       dateNumberEl.style.display = "none";
     }
   };
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (searchTerm.trim() === "") {
+      setIsSearching(false);
+      setRenderedEvents(selectedDateEvents);
+      return;
+    }
+
+    setIsSearching(true);
+
+    const timer = setTimeout(() => {
+      const search = searchTerm.toLowerCase();
+      const results = selectedDateEvents.filter((event) => {
+        return (
+          event.title.toLowerCase().includes(search) ||
+          event.location.toLowerCase().includes(search) ||
+          event.cast.toLowerCase().includes(search)
+        );
+      });
+
+      setRenderedEvents(results);
+      setIsSearching(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, selectedDateEvents, isLoading]);
 
   const filteredEvents = selectedDateEvents.filter((event) => {
     const search = searchTerm.toLowerCase();
@@ -124,7 +170,7 @@ const Calendarrecords = () => {
               headerToolbar={{
                 left: "prev",
                 center: "title",
-                right: "next", 
+                right: "next",
               }}
             />
           </div>
@@ -144,15 +190,19 @@ const Calendarrecords = () => {
               <div className="mytickets">
                 {isLoading ? (
                   <p className="calendar-no-records-message">
-                    관극 기록을 불러오는 중입니다...
+                     관극 기록을 불러오는 중입니다... 
                   </p>
-                ) : searchTerm === "" && events.length === 0 ? (
-                  // 로딩 완료 후, 검색어가 없고 기록이 없는 경우
+                ) : isSearching ? ( 
+                  <p className="calendar-no-records-message">검색 중...</p>
+                ) : searchTerm.trim() !== "" && renderedEvents.length === 0 ? (
+                  <p className="calendar-no-records-message">
+                    검색 결과가 없습니다.
+                  </p>
+                ) : searchTerm.trim() === "" && events.length === 0 ? (
                   <p className="calendar-no-records-message">
                     오른쪽 아래 '+'버튼을 눌러 관극 기록을 추가해보세요!
                   </p>
                 ) : (
-                  // 목록 렌더링 또는 검색 결과 없음 메시지 렌더링
                   (searchTerm ? filteredEvents : selectedDateEvents).map(
                     (event) => (
                       <div
@@ -186,14 +236,6 @@ const Calendarrecords = () => {
                     )
                   )
                 )}
-                {!isLoading &&
-                  searchTerm &&
-                  filteredEvents.length === 0 &&
-                  events.length > 0 && (
-                    <p className="calendar-no-records-message">
-                      검색 결과가 없습니다.
-                    </p>
-                  )}
               </div>
             </div>
           </div>

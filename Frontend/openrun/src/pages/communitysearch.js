@@ -24,7 +24,7 @@ const apiService = {
     url =
       url.slice(-1) === "&" || url.slice(-1) === "?" ? url.slice(0, -1) : url;
 
-    console.log(`[API URL] ${url}`); 
+    console.log(`[API URL] ${url}`);
 
     const response = await fetch(url, {
       method: "GET",
@@ -48,7 +48,7 @@ const CommunitySearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const token =
@@ -62,10 +62,13 @@ const CommunitySearch = () => {
 
   const handleTagChange = useCallback((e) => {
     setSelectedTag(e.target.value);
+    setLoading(true);
   }, []);
 
   const handleSearch = () => {
     console.log("검색 실행:", searchTerm, "태그:", selectedTag);
+    setLoading(true);
+    fetchSearchResults(selectedTag, searchTerm);
   };
 
   const handleKeyPress = (e) => {
@@ -117,12 +120,23 @@ const CommunitySearch = () => {
       }
     },
     [token]
-  ); 
+  );
 
   useEffect(() => {
-    fetchSearchResults(selectedTag, searchTerm);
-  }, [fetchSearchResults, selectedTag, searchTerm]); 
-  
+    if (searchTerm.trim() === "" && selectedTag === "전체") {
+      setLoading(true);
+      fetchSearchResults("전체", "");
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setLoading(true);
+      fetchSearchResults(selectedTag, searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [fetchSearchResults, selectedTag, searchTerm]);
+
   const dateTimeOptions = {
     year: "numeric",
     month: "2-digit",
@@ -181,14 +195,24 @@ const CommunitySearch = () => {
           </div>
 
           {loading ? (
-            <div className="loading-message">게시글을 불러오는 중입니다...</div>
+            <div
+              className="loading-message"
+              style={{ textAlign: "center", padding: "20px" }}
+            >
+              게시글을 검색 중...
+            </div>
           ) : posts.length === 0 ? (
-            <div className="no-results">검색 결과가 없습니다.</div>
+            <div
+              className="no-results"
+              style={{ textAlign: "center", padding: "20px" }}
+            >
+              검색 결과가 없습니다.
+            </div>
           ) : (
             <div className="post-list">
               {posts.map((post) => (
                 <Link
-                  to={`/community/${post.postDocumentId}`} 
+                  to={`/community/${post.postDocumentId}`}
                   key={post.postDocumentId}
                   className="post-item-link"
                 >
@@ -202,10 +226,7 @@ const CommunitySearch = () => {
                         </h4>
                         {post.postTag &&
                           post.postTag.map((tag, index) => (
-                            <span
-                              key={index} 
-                              className="post-tag"
-                            >
+                            <span key={index} className="post-tag">
                               {tag}
                             </span>
                           ))}
@@ -216,7 +237,9 @@ const CommunitySearch = () => {
                           : post.postContent}
                       </p>
                       <div className="post-meta">
-                        <span className="post-nickname">{post.userNickname}</span>
+                        <span className="post-nickname">
+                          {post.userNickname}
+                        </span>
                         <span className="post-date">
                           {new Date(post.postTimeStamp).toLocaleString(
                             "ko-KR",
@@ -235,7 +258,7 @@ const CommunitySearch = () => {
                           post.postImage.length > 0
                             ? post.postImage[0]
                             : logo
-                        } 
+                        }
                         alt={post.postTitle}
                         className="post-thumbnail"
                       />

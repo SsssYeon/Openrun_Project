@@ -6,16 +6,17 @@ import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import { useNavigate } from "react-router-dom";
-import favoritesMock from "../mocks/favorites.js"; 
+import favoritesMock from "../mocks/favorites.js";
 import performances from "../mocks/performances.js";
 
 const Mylikescalendar = () => {
-  const [events, setEvents] = useState([]); 
+  const [events, setEvents] = useState([]);
   const [selectedDateEvents, setSelectedDateEvents] = useState([]);
-  const [favorites, setFavorites] = useState([]); 
+  const [favorites, setFavorites] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredPerformances, setFilteredPerformances] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingSearch, setLoadingSearch] = useState(false);
   const navigate = useNavigate();
 
   const addOneDay = (dateStr) => {
@@ -48,7 +49,7 @@ const Mylikescalendar = () => {
 
         const data = await res.json();
         const likeList = data.userLikeList || [];
-        const topFavorites = likeList.slice(0, 3); 
+        const topFavorites = likeList.slice(0, 3);
 
         const calendarEvents = topFavorites.map((item, index) => ({
           id: item.id,
@@ -88,7 +89,6 @@ const Mylikescalendar = () => {
     setSelectedDateEvents(filtered);
   };
 
-
   const handleEventClick = (info) => {
     navigate(`/performance/${info.event.extendedProps.pfm_doc_id}`);
   };
@@ -97,8 +97,11 @@ const Mylikescalendar = () => {
     const fetchSearchResults = async () => {
       if (!searchTerm.trim()) {
         setFilteredPerformances([]);
+        setLoadingSearch(false);
         return;
       }
+
+      setLoadingSearch(true);
 
       try {
         const res = await fetch(
@@ -131,10 +134,13 @@ const Mylikescalendar = () => {
         setEvents(fallbackEvents);
         setSelectedDateEvents(fallbackEvents);
         setFavorites(fallbackTop);
+      } finally {
+        setLoadingSearch(false);
       }
     };
 
-    fetchSearchResults();
+    const timer = setTimeout(fetchSearchResults, 300);
+    return () => clearTimeout(timer);
   }, [searchTerm]);
 
   return (
@@ -153,7 +159,7 @@ const Mylikescalendar = () => {
             eventClick={handleEventClick}
             height={700}
             dayMaxEventRows={false}
-            fixedWeekCount={true} 
+            fixedWeekCount={true}
             showNonCurrentDates={false}
             contentHeight="auto"
             handleWindowResize={false}
@@ -161,7 +167,7 @@ const Mylikescalendar = () => {
             headerToolbar={{
               left: "prev",
               center: "title",
-              right: "next", 
+              right: "next",
             }}
           />
         </div>
@@ -178,7 +184,9 @@ const Mylikescalendar = () => {
               />
             </div>
             <div className="search-results">
-              {searchTerm === "" ? (
+              {loadingSearch ? (
+                <p className="loading-message">검색 중...</p>
+              ) : searchTerm === "" ? (
                 <p>궁금한 공연의 제목을 입력해주세요</p>
               ) : filteredPerformances.length === 0 ? (
                 <p>검색 결과가 없습니다.</p>

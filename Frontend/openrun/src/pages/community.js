@@ -70,20 +70,6 @@ const Community = () => {
     day: "2-digit",
   };
 
-  if (loading) {
-    return (
-      <div>
-        <Nav />
-        <div
-          className="community-container"
-          style={{ textAlign: "center", marginTop: "100px" }}
-        >
-          게시글을 불러오는 중...
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div>
       <Nav />
@@ -118,9 +104,16 @@ const Community = () => {
             <h3 id="community_title">전체 글</h3>
           </div>
 
-          {posts.length > 0 ? (
-            <div className="post-list">
-              {posts.map((post) => (
+          <div className="post-list">
+            {loading ? (
+              <p className="loading-message" style={{ textAlign: 'center', padding: '20px' }}>
+                게시글 목록을 불러오는 중...
+              </p>
+            ) : posts.length === 0 ? (
+              <p className="no-posts-message" style={{ textAlign: 'center', padding: '20px' }}>
+                작성된 게시글이 없습니다.
+              </p>
+            ) : (posts.map((post) => (
                 <Link
                   to={`/community/${post.postDocumentId}`}
                   key={post.postDocumentId}
@@ -179,15 +172,9 @@ const Community = () => {
                     </div>
                   </div>
                 </Link>
-              ))}
+              ))
+            )}
             </div>
-          ) : (
-            <div
-              style={{ textAlign: "center", padding: "50px", color: "#999" }}
-            >
-              {loading ? "로딩 중..." : "현재 카테고리에 글이 없습니다."}
-            </div>
-          )}
 
           <button
             className="floating-add-button"

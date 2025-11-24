@@ -139,10 +139,10 @@ const MyPage = () => {
 
         const interestData = await interestResponse.json();
         const likeList = interestData.userLikeList || [];
-        setInterests(likeList.slice(0, 2)); 
+        setInterests(likeList.slice(0, 5)); 
       } catch (error) {
         console.warn("관심 공연 API 실패. Mock 데이터 사용:", error);
-        setInterests(favoritesMock?.slice(0, 3) || []);
+        setInterests(favoritesMock?.slice(0, 5) || []);
       } finally {
         setIsInterestsLoading(false);
       }

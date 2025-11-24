@@ -31,9 +31,9 @@ public class PfmSearchService {
         Set<String> seenIds = new HashSet<>();
         String encodedQuery = URLEncoder.encode(query, "UTF-8");
 
-        // 오늘 기준 +1년 ~ -5년
+        // 오늘 기준 +1년 ~ -3년
         LocalDate today = LocalDate.now();
-        String stdate = today.minusYears(5).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String stdate = today.minusYears(3).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String eddate = today.plusYears(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
         int cpage = 1;

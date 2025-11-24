@@ -217,7 +217,7 @@ const Main2 = () => {
           <div className="main2-community-list">
             {loadingPosts ? (
               <p className="calendar-no-records-message">
-                관극 기록을 불러오는 중입니다...
+                최근 커뮤니티 글을 불러오는 중입니다...
               </p>
             ) : (latestPosts.map((item) => (
               <Link
