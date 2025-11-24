@@ -79,12 +79,6 @@ const CommunitySearch = () => {
 
   const fetchSearchResults = useCallback(
     async (tag, keyword) => {
-      if (keyword.trim() === "" && tag === "전체") {
-        setPosts([]);
-        setLoading(false);
-        return;
-      }
-
       setLoading(true);
       setError(null);
 
@@ -129,12 +123,13 @@ const CommunitySearch = () => {
   );
 
   useEffect(() => {
+    if (searchTerm.trim() === "" && selectedTag === "전체") {
+      setLoading(true);
+      fetchSearchResults("전체", "");
+      return;
+    }
+
     const timer = setTimeout(() => {
-      if (searchTerm.trim() === "" && selectedTag === "전체") {
-        setPosts([]);
-        setLoading(false);
-        return;
-      }
       setLoading(true);
       fetchSearchResults(selectedTag, searchTerm);
     }, 500);
