@@ -59,7 +59,7 @@ const Main = () => {
 
   const renderDropdownContent = () => {
     if (loading) {
-      return <li className="loading-message">검색 중...</li>; // 💡 로딩 중 메시지
+      return <li className="no-result">검색 중...</li>; // 💡 로딩 중 메시지
     }
     
     if (results.length > 0) {
