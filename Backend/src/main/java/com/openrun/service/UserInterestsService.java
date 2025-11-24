@@ -1,4 +1,3 @@
-// src/main/java/com/openrun/service/UserInterestsService.java
 package com.openrun.service;
 
 import com.google.cloud.firestore.*;
@@ -6,28 +5,39 @@ import com.openrun.dto.InterestsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.*;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.URLEncoder;
 import java.nio.charset.*;
 import java.time.LocalDate;
-import java.time.format.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-@Service @RequiredArgsConstructor @Slf4j
+@Service
+@RequiredArgsConstructor
+@Slf4j
 public class UserInterestsService {
-    private static final String USER_COLLECTION="UserData";
+
+    private static final String USER_COLLECTION = "UserData";
+    private static final String PERF_COLLECTION = "Kopis_performances_detail";
+
     private final Firestore firestore;
-    private final org.springframework.web.client.RestTemplate restTemplate;
-    @Value("${kopis.api.key}") private String kopisApiKey;
+    private final RestTemplate restTemplate;
+
+    @Value("${kopis.api.key}")
+    private String kopisApiKey;
 
     private String extractToken(String h){
         if(h==null||h.isBlank()) return null;
         return h.startsWith("Bearer ")?h.substring(7).trim():h.trim();
     }
+
     private String getUserDocIdByToken(String auth) throws ExecutionException,InterruptedException{
         String t=extractToken(auth); if(t==null||t.isBlank()) return null;
         QuerySnapshot qs = firestore.collection(USER_COLLECTION)
@@ -54,31 +64,18 @@ public class UserInterestsService {
         if (likeIds==null) likeIds = Collections.emptyList();
         if (priorityIds==null) priorityIds = Collections.emptyList();
 
-        // OpenAPI 호출 중복 방지 캐시
-        Map<String, InterestsResponse.Item> cache = new HashMap<>();
+        Map<String, InterestsResponse.Item> localCache = new HashMap<>();
 
-        // 1) 전체 관심 공연 배열
         List<InterestsResponse.Item> likeItems = new ArrayList<>();
         for (String id : likeIds) {
             if (id==null || id.isBlank()) continue;
-            try {
-                InterestsResponse.Item item = cache.computeIfAbsent(id, this::safeFetch);
-                likeItems.add(item);
-            } catch (Exception e) {
-                likeItems.add(minimal(id));
-            }
+            likeItems.add(localCache.computeIfAbsent(id, this::safeFetch));
         }
 
-        // 2) 우선 관심 공연 배열
         List<InterestsResponse.Item> priorityItems = new ArrayList<>();
         for (String id : priorityIds) {
             if (id==null || id.isBlank()) continue;
-            try {
-                InterestsResponse.Item item = cache.computeIfAbsent(id, this::safeFetch);
-                priorityItems.add(item);
-            } catch (Exception e) {
-                priorityItems.add(minimal(id));
-            }
+            priorityItems.add(localCache.computeIfAbsent(id, this::safeFetch));
         }
 
         return InterestsResponse.builder()
@@ -87,41 +84,58 @@ public class UserInterestsService {
                 .build();
     }
 
-    /* 캐시 computeIfAbsent용 안전 래퍼 */
     private InterestsResponse.Item safeFetch(String id) {
-        try { return fetchDetail(id); }
-        catch (Exception e) {
-            log.warn("KOPIS 조회 실패 {}: {}", id, e.toString());
+        try {
+            // 1) Firestore 캐시 먼저
+            InterestsResponse.Item fromDb = fetchFromFirestore(id);
+            if (fromDb != null) return fromDb;
+
+            // 2) 없으면 API(요청 간 캐시 적용)
+            return fetchDetailFromApiCached(id);
+        } catch (Exception e) {
+            log.warn("관심공연 조회 실패 {}: {}", id, e.toString());
             return minimal(id);
         }
     }
 
-    /* 상세 채워 반환 */
-    private InterestsResponse.Item fetchDetail(String id) throws Exception {
+    private InterestsResponse.Item fetchFromFirestore(String id) {
+        try {
+            DocumentSnapshot snap = firestore.collection(PERF_COLLECTION).document(id).get().get();
+            if (!snap.exists()) return null;
+
+            String title = nvl(snap.getString("prfnm"));
+            String start = normalizeDate(nvl(snap.getString("prfpdfrom")));
+            String end = normalizeDate(nvl(snap.getString("prfpdto")));
+            String poster = nvl(snap.getString("poster"));
+
+            return InterestsResponse.Item.builder()
+                    .id(id).pfm_doc_id(id)
+                    .title(title).start(start).end(end).poster(poster)
+                    .build();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Cacheable(value = "pfmDetail", key = "#id")
+    public InterestsResponse.Item fetchDetailFromApiCached(String id) throws Exception {
         String url="https://www.kopis.or.kr/openApi/restful/pblprfr/"
                 + URLEncoder.encode(id, StandardCharsets.UTF_8)
                 + "?service=" + kopisApiKey;
 
         ResponseEntity<byte[]> resp = restTemplate.exchange(url, HttpMethod.GET, null, byte[].class);
-        byte[] body = resp.getBody(); if (body==null || body.length==0) return minimal(id);
+        byte[] body = resp.getBody();
+        if (body==null || body.length==0) return minimal(id);
 
-        String head = new String(body, 0, Math.min(body.length, 256), StandardCharsets.ISO_8859_1);
-        Charset cs = head.toUpperCase().contains("ENCODING=\"EUC-KR\"") ? Charset.forName("EUC-KR") : StandardCharsets.UTF_8;
-        String xml = new String(body, cs);
-
+        Charset cs = detectCharset(body);
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-                .parse(new java.io.ByteArrayInputStream(xml.getBytes(cs)));
+                .parse(new java.io.ByteArrayInputStream(body));
         doc.getDocumentElement().normalize();
+
         NodeList dbs = doc.getElementsByTagName("db");
         if (dbs.getLength()==0) return minimal(id);
 
         Element first=(Element) dbs.item(0);
-        String rc = text(first,"returncode");
-        if (rc!=null && !rc.isBlank()){
-            if (!"00".equals(rc.trim())) return minimal(id);
-            if (dbs.getLength()>=2) first=(Element) dbs.item(1);
-            else return minimal(id);
-        }
 
         String title = text(first,"prfnm");
         String start = normalizeDate(text(first,"prfpdfrom"));
@@ -147,6 +161,7 @@ public class UserInterestsService {
         Node n = nl.item(0);
         return n.getTextContent()==null ? "" : n.getTextContent().trim();
     }
+
     private static String nvl(String s){ return s==null? "": s; }
 
     private static String normalizeDate(String raw){
@@ -166,5 +181,10 @@ public class UserInterestsService {
             } catch (Exception ignore) {}
         }
         return raw;
+    }
+
+    private Charset detectCharset(byte[] body) {
+        String head = new String(body, 0, Math.min(body.length, 256), StandardCharsets.ISO_8859_1).toUpperCase();
+        return head.contains("ENCODING=\"EUC-KR\"") ? Charset.forName("EUC-KR") : StandardCharsets.UTF_8;
     }
 }

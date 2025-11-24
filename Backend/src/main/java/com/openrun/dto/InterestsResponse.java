@@ -1,4 +1,3 @@
-// src/main/java/com/openrun/dto/InterestsResponse.java
 package com.openrun.dto;
 
 import lombok.*;
